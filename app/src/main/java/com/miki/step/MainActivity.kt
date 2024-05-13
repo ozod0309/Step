@@ -3,12 +3,15 @@ package com.miki.step
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -36,6 +39,7 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.getValue
@@ -56,14 +60,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             StepTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.background
+                    color = MaterialTheme.colorScheme.tertiary
                 ) {
                     ModalNavigationDrawer(
                         drawerContent = {
-                            ModalDrawerSheet {
+                            ModalDrawerSheet(
+                                modifier = Modifier.width(200.dp)
+                            ) {
                                 Text("Drawer title", modifier = Modifier.padding(16.dp))
                                 Divider()
                                 NavigationDrawerItem(
@@ -82,7 +87,7 @@ class MainActivity : ComponentActivity() {
                         var testTypesToggle by remember {
                             mutableStateOf(false)
                         }
-                        var heightTestType by remember {
+                        var testTypesHeight by remember {
                             mutableStateOf(0)
                         }
                         Scaffold(
@@ -90,33 +95,37 @@ class MainActivity : ComponentActivity() {
                             topBar = {
                                 LargeTopAppBar(
                                     colors = TopAppBarDefaults.largeTopAppBarColors(
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                        titleContentColor = MaterialTheme.colorScheme.primary,
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        titleContentColor = MaterialTheme.colorScheme.secondary,
                                     ),
                                     title = {
                                         Text(
-                                            text = "STEP",
+                                            text = "Student Exam Preparation",
                                             maxLines = 1,
                                             textAlign = TextAlign.Center,
                                             overflow = TextOverflow.Ellipsis,
                                             modifier = Modifier.clickable(onClick = {
                                                 testTypesToggle = !testTypesToggle
-                                                heightTestType = if(testTypesToggle) 100 else 0
+                                                testTypesHeight = if(testTypesToggle) 100 else 0
                                             })
                                         )
                                     },
                                     navigationIcon = {
-                                        IconButton(onClick = { /* do something */ }) {
+                                        IconButton(onClick = {
+                                        /* do something */
+                                        }) {
                                             Icon(
-                                                imageVector = Icons.Filled.ArrowBack,
+                                                imageVector = Icons.Filled.Menu,
                                                 contentDescription = "Localized description"
                                             )
                                         }
                                     },
                                     actions = {
-                                        IconButton(onClick = { /* do something */ }) {
+                                        IconButton(onClick = {
+                                        /* do something */
+                                        }) {
                                             Icon(
-                                                imageVector = Icons.Filled.Menu,
+                                                imageVector = Icons.Filled.Add,
                                                 contentDescription = "Localized description"
                                             )
                                         }
@@ -126,11 +135,14 @@ class MainActivity : ComponentActivity() {
                             },
                             content = { innerPadding ->
                                 Box(
-                                    modifier = Modifier.padding(innerPadding).height(heightTestType.dp),
-
+                                    modifier = Modifier
+                                        .padding(innerPadding)
+                                        .height(testTypesHeight.dp)
+                                        .fillMaxWidth()
+                                        .animateContentSize()
+                                        .background(MaterialTheme.colorScheme.primary)
                                     ) {
                                     LazyRow(
-
                                         horizontalArrangement = Arrangement.Center
                                     ) {
                                         items(1) {
