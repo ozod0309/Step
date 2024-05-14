@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Theme.Step" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.Step.Splash" parent="Theme.SplashScreen">
+        <!-- Set the splash screen background, animated icon, and animation duration. -->
+        <item name="windowSplashScreenBackground">@color/white</item>
+
+        <!-- Use windowSplashScreenAnimatedIcon to add either a drawable or an
+             animated drawable. One of these is required. -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_logo_anim</item>
+        <!-- Required for animated icons -->
+        <item name="windowSplashScreenAnimationDuration">10000</item>
+
+        <item name="android:windowSplashScreenBrandingImage" tools:targetApi="s">@drawable/ic_app_name</item>
+
+        <!-- Set the theme of the Activity that directly follows your splash screen. -->
+        <!-- Required -->
+        <item name="postSplashScreenTheme">@style/Theme.Step</item>
+    </style>
+
 </resources>

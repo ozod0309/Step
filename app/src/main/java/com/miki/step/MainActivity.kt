@@ -3,7 +3,13 @@ package com.miki.step
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.*
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
+import androidx.compose.animation.graphics.res.animatedVectorResource
+import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
+import androidx.compose.animation.graphics.vector.AnimatedImageVector
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,18 +23,16 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
@@ -39,25 +43,23 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.miki.step.ui.theme.StepTheme
 
 class MainActivity : ComponentActivity() {
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationGraphicsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen()
         setContent {
             StepTheme {
                 Surface(
@@ -70,7 +72,7 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.width(200.dp)
                             ) {
                                 Text("Drawer title", modifier = Modifier.padding(16.dp))
-                                Divider()
+                                HorizontalDivider()
                                 NavigationDrawerItem(
                                     label = { Text(text = "Drawer Item") },
                                     selected = false,
@@ -88,7 +90,7 @@ class MainActivity : ComponentActivity() {
                             mutableStateOf(false)
                         }
                         var testTypesHeight by remember {
-                            mutableStateOf(0)
+                            mutableIntStateOf(0)
                         }
                         Scaffold(
                             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -99,6 +101,8 @@ class MainActivity : ComponentActivity() {
                                         titleContentColor = MaterialTheme.colorScheme.secondary,
                                     ),
                                     title = {
+
+
                                         Text(
                                             text = "Student Exam Preparation",
                                             maxLines = 1,
@@ -134,6 +138,19 @@ class MainActivity : ComponentActivity() {
                                 )
                             },
                             content = { innerPadding ->
+//                                var atEnd by remember { mutableStateOf(false) }
+//                                val image = AnimatedImageVector.animatedVectorResource(R.drawable.ic_logo_anim)
+//                                Image(
+//                                    painter = rememberAnimatedVectorPainter(
+//                                        animatedImageVector = image,
+//                                        atEnd = atEnd
+//                                    ),
+//                                    contentDescription = "Timer",
+//                                    modifier = Modifier.clickable {
+//                                        atEnd = !atEnd
+//                                    },
+////                                            contentScale = ContentScale.Crop
+//                                )
                                 Box(
                                     modifier = Modifier
                                         .padding(innerPadding)
@@ -180,7 +197,7 @@ class MainActivity : ComponentActivity() {
                                         }
                                         IconButton(onClick = { /* do something */ }) {
                                             Icon(
-                                                Icons.Filled.Send,
+                                                Icons.Filled.Check,
                                                 contentDescription = "Localized description",
                                             )
                                         }
