@@ -89,8 +89,6 @@ class MainUI(context: Context) {
                             titleContentColor = MaterialTheme.colorScheme.secondary,
                         ),
                         title = {
-
-
                             Text(
                                 text = "Student Exam Preparation",
                                 maxLines = 1,
@@ -126,19 +124,6 @@ class MainUI(context: Context) {
                     )
                 },
                 content = { innerPadding ->
-//                                var atEnd by remember { mutableStateOf(false) }
-//                                val image = AnimatedImageVector.animatedVectorResource(R.drawable.ic_logo_anim)
-//                                Image(
-//                                    painter = rememberAnimatedVectorPainter(
-//                                        animatedImageVector = image,
-//                                        atEnd = atEnd
-//                                    ),
-//                                    contentDescription = "Timer",
-//                                    modifier = Modifier.clickable {
-//                                        atEnd = !atEnd
-//                                    },
-////                                            contentScale = ContentScale.Crop
-//                                )
                     Box(
                         modifier = Modifier
                             .padding(innerPadding)

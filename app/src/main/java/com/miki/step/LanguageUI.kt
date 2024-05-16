@@ -1,26 +1,56 @@
 package com.miki.step
 
 import android.content.Context
+import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.miki.step.lib.LanguageCodes
 
-class LanguageUI(applicationContext: Context?) {
+class LanguageUI(val context: Context?) {
     @Composable
-    fun UI() {
+    fun UI(onClick:(index: Int) -> Unit) {
         Box(modifier = Modifier.padding()) {
             LazyColumn(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.secondary)
             ) {
-                items(Languages.LanguageCodes.size) {
-                    Languages.LanguageCodes[it].name
+                items(LanguageCodes.size) { index ->
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp, 10.dp),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        ),
+                        onClick = {
+                            Toast.makeText(
+                                context,
+                                LanguageCodes[index].name,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            onClick(index)
+                        }
+                    ) {
+                        Text(LanguageCodes[index].name)
+                    }
                 }
             }
         }
