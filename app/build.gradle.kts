@@ -66,13 +66,18 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.6.7")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.preference:preference-ktx:1.2.1")
-    implementation("com.google.android.gms:play-services-auth:21.1.1")
 
+    implementation("com.google.android.gms:play-services-auth:21.1.1")
     implementation("com.google.gms:google-services:4.4.1")
     implementation("com.google.firebase:firebase-core:21.1.1")
 
+    implementation("androidx.credentials:credentials:1.2.2")
+    implementation("androidx.credentials:credentials-play-services-auth:1.2.2")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
+
     implementation("com.google.firebase:firebase-auth:23.0.0")
     implementation("com.google.android.gms:play-services-auth:21.1.1")
+    implementation("com.android.tools.compose:compose-preview-renderer:0.0.1-alpha01")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

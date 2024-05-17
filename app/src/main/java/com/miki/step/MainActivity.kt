@@ -3,6 +3,7 @@ package com.miki.step
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Base64
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -24,6 +25,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
@@ -33,6 +35,7 @@ import com.miki.step.lib.RegistrationTypes
 import com.miki.step.lib.SharedPreference
 import com.miki.step.lib.StepAPI
 import com.miki.step.ui.theme.StepTheme
+import java.security.SecureRandom
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
@@ -50,6 +53,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
+
         FirebaseApp.initializeApp(applicationContext)
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
