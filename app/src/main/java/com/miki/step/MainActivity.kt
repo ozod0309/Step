@@ -49,8 +49,14 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        FirebaseApp.initializeApp(applicationContext)
         installSplashScreen()
+        FirebaseApp.initializeApp(applicationContext)
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+        mGoogleSignInClient = GoogleSignIn.getClient(applicationContext, gso)
+        firebaseAuth = FirebaseAuth.getInstance()
 
         val sharedPreference = SharedPreference(applicationContext)
         userRegistration = sharedPreference.getValueInt(PreferencesKeys.UserRegistration)
@@ -98,13 +104,6 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(StepAPI.LOGIN) {
                             LoginUI(applicationContext).UI(onClick = {
-                                val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                                    .requestIdToken(getString(R.string.default_web_client_id))
-                                    .requestEmail()
-                                    .build()
-                                mGoogleSignInClient = GoogleSignIn.getClient(applicationContext, gso)
-                                firebaseAuth = FirebaseAuth.getInstance()
-
                                 signInGoogle()
                             })
                         }
@@ -164,7 +163,7 @@ class MainActivity : ComponentActivity() {
         val credential = GoogleAuthProvider.getCredential(account.idToken, null)
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                Toast.makeText(this, account.email.toString() + ' ' + account.displayName.toString(), Toast.LENGTH_LONG)
+                Toast.makeText(this, account.displayName.toString() + " registered", Toast.LENGTH_LONG).show()
 //                SavedPreference.setEmail(this, account.email.toString())
 //                SavedPreference.setUsername(this, account.displayName.toString())
 //                val intent = Intent(this, DashboardActivity::class.java)
