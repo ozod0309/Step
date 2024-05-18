@@ -1,9 +1,9 @@
 package com.miki.step
 
+import android.content.ContentValues
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import android.util.Base64
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,27 +15,32 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialResponse
+import androidx.credentials.exceptions.GetCredentialException
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.Task
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.miki.step.lib.LanguageCodes
 import com.miki.step.lib.PreferencesKeys
 import com.miki.step.lib.RegistrationTypes
 import com.miki.step.lib.SharedPreference
 import com.miki.step.lib.StepAPI
 import com.miki.step.ui.theme.StepTheme
-import java.security.SecureRandom
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
@@ -43,7 +48,6 @@ class MainActivity : ComponentActivity() {
     companion object {
         var userRegistration = RegistrationTypes.UNREGISTERED
         var langCode: String = ""
-
     }
 
     lateinit var mGoogleSignInClient: GoogleSignInClient
@@ -54,18 +58,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         installSplashScreen()
 
-        FirebaseApp.initializeApp(applicationContext)
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
-        mGoogleSignInClient = GoogleSignIn.getClient(applicationContext, gso)
-        firebaseAuth = FirebaseAuth.getInstance()
-
         val sharedPreference = SharedPreference(applicationContext)
         userRegistration = sharedPreference.getValueInt(PreferencesKeys.UserRegistration)
         langCode = sharedPreference.getValueString(PreferencesKeys.LangCode).toString()
-        val startUI: String =
+        var startUI: String =
             if (sharedPreference.getValueBoolean(PreferencesKeys.NotFirstRun) || langCode.isEmpty()) {
                 when (userRegistration) {
                     RegistrationTypes.REGISTERED -> StepAPI.MAIN
@@ -75,6 +71,7 @@ class MainActivity : ComponentActivity() {
                 sharedPreference.save(PreferencesKeys.NotFirstRun, true)
                 StepAPI.LANGUAGE
             }
+//        startUI = StepAPI.TEST
         setContent {
             val navController = rememberNavController()
             var startDestination by remember { mutableStateOf(startUI) }
@@ -107,9 +104,10 @@ class MainActivity : ComponentActivity() {
                             TestUI(applicationContext).UI()
                         }
                         composable(StepAPI.LOGIN) {
-                            LoginUI(applicationContext).UI(onClick = {
-                                signInGoogle()
-                            })
+                            LoginUI(LocalContext.current, onClick = {
+//                                signUp()
+                            }
+                            ).UI()
                         }
                     }
                 }
@@ -134,60 +132,4 @@ class MainActivity : ComponentActivity() {
         }
         return createConfigurationContext(config)
     }
-
-
-    private fun signInGoogle() {
-        val signInIntent: Intent = mGoogleSignInClient.signInIntent
-        startActivityForResult(signInIntent, Req_Code)
-    }
-
-    // onActivityResult() function : this is where
-    // we provide the task and data for the Google Account
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == Req_Code) {
-            val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
-            handleResult(task)
-        }
-    }
-
-    private fun handleResult(completedTask: Task<GoogleSignInAccount>) {
-        try {
-            val account: GoogleSignInAccount? = completedTask.getResult(ApiException::class.java)
-            if (account != null) {
-                UpdateUI(account)
-            }
-        } catch (e: ApiException) {
-            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    // this is where we update the UI after Google signin takes place
-    private fun UpdateUI(account: GoogleSignInAccount) {
-        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-        firebaseAuth.signInWithCredential(credential).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Toast.makeText(this, account.displayName.toString() + " registered", Toast.LENGTH_LONG).show()
-//                SavedPreference.setEmail(this, account.email.toString())
-//                SavedPreference.setUsername(this, account.displayName.toString())
-//                val intent = Intent(this, DashboardActivity::class.java)
-//                startActivity(intent)
-//                finish()
-            }
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        if (GoogleSignIn.getLastSignedInAccount(this) != null) {
-//            startActivity(
-//                Intent(
-//                    this, DashboardActivity
-//                    ::class.java
-//                )
-//            )
-//            finish()
-        }
-    }
-
 }

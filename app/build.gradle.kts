@@ -77,7 +77,6 @@ dependencies {
 
     implementation("com.google.firebase:firebase-auth:23.0.0")
     implementation("com.google.android.gms:play-services-auth:21.1.1")
-    implementation("com.android.tools.compose:compose-preview-renderer:0.0.1-alpha01")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
