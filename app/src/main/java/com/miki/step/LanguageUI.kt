@@ -1,7 +1,6 @@
 package com.miki.step
 
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.miki.step.lib.LanguageCodes
 
 class LanguageUI(val context: Context?) {
@@ -41,15 +41,14 @@ class LanguageUI(val context: Context?) {
                             containerColor = MaterialTheme.colorScheme.primary
                         ),
                         onClick = {
-                            Toast.makeText(
-                                context,
-                                LanguageCodes[index].name,
-                                Toast.LENGTH_SHORT
-                            ).show()
                             onClick(index)
                         }
                     ) {
-                        Text(LanguageCodes[index].name)
+                        Text(
+                            text =LanguageCodes[index].name,
+                            fontSize = 20.sp,
+                            color = MaterialTheme.colorScheme.onTertiary
+                            )
                     }
                 }
             }

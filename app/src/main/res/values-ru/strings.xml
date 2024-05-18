@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
-
 <resources>
-    <string name="login">Логин</string>
+    <string name="login">Авторизоваться</string>
+    <string name="google_sign_in">Авторизуйтесь с помощью Google</string>
 </resources>

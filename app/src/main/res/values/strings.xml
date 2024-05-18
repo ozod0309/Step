@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">Step</string>
+    <string name="created_by" translatable="false">Created by Miki Corp. 2024</string>
     <string name="default_web_client_id" translatable="false">827898636912-5222fva58l1bda9ci4pdom8tuvm2pv54.apps.googleusercontent.com</string>
     <!-- Preference Titles -->
     <string name="messages_header" translatable="false">Messages</string>
@@ -16,6 +17,7 @@
     </string>
     <string name="attachment_summary_off" translatable="false">Only download attachments when manually requested</string>
 
-    <string name="login">Login</string>
+    <string name="login">Sign In</string>
+    <string name="google_sign_in">Sign in with Google</string>
 
 </resources>

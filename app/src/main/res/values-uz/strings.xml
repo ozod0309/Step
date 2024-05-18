@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="login">Ulanish</string>
+    <string name="login">Tizimga kirish</string>
+    <string name="google_sign_in">Google orqali tizimga kiring</string>
 </resources>

@@ -7,7 +7,7 @@ val White = Color(0xFFFFFFFF)
 val MikiColor = Color(0xFF00AA87)
 val MikiColorDark = Color(0xFF006651)
 
-val LightGray = Color(0xFF888888)
+val LightGray = Color(0xFFBBBBBB)
 val Gray = Color(0xFF444444)
 val DarkGray = Color(0xFF222222)
 
