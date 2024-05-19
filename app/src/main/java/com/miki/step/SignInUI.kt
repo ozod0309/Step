@@ -4,10 +4,18 @@ import android.content.ContentValues.TAG
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
+import androidx.compose.animation.graphics.res.animatedVectorResource
+import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
+import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,7 +28,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -39,9 +54,12 @@ import kotlinx.coroutines.launch
 
 class SignInUI(private val context: Context?, val onClick: (result: Boolean) -> Unit) {
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationGraphicsApi::class)
     @Composable
     fun UI() {
+        val isLoading  = remember { mutableStateOf(false) }
+        val image = AnimatedImageVector.animatedVectorResource(id = R.drawable.ic_logo_anim)
+        val atEnd by remember { mutableStateOf(false) }
         Scaffold(
             topBar = {
                 LargeTopAppBar(
@@ -69,7 +87,7 @@ class SignInUI(private val context: Context?, val onClick: (result: Boolean) -> 
                 ) {
                     Button(
                         onClick = {
-                            signUp()
+                            signUp(isLoading)
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -105,9 +123,26 @@ class SignInUI(private val context: Context?, val onClick: (result: Boolean) -> 
                     )
             }
         )
+        if(isLoading.value) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White)
+            ) {
+                Image(
+                    painter = rememberAnimatedVectorPainter(
+                        animatedImageVector = image,
+                        atEnd = atEnd,
+                    ),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop
+                )
+            }
+        }
     }
 
-    private fun signUp() {
+    private fun signUp(isLoading: MutableState<Boolean>) {
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(false) // Query all google accounts on the device
             .setServerClientId(context!!.resources.getString(R.string.default_web_client_id))
@@ -125,14 +160,19 @@ class SignInUI(private val context: Context?, val onClick: (result: Boolean) -> 
                     context = context,
                     request = request
                 )
-                handleSignIn(result)
+                handleSignIn(result, onFinish = {
+                    isLoading.value = false
+                    onClick(it)
+                })
+                isLoading.value = true
+
             } catch (e: GetCredentialException) {
                 Log.e("MainActivity", "GetCredentialException", e)
             }
         }
     }
 
-    private fun handleSignIn(result: GetCredentialResponse) {
+    private fun handleSignIn(result: GetCredentialResponse, onFinish:(result: Boolean) -> Unit) {
         val credential = result.credential
 
         if (credential is CustomCredential) {
@@ -147,7 +187,7 @@ class SignInUI(private val context: Context?, val onClick: (result: Boolean) -> 
                     Log.e(TAG, "Received an invalid google id token response", e)
                     signInResult = false
                 } finally {
-                    onClick(signInResult)
+                    onFinish(signInResult)
                 }
             } else {
                 Log.e(TAG, "Unexpected type of credential")
