@@ -21,6 +21,7 @@ import com.miki.step.lib.PreferencesKeys
 import com.miki.step.lib.RegistrationTypes
 import com.miki.step.lib.SharedPreference
 import com.miki.step.lib.StepAPI
+import com.miki.step.lib.User
 import com.miki.step.ui.theme.StepTheme
 import java.util.Locale
 
@@ -29,6 +30,7 @@ class MainActivity : ComponentActivity() {
     companion object {
         var userRegistration = RegistrationTypes.UNREGISTERED
         var langCode: String = ""
+        var stepUser = User()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,7 +64,6 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(StepAPI.LANGUAGE) {
                             LanguageUI(LocalContext.current).UI(onClick = { index ->
-                                langCode = LanguageCodes[index].code
                                 sharedPreference.save(
                                     PreferencesKeys.LANG_CODE,
                                     langCode
@@ -83,13 +84,18 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(StepAPI.LOGIN) {
                             SignInUI(LocalContext.current, onClick = {
-//                                signUp()
+                                navController.navigate(StepAPI.MAIN)
                             }).UI()
                         }
                     }
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        applyNewLocale(Locale(langCode, langCode))
     }
 
     override fun attachBaseContext(newBase: Context?) {

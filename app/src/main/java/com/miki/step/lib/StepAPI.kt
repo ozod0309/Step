@@ -11,11 +11,11 @@ object StepAPI {
 }
 
 data class User(
-    val accountName: String,
-    val name: String,
-    val surname: String,
-    val googleToken: String,
-    val stepToken: String
+    val accountName: String = "",
+    val name: String = "",
+    val surname: String = "",
+    val googleToken: String = "",
+    val stepToken: String = ""
 ) {
     fun toJSON(): JSONObject {
         val json: JSONObject = JSONObject()

@@ -41,6 +41,7 @@ class LanguageUI(val context: Context?) {
                             containerColor = MaterialTheme.colorScheme.primary
                         ),
                         onClick = {
+                            MainActivity.langCode = LanguageCodes[index].code
                             onClick(index)
                         }
                     ) {

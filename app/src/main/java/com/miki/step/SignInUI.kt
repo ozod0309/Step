@@ -3,8 +3,6 @@ package com.miki.step
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
-import androidx.compose.animation.core.animate
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
@@ -28,14 +26,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -48,8 +47,10 @@ import androidx.credentials.exceptions.GetCredentialException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import com.miki.step.lib.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class SignInUI(private val context: Context?, val onClick: (result: Boolean) -> Unit) {
@@ -58,8 +59,9 @@ class SignInUI(private val context: Context?, val onClick: (result: Boolean) -> 
     @Composable
     fun UI() {
         val isLoading  = remember { mutableStateOf(false) }
-        val image = AnimatedImageVector.animatedVectorResource(id = R.drawable.ic_logo_anim)
-        val atEnd by remember { mutableStateOf(false) }
+        val image1 = AnimatedImageVector.animatedVectorResource(id = R.drawable.ic_logo_anim1)
+        val image2 = AnimatedImageVector.animatedVectorResource(id = R.drawable.ic_logo_anim1)
+        var atEnd by remember { mutableStateOf(false) }
         Scaffold(
             topBar = {
                 LargeTopAppBar(
@@ -132,12 +134,18 @@ class SignInUI(private val context: Context?, val onClick: (result: Boolean) -> 
             ) {
                 Image(
                     painter = rememberAnimatedVectorPainter(
-                        animatedImageVector = image,
-                        atEnd = atEnd,
+                        animatedImageVector = if(atEnd) image1 else image2,
+                        atEnd = !atEnd,
                     ),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop
+                    contentDescription = null
                 )
+                LaunchedEffect(Unit) {
+                    while (true) {
+                        delay(2000)
+                        atEnd = !atEnd
+                    }
+                }
+
             }
         }
     }
@@ -181,8 +189,12 @@ class SignInUI(private val context: Context?, val onClick: (result: Boolean) -> 
                 try {
                     val googleIdTokenCredential = GoogleIdTokenCredential
                         .createFrom(credential.data)
-                    Toast.makeText(context, googleIdTokenCredential.idToken, Toast.LENGTH_LONG)
-                        .show()
+                    MainActivity.stepUser = User(
+                        accountName = googleIdTokenCredential.id,
+                        name = googleIdTokenCredential.givenName.toString(),
+                        surname = googleIdTokenCredential.familyName.toString(),
+                        googleToken = googleIdTokenCredential.idToken
+                    )
                 } catch (e: GoogleIdTokenParsingException) {
                     Log.e(TAG, "Received an invalid google id token response", e)
                     signInResult = false

@@ -91,10 +91,13 @@ class MainUI(context: Context) {
                         title = {
                             Text(
                                 text = "Student Exam Preparation",
+                                color = MaterialTheme.colorScheme.onTertiary,
                                 maxLines = 1,
                                 textAlign = TextAlign.Center,
                                 overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.clickable(onClick = {
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable(onClick = {
                                     testTypesToggle = !testTypesToggle
                                     testTypesHeight = if(testTypesToggle) 100 else 0
                                 })
