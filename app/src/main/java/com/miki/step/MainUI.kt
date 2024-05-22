@@ -18,11 +18,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -44,6 +46,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -98,9 +101,9 @@ class MainUI(context: Context) {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable(onClick = {
-                                    testTypesToggle = !testTypesToggle
-                                    testTypesHeight = if(testTypesToggle) 100 else 0
-                                })
+                                        testTypesToggle = !testTypesToggle
+                                        testTypesHeight = if (testTypesToggle) 100 else 0
+                                    })
                             )
                         },
                         navigationIcon = {
@@ -171,6 +174,11 @@ class MainUI(context: Context) {
                                     contentDescription = "Localized description",
                                 )
                             }
+                            ExtendedFloatingActionButton(
+                                icon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
+                                text = { Text("") },
+                                onClick = { /*do something*/ }
+                            )
                             IconButton(onClick = { /* do something */ }) {
                                 Icon(
                                     Icons.Filled.Check,
