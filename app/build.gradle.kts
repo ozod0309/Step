@@ -59,11 +59,12 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material:material:1.2.0-alpha02")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-extended:1.6.7")
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("androidx.compose.animation:animation:1.6.7")
     implementation("androidx.compose.animation:animation-graphics:1.6.7")
-    implementation("androidx.compose.material:material-icons-extended:1.6.7")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.preference:preference-ktx:1.2.1")
 
