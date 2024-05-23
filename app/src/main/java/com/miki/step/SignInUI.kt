@@ -193,7 +193,8 @@ class SignInUI(private val context: Context?, val onClick: (result: Boolean) -> 
                         accountName = googleIdTokenCredential.id,
                         name = googleIdTokenCredential.givenName.toString(),
                         surname = googleIdTokenCredential.familyName.toString(),
-                        googleToken = googleIdTokenCredential.idToken
+                        googleToken = googleIdTokenCredential.idToken,
+                        pictureURL = googleIdTokenCredential.profilePictureUri.toString()
                     )
                 } catch (e: GoogleIdTokenParsingException) {
                     Log.e(TAG, "Received an invalid google id token response", e)

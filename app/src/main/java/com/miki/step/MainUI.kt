@@ -3,6 +3,7 @@ package com.miki.step
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,19 +19,23 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.BottomAppBarDefaults
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,12 +47,14 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,25 +63,64 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
+import kotlinx.coroutines.launch
 
 class MainUI(context: Context) {
     @SuppressLint("NotConstructor")
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun UI() {
+    fun UI(
+        onLogout: () -> Unit
+    ) {
+        val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+        val scope = rememberCoroutineScope()
         ModalNavigationDrawer(
+            drawerState = drawerState,
             drawerContent = {
                 ModalDrawerSheet(
-                    modifier = Modifier.width(200.dp)
+                    modifier = Modifier.width(200.dp),
+
                 ) {
-                    Text("Drawer title", modifier = Modifier.padding(16.dp))
+                    Image(
+                        painter = rememberAsyncImagePainter(MainActivity.stepUser.pictureURL),
+                        contentDescription = null,
+                        modifier = Modifier.size(128.dp)
+                    )
+
+
+                    Text(MainActivity.stepUser.getFullName(), modifier = Modifier.padding(16.dp))
                     HorizontalDivider()
                     NavigationDrawerItem(
-                        label = { Text(text = "Drawer Item") },
+                        icon = {Icon(Icons.Filled.Settings, tint = Color.Gray,contentDescription = "")},
+                        label = { Text(text = "Settings") },
                         selected = false,
                         onClick = { /*TODO*/ }
                     )
-                    // ...other drawer items
+                    NavigationDrawerItem(
+                        icon = {Icon(Icons.Filled.PersonAdd, tint = Color.Gray,contentDescription = "")},
+                        label = { Text(text = "Invite Friends") },
+                        selected = false,
+                        onClick = { /*TODO*/ }
+                    )
+                    NavigationDrawerItem(
+                        icon = {Icon(Icons.Filled.Share, tint = Color.Gray,contentDescription = "")},
+                        label = { Text(text = "Share") },
+                        selected = false,
+                        onClick = { /*TODO*/ }
+                    )
+                    NavigationDrawerItem(
+                        icon = {Icon(Icons.Filled.Code, tint = Color.Gray,contentDescription = "")},
+                        label = { Text(text = "Coders") },
+                        selected = false,
+                        onClick = { /*TODO*/ }
+                    )
+                    NavigationDrawerItem(
+                        icon = {Icon(Icons.AutoMirrored.Filled.Logout, tint = Color.Gray,contentDescription = "")},
+                        label = { Text(text = "Logout") },
+                        selected = false,
+                        onClick = { onLogout() }
+                    )
                 }
             }
         ) {
@@ -89,7 +135,8 @@ class MainUI(context: Context) {
                 mutableIntStateOf(0)
             }
             Scaffold(
-                modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+                modifier = Modifier
+                    .nestedScroll(scrollBehavior.nestedScrollConnection),
                 topBar = {
                     LargeTopAppBar(
                         colors = TopAppBarDefaults.largeTopAppBarColors(
@@ -113,7 +160,7 @@ class MainUI(context: Context) {
                         },
                         navigationIcon = {
                             IconButton(onClick = {
-                                /* do something */
+                                scope.launch { drawerState.open() }
                             }) {
                                 Icon(
                                     imageVector = Icons.Filled.Menu,
@@ -126,7 +173,7 @@ class MainUI(context: Context) {
                                 /* do something */
                             }) {
                                 Icon(
-                                    imageVector = Icons.Filled.Add,
+                                    imageVector = Icons.Filled.Notifications,
                                     contentDescription = "Localized description"
                                 )
                             }
@@ -196,7 +243,7 @@ class MainUI(context: Context) {
                     )
                 },
                 floatingActionButton = {
-                    Box(){
+                    Box{
                         FloatingActionButton(
                             onClick = { /* stub */ },
                             shape = CircleShape,
