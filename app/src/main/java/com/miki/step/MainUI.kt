@@ -3,6 +3,8 @@ package com.miki.step
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -63,6 +66,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -198,9 +202,10 @@ class MainUI(context: Context) {
             }
         ) {
             // Screen content
-            val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
-            var testTypesToggle by remember {mutableStateOf(false)}
-            var testTypesHeight by remember {mutableIntStateOf(0)}
+            val scrollBehavior =
+                TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+            var testTypesToggle by remember { mutableStateOf(false) }
+            var testTypesHeight by remember { mutableIntStateOf(0) }
             Scaffold(
                 modifier = Modifier
                     .nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -257,49 +262,70 @@ class MainUI(context: Context) {
                             .padding(innerPadding)
                             .height(testTypesHeight.dp)
                             .fillMaxWidth()
-                            .animateContentSize()
+                            .animateContentSize(
+                                animationSpec = tween(
+                                    durationMillis = 2000,
+                                    easing = LinearOutSlowInEasing
+                                )
+                            )
                             .background(MaterialTheme.colorScheme.secondary)
+                            .clip(shape = RoundedCornerShape(0.dp, 0.dp, 15.dp, 15.dp))
+                            .border(2.dp, MaterialTheme.colorScheme.primary)
                     ) {
                         LazyRow(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(shape = RoundedCornerShape(0.dp, 0.dp, 15.dp, 15.dp))
-                                .background(MaterialTheme.colorScheme.tertiary),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             items(1) {
-                                Spacer(
-                                    modifier = Modifier
-                                        .width(20.dp)
-                                )
-                                OutlinedButton(
-                                    onClick = { },
-                                    border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
-                                    shape = RoundedCornerShape(15), // = 50% percent
-                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red)
+                                Spacer(modifier = Modifier.width(20.dp))
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Column {
-                                        Image(
-                                            alignment = Alignment.Center,
-                                            painter = rememberAsyncImagePainter(MainActivity.stepUser.pictureURL),
-                                            contentDescription = null,
-                                            modifier = Modifier
-                                                .size(64.dp)
-                                                .
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(20.dp)
+                                    )
+                                    OutlinedButton(
+                                        onClick = { },
+                                        border = BorderStroke(
+                                            3.dp,
+                                            MaterialTheme.colorScheme.primary
+                                        ),
+                                        shape = RoundedCornerShape(15), // = 50% percent
+                                        colors = ButtonDefaults.outlinedButtonColors(
+                                            contentColor = MaterialTheme.colorScheme.secondary,
+                                            containerColor = MaterialTheme.colorScheme.primary
                                         )
-                                        Text(
-                                            MainActivity.stepUser.getFullName(),
-                                            fontSize = 14.sp,
-                                            style = MaterialTheme.typography.titleMedium.copy(
-                                                lineHeight = 18.sp
-                                            ),
-                                            modifier = Modifier.padding(0.dp, 10.dp, 0.dp, 0.dp)
-                                        )
+                                    ) {
+                                        Column(
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Image(
+                                                alignment = Alignment.Center,
+                                                painter = rememberAsyncImagePainter(MainActivity.stepUser.pictureURL),
+                                                contentDescription = null,
+                                                modifier = Modifier
+                                                    .size(64.dp)
+                                            )
+                                            Text(
+                                                text = "DTM",
+                                                fontSize = 14.sp,
+                                                modifier = Modifier
+                                                    .padding(0.dp, 10.dp, 0.dp, 0.dp)
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.5f))
+                    )
+
 
                 },
                 bottomBar = {
