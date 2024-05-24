@@ -3,21 +3,24 @@ package com.miki.step
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Check
@@ -31,6 +34,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,6 +48,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -58,11 +63,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
 
@@ -71,6 +78,10 @@ class MainUI(context: Context) {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun UI(
+        onSettings: () -> Unit,
+        onInviteFriends: () -> Unit,
+        onShare: () -> Unit,
+        onCoders: () -> Unit,
         onLogout: () -> Unit
     ) {
         val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -80,43 +91,105 @@ class MainUI(context: Context) {
             drawerContent = {
                 ModalDrawerSheet(
                     modifier = Modifier.width(200.dp),
-
                 ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(MainActivity.stepUser.pictureURL),
-                        contentDescription = null,
-                        modifier = Modifier.size(128.dp)
-                    )
-
-
-                    Text(MainActivity.stepUser.getFullName(), modifier = Modifier.padding(16.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.primary),
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(10.dp)
+                        ) {
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Image(
+                                alignment = Alignment.Center,
+                                painter = rememberAsyncImagePainter(MainActivity.stepUser.pictureURL),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(64.dp)
+                                    .fillMaxWidth()
+                                    .border(
+                                        BorderStroke(4.dp, Color.Green),
+                                        CircleShape
+                                    )
+                                    .padding(4.dp)
+                                    .clip(CircleShape)
+                            )
+                            Text(
+                                MainActivity.stepUser.getFullName(),
+                                fontSize = 14.sp,
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    lineHeight = 18.sp
+                                ),
+                                modifier = Modifier.padding(0.dp, 10.dp, 0.dp, 0.dp)
+                            )
+                            Text(
+                                MainActivity.stepUser.accountName,
+                                fontSize = 10.sp,
+                                color = MaterialTheme.colorScheme.onTertiary,
+                                style = MaterialTheme.typography.titleSmall.copy(
+                                    lineHeight = 14.sp
+                                )
+                            )
+                        }
+                    }
                     HorizontalDivider()
                     NavigationDrawerItem(
-                        icon = {Icon(Icons.Filled.Settings, tint = Color.Gray,contentDescription = "")},
+                        icon = {
+                            Icon(
+                                Icons.Filled.Settings,
+                                tint = Color.Gray,
+                                contentDescription = ""
+                            )
+                        },
                         label = { Text(text = "Settings") },
                         selected = false,
-                        onClick = { /*TODO*/ }
+                        onClick = { onSettings() }
                     )
                     NavigationDrawerItem(
-                        icon = {Icon(Icons.Filled.PersonAdd, tint = Color.Gray,contentDescription = "")},
+                        icon = {
+                            Icon(
+                                Icons.Filled.PersonAdd,
+                                tint = Color.Gray,
+                                contentDescription = ""
+                            )
+                        },
                         label = { Text(text = "Invite Friends") },
                         selected = false,
-                        onClick = { /*TODO*/ }
+                        onClick = { onInviteFriends() }
                     )
                     NavigationDrawerItem(
-                        icon = {Icon(Icons.Filled.Share, tint = Color.Gray,contentDescription = "")},
+                        icon = {
+                            Icon(
+                                Icons.Filled.Share,
+                                tint = Color.Gray,
+                                contentDescription = ""
+                            )
+                        },
                         label = { Text(text = "Share") },
                         selected = false,
-                        onClick = { /*TODO*/ }
+                        onClick = { onShare() }
                     )
                     NavigationDrawerItem(
-                        icon = {Icon(Icons.Filled.Code, tint = Color.Gray,contentDescription = "")},
+                        icon = {
+                            Icon(
+                                Icons.Filled.Code,
+                                tint = Color.Gray,
+                                contentDescription = ""
+                            )
+                        },
                         label = { Text(text = "Coders") },
                         selected = false,
-                        onClick = { /*TODO*/ }
+                        onClick = { onCoders() }
                     )
                     NavigationDrawerItem(
-                        icon = {Icon(Icons.AutoMirrored.Filled.Logout, tint = Color.Gray,contentDescription = "")},
+                        icon = {
+                            Icon(
+                                Icons.AutoMirrored.Filled.Logout,
+                                tint = Color.Gray,
+                                contentDescription = ""
+                            )
+                        },
                         label = { Text(text = "Logout") },
                         selected = false,
                         onClick = { onLogout() }
@@ -125,15 +198,9 @@ class MainUI(context: Context) {
             }
         ) {
             // Screen content
-            val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
-                rememberTopAppBarState()
-            )
-            var testTypesToggle by remember {
-                mutableStateOf(false)
-            }
-            var testTypesHeight by remember {
-                mutableIntStateOf(0)
-            }
+            val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+            var testTypesToggle by remember {mutableStateOf(false)}
+            var testTypesHeight by remember {mutableIntStateOf(0)}
             Scaffold(
                 modifier = Modifier
                     .nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -142,11 +209,12 @@ class MainUI(context: Context) {
                         colors = TopAppBarDefaults.largeTopAppBarColors(
                             containerColor = MaterialTheme.colorScheme.primary,
                             titleContentColor = MaterialTheme.colorScheme.secondary,
+                            scrolledContainerColor = MaterialTheme.colorScheme.primary,
                         ),
                         title = {
                             Text(
                                 text = "Student Exam Preparation",
-                                color = MaterialTheme.colorScheme.onTertiary,
+                                color = MaterialTheme.colorScheme.secondary,
                                 maxLines = 1,
                                 textAlign = TextAlign.Center,
                                 overflow = TextOverflow.Ellipsis,
@@ -154,7 +222,7 @@ class MainUI(context: Context) {
                                     .fillMaxWidth()
                                     .clickable(onClick = {
                                         testTypesToggle = !testTypesToggle
-                                        testTypesHeight = if (testTypesToggle) 100 else 0
+                                        testTypesHeight = if (testTypesToggle) 150 else 0
                                     })
                             )
                         },
@@ -164,7 +232,8 @@ class MainUI(context: Context) {
                             }) {
                                 Icon(
                                     imageVector = Icons.Filled.Menu,
-                                    contentDescription = "Localized description"
+                                    contentDescription = "Localized description",
+                                    tint = MaterialTheme.colorScheme.secondary
                                 )
                             }
                         },
@@ -174,7 +243,8 @@ class MainUI(context: Context) {
                             }) {
                                 Icon(
                                     imageVector = Icons.Filled.Notifications,
-                                    contentDescription = "Localized description"
+                                    contentDescription = "Localized description",
+                                    tint = MaterialTheme.colorScheme.secondary
                                 )
                             }
                         },
@@ -188,28 +258,49 @@ class MainUI(context: Context) {
                             .height(testTypesHeight.dp)
                             .fillMaxWidth()
                             .animateContentSize()
-                            .background(MaterialTheme.colorScheme.primary)
+                            .background(MaterialTheme.colorScheme.secondary)
                     ) {
                         LazyRow(
-                            horizontalArrangement = Arrangement.Center
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(shape = RoundedCornerShape(0.dp, 0.dp, 15.dp, 15.dp))
+                                .background(MaterialTheme.colorScheme.tertiary),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             items(1) {
-                                Text(text = "DTM")
-                                Text(text = "PDD")
-                            }
-                        }
-                    }
-                    Box(modifier = Modifier.padding(innerPadding)) {
-                        LazyColumn {
-                            items((1..100).toList()) {
-                                Text(
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    text = "Item $it"
+                                Spacer(
+                                    modifier = Modifier
+                                        .width(20.dp)
                                 )
+                                OutlinedButton(
+                                    onClick = { },
+                                    border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+                                    shape = RoundedCornerShape(15), // = 50% percent
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red)
+                                ) {
+                                    Column {
+                                        Image(
+                                            alignment = Alignment.Center,
+                                            painter = rememberAsyncImagePainter(MainActivity.stepUser.pictureURL),
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .size(64.dp)
+                                                .
+                                        )
+                                        Text(
+                                            MainActivity.stepUser.getFullName(),
+                                            fontSize = 14.sp,
+                                            style = MaterialTheme.typography.titleMedium.copy(
+                                                lineHeight = 18.sp
+                                            ),
+                                            modifier = Modifier.padding(0.dp, 10.dp, 0.dp, 0.dp)
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
+
                 },
                 bottomBar = {
                     BottomAppBar(
@@ -240,10 +331,10 @@ class MainUI(context: Context) {
                             }
                         },
 
-                    )
+                        )
                 },
                 floatingActionButton = {
-                    Box{
+                    Box {
                         FloatingActionButton(
                             onClick = { /* stub */ },
                             shape = CircleShape,
@@ -262,7 +353,7 @@ class MainUI(context: Context) {
                 },
                 floatingActionButtonPosition = FabPosition.Center,
 
-            )
+                )
         }
     }
 }

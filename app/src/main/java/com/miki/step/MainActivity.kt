@@ -44,9 +44,11 @@ class MainActivity : ComponentActivity() {
             if (sharedPreference.getValueBoolean(PreferencesKeys.NOT_FIRST_RUN) && langCode.isNotEmpty()) {
                 when (userRegistration) {
                     RegistrationTypes.REGISTERED -> {
-                        stepUser = sharedPreference.getValueString(PreferencesKeys.USER)!!.toStepUser()
+                        stepUser =
+                            sharedPreference.getValueString(PreferencesKeys.USER)!!.toStepUser()
                         StepAPI.MAIN
                     }
+
                     else -> StepAPI.SIGN_IN
                 }
             } else {
@@ -64,17 +66,32 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = startDestination) {
                         composable(StepAPI.MAIN) {
                             MainUI(LocalContext.current).UI(
+                                onSettings = {
+                                    navController.navigate(StepAPI.SETTINGS)
+                                },
+                                onInviteFriends = {
+
+                                },
+                                onShare = {
+
+                                },
+                                onCoders = {
+
+                                },
                                 onLogout = {
                                     stepUser = User()
                                     userRegistration = RegistrationTypes.UNREGISTERED
                                     sharedPreference.save(PreferencesKeys.USER, "")
-                                    sharedPreference.save(PreferencesKeys.USER_REGISTRATION, userRegistration)
+                                    sharedPreference.save(
+                                        PreferencesKeys.USER_REGISTRATION,
+                                        userRegistration
+                                    )
                                     navController.navigate(StepAPI.SIGN_IN)
                                 }
                             )
                         }
                         composable(StepAPI.LANGUAGE) {
-                            LanguageUI(LocalContext.current).UI(onClick = { index ->
+                            LanguageUI(LocalContext.current).UI(onClick = {
                                 sharedPreference.save(
                                     PreferencesKeys.LANG_CODE,
                                     langCode
@@ -95,9 +112,12 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(StepAPI.SIGN_IN) {
                             SignInUI(LocalContext.current, onClick = {
-                                if(it) {
+                                if (it) {
                                     sharedPreference.save(PreferencesKeys.USER, stepUser.toJSON())
-                                    sharedPreference.save(PreferencesKeys.USER_REGISTRATION, RegistrationTypes.REGISTERED)
+                                    sharedPreference.save(
+                                        PreferencesKeys.USER_REGISTRATION,
+                                        RegistrationTypes.REGISTERED
+                                    )
                                     navController.navigate(StepAPI.MAIN)
                                 } else {
                                     navController.navigate(StepAPI.SIGN_IN)

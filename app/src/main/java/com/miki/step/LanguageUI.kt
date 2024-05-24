@@ -22,7 +22,7 @@ import com.miki.step.lib.LanguageCodes
 
 class LanguageUI(val context: Context?) {
     @Composable
-    fun UI(onClick:(index: Int) -> Unit) {
+    fun UI(onClick:() -> Unit) {
         Box(modifier = Modifier.padding()) {
             LazyColumn(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -42,7 +42,7 @@ class LanguageUI(val context: Context?) {
                         ),
                         onClick = {
                             MainActivity.langCode = LanguageCodes[index].code
-                            onClick(index)
+                            onClick()
                         }
                     ) {
                         Text(
