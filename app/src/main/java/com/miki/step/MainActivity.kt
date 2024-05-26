@@ -66,6 +66,9 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = startDestination) {
                         composable(StepAPI.MAIN) {
                             MainUI(LocalContext.current).UI(
+                                onStartTest = {testID ->
+                                    navController.navigate(StepAPI.TEST)
+                                },
                                 onSettings = {
                                     navController.navigate(StepAPI.SETTINGS)
                                 },
@@ -108,7 +111,11 @@ class MainActivity : ComponentActivity() {
                             SettingsUI(LocalContext.current).UI()
                         }
                         composable(StepAPI.TEST) {
-                            TestUI(LocalContext.current).UI()
+                            TestUI(LocalContext.current).UI(
+                                onBackPressed = {
+                                    navController.navigate(StepAPI.MAIN)
+                                }
+                            )
                         }
                         composable(StepAPI.SIGN_IN) {
                             SignInUI(LocalContext.current, onClick = {
