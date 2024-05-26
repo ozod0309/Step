@@ -114,6 +114,16 @@ class MainActivity : ComponentActivity() {
                             TestUI(LocalContext.current).UI(
                                 onBackPressed = {
                                     navController.navigate(StepAPI.MAIN)
+                                },
+                                onTimeOut = {
+                                    navController.navigate(StepAPI.RESULT)
+                                }
+                            )
+                        }
+                        composable(StepAPI.RESULT) {
+                            ResultUI(LocalContext.current).UI(
+                                onDone = {
+                                    navController.navigate(StepAPI.MAIN)
                                 }
                             )
                         }

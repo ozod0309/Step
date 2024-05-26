@@ -7,6 +7,7 @@ object StepAPI {
     const val LANGUAGE = "Language"
     const val SETTINGS = "Settings"
     const val TEST = "Test"
+    const val RESULT = "Result"
     const val SIGN_IN = "SignIn"
 }
 
