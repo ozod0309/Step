@@ -19,12 +19,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckBox
@@ -64,6 +64,8 @@ import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
 class TestUI(val context: Context?) {
+    val questionCount = 65
+
     @SuppressLint("NotConstructor")
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -137,9 +139,9 @@ class TestUI(val context: Context?) {
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     HorizontalDivider()
-                    Spacer(modifier = Modifier.height(20.dp))
                     LazyColumn {
                         items(radioOptions) {
+                            Spacer(modifier = Modifier.height(20.dp))
                             Row(
                                 Modifier
                                     .fillMaxWidth()
@@ -157,7 +159,7 @@ class TestUI(val context: Context?) {
                                 )
                                 Text(
                                     text = it,
-                                    style = MaterialTheme.typography.bodyMedium.merge(),
+                                    style = MaterialTheme.typography.titleMedium.merge(),
                                     modifier = Modifier.padding(start = 16.dp)
                                 )
                             }
@@ -174,11 +176,6 @@ class TestUI(val context: Context?) {
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(15.dp, 0.dp)
-                                .border(
-                                    width = 1.dp,
-                                    color = if (isEnabled) Color.Red else Color.Gray,
-                                    shape = RoundedCornerShape(20.dp)
-                                )
                                 .fillMaxWidth(),
                             shape = RoundedCornerShape(20.dp),
                             colors = ButtonDefaults.buttonColors(
@@ -220,19 +217,15 @@ class TestUI(val context: Context?) {
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(15.dp, 0.dp)
-                                .border(
-                                    width = 1.dp,
-                                    color = if (isEnabled) Color.Red else Color.Gray,
-                                    shape = RoundedCornerShape(20.dp)
-                                )
                                 .fillMaxWidth(),
                             shape = RoundedCornerShape(20.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary
+                                containerColor = MaterialTheme.colorScheme.secondary
                             )
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.ChevronRight,
+                                tint = MaterialTheme.colorScheme.primary,
                                 contentDescription = null
                             )
                         }
@@ -261,8 +254,9 @@ class TestUI(val context: Context?) {
             ),
             label = ""
         )
+        val hh = if (Math.floorDiv(questionCount - 1, 10) < 5) (Math.floorDiv(questionCount - 1, 10) + 1) * 50 else 200
         val animatedBoxHeight by animateDpAsState(
-            targetValue = if (anim) 150.dp else 0.dp,
+            targetValue = if (anim) hh.dp else 0.dp,
             animationSpec = tween(
                 durationMillis = 200,
                 easing = LinearEasing
@@ -296,24 +290,60 @@ class TestUI(val context: Context?) {
                     .border(2.dp, MaterialTheme.colorScheme.primary)
                     .background(MaterialTheme.colorScheme.secondary)
                     .fillMaxWidth()
-                    .height(150.dp)
+                    .height(animatedBoxHeight)
+                    .clickable { }
             ) {
-                val numbers = (0..20).toList()
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(10),
+                val numbers = (1..questionCount).toList()
+                Column(
+                    Modifier.verticalScroll(rememberScrollState())
                 ) {
-                    items(
-                        numbers.size,
-                        key = {
-                            it
-                        }
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(imageVector = Icons.Filled.CheckBox, contentDescription = "")
-                            Text(text = "  $it")
+                    for (i in 0 until Math.floorDiv(numbers.size - 1, 10) + 1 ) {
+                        Row {
+                            repeat(10) { j ->
+                                val index = i * 10 + j
+                                Box(
+                                    Modifier
+                                        .weight(1f)
+                                        .height(50.dp)
+                                        .clickable {
+
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    if (index < numbers.size) {
+                                        Column(
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Filled.CheckBox,
+                                                contentDescription = ""
+                                            )
+                                            Text(
+                                                text = numbers[index].toString()
+                                            )
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
+
+//                LazyVerticalGrid(
+//                    columns = GridCells.Fixed(10),
+//                ) {
+//                    items(
+//                        numbers.size,
+//                        key = {
+//                            it
+//                        }
+//                    ) {
+//                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+//                            Icon(imageVector = Icons.Filled.CheckBox, contentDescription = "")
+//                            Text(text = "  $it")
+//                        }
+//                    }
+//                }
             }
         }
     }
