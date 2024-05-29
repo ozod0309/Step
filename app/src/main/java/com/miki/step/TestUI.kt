@@ -32,10 +32,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckBox
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Dataset
 import androidx.compose.material.icons.filled.RadioButtonChecked
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
@@ -50,7 +48,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -68,12 +65,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.miki.step.ui.theme.Red
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
-class TestUI(val context: Context?) {
-    val questionCount = 65
+class TestUI(context: Context?) {
+    private val questionCount = 65
 
     @SuppressLint("NotConstructor")
     @OptIn(ExperimentalMaterial3Api::class)
@@ -83,9 +79,6 @@ class TestUI(val context: Context?) {
         onTimeOut: () -> Unit
 
     ) {
-        val isEnabled by remember {
-            mutableStateOf(false)
-        }
         val totalTime = 300
         var testTimer by remember { mutableIntStateOf(totalTime) }
         var testProgressBarAlpha by remember { mutableIntStateOf(0) }
@@ -112,13 +105,13 @@ class TestUI(val context: Context?) {
         )
 
         val listState = rememberLazyListState()
-        var selectedIndex by remember { mutableStateOf(-1) }
+        var selectedIndex by remember { mutableIntStateOf(-1) }
 
         LaunchedEffect(Unit) {
             while (true) {
                 delay(1.seconds)
                 testTimer--
-                testProgressBarAlpha = (255 * (totalTime - testTimer) / totalTime).toInt()
+                testProgressBarAlpha = (255 * (totalTime - testTimer) / totalTime)
                 if (testTimer == 0) {
                     onTimeOut()
                 }
@@ -219,9 +212,8 @@ class TestUI(val context: Context?) {
                                     .selectable(
                                         selected = answer.id == selectedIndex,
                                         onClick = {
-                                            if (selectedIndex != answer.id)
-                                                selectedIndex = answer.id else selectedIndex =
-                                                -1
+                                            selectedIndex = if (selectedIndex != answer.id)
+                                                answer.id else -1
                                         })
                             ) {
                                 Spacer(modifier = Modifier.width(15.dp))
