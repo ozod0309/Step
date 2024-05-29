@@ -13,13 +13,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
@@ -27,10 +30,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Dataset
+import androidx.compose.material.icons.filled.RadioButtonChecked
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -42,6 +50,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -59,7 +68,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.wear.compose.material.RadioButton
+import com.miki.step.ui.theme.Red
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
@@ -79,16 +88,37 @@ class TestUI(val context: Context?) {
         }
         val totalTime = 300
         var testTimer by remember { mutableIntStateOf(totalTime) }
+        var testProgressBarAlpha by remember { mutableIntStateOf(0) }
         val showTestResult = remember {
             mutableStateOf(false)
         }
         var bottomHeight by remember { mutableIntStateOf(0) }
-        val radioOptions = listOf("A", "B", "C")
-        val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[1]) }
+
+        data class Answer(
+            val id: Int,
+            val text: String
+        )
+
+        val answers: List<Answer> = listOf(
+            Answer(1, "aasdfasdf vzcxv dasfv sdfvs dfv sdf v sdfv sd fv sdf vs dfvsdf"),
+            Answer(
+                2,
+                "basdfasdfasd sdfvs dfv sdfv sdfv sdfv sdfv sdfv sdfv sdfv sdf vsdf vsfd vsdf vsdfv sdfv"
+            ),
+            Answer(
+                3,
+                "clkdjf;sljdf sdfv sdfv sdf vsdf v sdfv sdfv sdf vsdf vs fv sdfv sdf vs dfv sfdv sfd v"
+            )
+        )
+
+        val listState = rememberLazyListState()
+        var selectedIndex by remember { mutableStateOf(-1) }
+
         LaunchedEffect(Unit) {
             while (true) {
                 delay(1.seconds)
                 testTimer--
+                testProgressBarAlpha = (255 * (totalTime - testTimer) / totalTime).toInt()
                 if (testTimer == 0) {
                     onTimeOut()
                 }
@@ -96,34 +126,70 @@ class TestUI(val context: Context?) {
         }
         Scaffold(
             topBar = {
-                TopAppBar(
-                    title = {
-                        Text(text = "Top App Bar")
-                    },
-                    navigationIcon = {
-                        IconButton(
-                            onClick = {
-                                onBackPressed()
+                Column {
+                    TopAppBar(
+                        title = {
+                            Text(text = "Top App Bar")
+                        },
+                        navigationIcon = {
+                            IconButton(
+                                onClick = {
+                                    onBackPressed()
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    tint = MaterialTheme.colorScheme.secondary,
+                                    contentDescription = ""
+                                )
                             }
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                tint = MaterialTheme.colorScheme.secondary,
-                                contentDescription = ""
+                        },
+                        actions = {
+                            Text(
+                                text = showTimer(testTimer),
+                                color = if (testTimer > totalTime * 0.1) MaterialTheme.colorScheme.secondary else Color.Red
+                            )
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            titleContentColor = MaterialTheme.colorScheme.secondary,
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
+                    )
+                    Box(
+                        modifier = Modifier
+                            .height(25.dp)
+                            .fillMaxWidth()
+                            .background(
+                                Color(
+                                    red = 255,
+                                    green = 0,
+                                    blue = 0,
+                                    alpha = testProgressBarAlpha
+                                )
+                            )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .width(150.dp)
+                                .fillMaxHeight()
+                                .background(MaterialTheme.colorScheme.primary)
+                        )
+                        Row (modifier =  Modifier
+                            .clip(RoundedCornerShape(100))){
+                            Text(
+                                text = testProgressBarAlpha.toString(),
+                                color = MaterialTheme.colorScheme.onTertiary,
+                                modifier = Modifier.padding(5.dp, 0.dp)
+                            )
+                            Spacer(modifier = Modifier.weight(1f))
+                            Text(
+                                text = questionCount.toString(),
+                                color = MaterialTheme.colorScheme.onTertiary,
+                                modifier = Modifier.padding(5.dp, 0.dp)
                             )
                         }
-                    },
-                    actions = {
-                        Text(
-                            text = showTimer(testTimer),
-                            color = if (testTimer > totalTime * 0.1) MaterialTheme.colorScheme.secondary else Color.Red
-                        )
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        titleContentColor = MaterialTheme.colorScheme.secondary,
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
-                )
+                    }
+                }
             },
             content = { innerPadding ->
                 bottomHeight = innerPadding.calculateBottomPadding().value.toInt()
@@ -139,28 +205,39 @@ class TestUI(val context: Context?) {
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     HorizontalDivider()
-                    LazyColumn {
-                        items(radioOptions) {
+                    LazyColumn(state = listState) {
+                        items(items = answers) { answer ->
                             Spacer(modifier = Modifier.height(20.dp))
                             Row(
-                                Modifier
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
                                     .fillMaxWidth()
-                                    .selectable(
-                                        selected = (it == selectedOption),
-                                        onClick = {
-                                            onOptionSelected(it)
-                                        }
+                                    .border(
+                                        if (answer.id == selectedIndex) 2.dp else 0.dp,
+                                        MaterialTheme.colorScheme.primary
                                     )
-                                    .padding(horizontal = 16.dp)
+                                    .selectable(
+                                        selected = answer.id == selectedIndex,
+                                        onClick = {
+                                            if (selectedIndex != answer.id)
+                                                selectedIndex = answer.id else selectedIndex =
+                                                -1
+                                        })
                             ) {
-                                RadioButton(
-                                    selected = (it == selectedOption),
-                                    onClick = { onOptionSelected(it) }
+                                Spacer(modifier = Modifier.width(15.dp))
+                                Icon(
+                                    imageVector = if (answer.id == selectedIndex)
+                                        Icons.Filled.RadioButtonChecked
+                                    else
+                                        Icons.Filled.RadioButtonUnchecked,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    contentDescription = null
                                 )
+                                Spacer(modifier = Modifier.width(15.dp))
+
                                 Text(
-                                    text = it,
-                                    style = MaterialTheme.typography.titleMedium.merge(),
-                                    modifier = Modifier.padding(start = 16.dp)
+                                    text = answer.text,
+                                    modifier = Modifier.fillMaxWidth(),
                                 )
                             }
                         }
@@ -224,7 +301,10 @@ class TestUI(val context: Context?) {
                             )
                         ) {
                             Icon(
-                                imageVector = Icons.Filled.ChevronRight,
+                                imageVector = if (selectedIndex >= 0)
+                                    Icons.Filled.Check
+                                else
+                                    Icons.Filled.ChevronRight,
                                 tint = MaterialTheme.colorScheme.primary,
                                 contentDescription = null
                             )
@@ -254,7 +334,10 @@ class TestUI(val context: Context?) {
             ),
             label = ""
         )
-        val hh = if (Math.floorDiv(questionCount - 1, 10) < 5) (Math.floorDiv(questionCount - 1, 10) + 1) * 50 else 200
+        val hh = if (Math.floorDiv(questionCount - 1, 10) < 5) (Math.floorDiv(
+            questionCount - 1,
+            10
+        ) + 1) * 50 else 200
         val animatedBoxHeight by animateDpAsState(
             targetValue = if (anim) hh.dp else 0.dp,
             animationSpec = tween(
@@ -297,7 +380,7 @@ class TestUI(val context: Context?) {
                 Column(
                     Modifier.verticalScroll(rememberScrollState())
                 ) {
-                    for (i in 0 until Math.floorDiv(numbers.size - 1, 10) + 1 ) {
+                    for (i in 0 until Math.floorDiv(numbers.size - 1, 10) + 1) {
                         Row {
                             repeat(10) { j ->
                                 val index = i * 10 + j
