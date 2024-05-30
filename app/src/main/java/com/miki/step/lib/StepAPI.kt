@@ -1,8 +1,22 @@
 package com.miki.step.lib
 
+import com.miki.step.MainActivity
+import org.json.JSONArray
 import org.json.JSONObject
 
-object StepAPI {
+object StepGlobal {
+    const val ID = "Id"
+    const val DATA = "data"
+    const val NAME = "name"
+    const val CATEGORY_ID = "category_id"
+    const val SUBCATEGORY_ID = "subcategory_id"
+    const val ANSWER_LIST = "answer_list"
+    const val QUESTION_ID = "question_id"
+    const val IS_CORRECT = "is_correct"
+    const val IMAGE = "image"
+}
+
+object StepFragments {
     const val MAIN = "Main"
     const val LANGUAGE = "Language"
     const val SETTINGS = "Settings"
@@ -72,3 +86,26 @@ data class Test(
     val image: String,
     val answer: ArrayList<Answer>
 )
+
+fun JSONArray.toTest() {
+    for (i in 0 until this.length()) {
+        val item = this[i]
+        val test = Test(
+            question =
+        )
+    }
+    val json = try {
+        JSONObject(this)
+    } catch (e: Exception) {
+        JSONObject()
+    }
+    return User(
+        accountName = json.optString(PreferencesKeys.GOOGLE_ACCOUNT_NAME),
+        name = json.optString(PreferencesKeys.NAME),
+        surname = json.optString(PreferencesKeys.SURNAME),
+        googleToken = json.optString(PreferencesKeys.GOOGLE_TOKEN),
+        stepToken = json.optString(PreferencesKeys.STEP_TOKEN),
+        pictureURL = json.optString(PreferencesKeys.PICTURE_URL)
+    )
+}
+

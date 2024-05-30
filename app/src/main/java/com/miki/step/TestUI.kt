@@ -69,8 +69,6 @@ import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
 class TestUI(context: Context?) {
-    private val questionCount = 65
-
     @SuppressLint("NotConstructor")
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -176,7 +174,7 @@ class TestUI(context: Context?) {
                             )
                             Spacer(modifier = Modifier.weight(1f))
                             Text(
-                                text = questionCount.toString(),
+                                text = MainActivity.tests. .toString(),
                                 color = MaterialTheme.colorScheme.onTertiary,
                                 modifier = Modifier.padding(5.dp, 0.dp)
                             )

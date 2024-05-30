@@ -2,6 +2,7 @@ package com.miki.step
 
 import android.content.Context
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,13 +17,19 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.miki.step.lib.APIURLS
+import com.miki.step.lib.PostData
 import com.miki.step.lib.PreferencesKeys
 import com.miki.step.lib.RegistrationTypes
 import com.miki.step.lib.SharedPreference
-import com.miki.step.lib.StepAPI
+import com.miki.step.lib.StepFragments
+import com.miki.step.lib.StepGlobal
+import com.miki.step.lib.URLDownload
 import com.miki.step.lib.User
 import com.miki.step.lib.toStepUser
 import com.miki.step.ui.theme.StepTheme
+import org.json.JSONArray
+import org.json.JSONObject
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
@@ -31,6 +38,7 @@ class MainActivity : ComponentActivity() {
         var userRegistration = RegistrationTypes.UNREGISTERED
         var langCode: String = ""
         var stepUser = User()
+        var tests = JSONArray()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,14 +54,14 @@ class MainActivity : ComponentActivity() {
                     RegistrationTypes.REGISTERED -> {
                         stepUser =
                             sharedPreference.getValueString(PreferencesKeys.USER)!!.toStepUser()
-                        StepAPI.MAIN
+                        StepFragments.MAIN
                     }
 
-                    else -> StepAPI.SIGN_IN
+                    else -> StepFragments.SIGN_IN
                 }
             } else {
                 sharedPreference.save(PreferencesKeys.NOT_FIRST_RUN, true)
-                StepAPI.LANGUAGE
+                StepFragments.LANGUAGE
             }
         setContent {
             val navController = rememberNavController()
@@ -64,13 +72,34 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.tertiary
                 ) {
                     NavHost(navController = navController, startDestination = startDestination) {
-                        composable(StepAPI.MAIN) {
+                        composable(StepFragments.MAIN) {
+                            val context = LocalContext.current
                             MainUI(LocalContext.current).UI(
-                                onStartTest = {testID ->
-                                    navController.navigate(StepAPI.TEST)
+                                onStartTest = { testID ->
+                                    URLDownload.urlDownload(
+                                        context = context,
+                                        url = APIURLS.GET_TEST,
+                                        data = arrayListOf(
+                                            PostData(StepGlobal.ID, testID.toString())
+                                        ),
+                                        onResult = { result ->
+                                            try {
+                                                val json = JSONObject(result)
+                                                tests = json.optJSONArray(StepGlobal.DATA)!!
+                                                navController.navigate(StepFragments.TEST)
+                                            } catch (e: Exception) {
+                                                Toast.makeText(
+                                                    context,
+                                                    "Error loading tests",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                        }
+                                    )
+                                    navController.navigate(StepFragments.TEST)
                                 },
                                 onSettings = {
-                                    navController.navigate(StepAPI.SETTINGS)
+                                    navController.navigate(StepFragments.SETTINGS)
                                 },
                                 onInviteFriends = {
 
@@ -89,45 +118,45 @@ class MainActivity : ComponentActivity() {
                                         PreferencesKeys.USER_REGISTRATION,
                                         userRegistration
                                     )
-                                    navController.navigate(StepAPI.SIGN_IN)
+                                    navController.navigate(StepFragments.SIGN_IN)
                                 }
                             )
                         }
-                        composable(StepAPI.LANGUAGE) {
+                        composable(StepFragments.LANGUAGE) {
                             LanguageUI(LocalContext.current).UI(onClick = {
                                 sharedPreference.save(
                                     PreferencesKeys.LANG_CODE,
                                     langCode
                                 )
                                 if (userRegistration == RegistrationTypes.REGISTERED) {
-                                    navController.navigate(StepAPI.MAIN)
+                                    navController.navigate(StepFragments.MAIN)
                                 } else {
-                                    navController.navigate(StepAPI.SIGN_IN)
+                                    navController.navigate(StepFragments.SIGN_IN)
                                 }
                                 applyNewLocale(Locale(langCode, langCode))
                             })
                         }
-                        composable(StepAPI.SETTINGS) {
+                        composable(StepFragments.SETTINGS) {
                             SettingsUI(LocalContext.current).UI()
                         }
-                        composable(StepAPI.TEST) {
+                        composable(StepFragments.TEST) {
                             TestUI(LocalContext.current).UI(
                                 onBackPressed = {
-                                    navController.navigate(StepAPI.MAIN)
+                                    navController.navigate(StepFragments.MAIN)
                                 },
                                 onTimeOut = {
-                                    navController.navigate(StepAPI.RESULT)
+                                    navController.navigate(StepFragments.RESULT)
                                 }
                             )
                         }
-                        composable(StepAPI.RESULT) {
+                        composable(StepFragments.RESULT) {
                             ResultUI(LocalContext.current).UI(
                                 onDone = {
-                                    navController.navigate(StepAPI.MAIN)
+                                    navController.navigate(StepFragments.MAIN)
                                 }
                             )
                         }
-                        composable(StepAPI.SIGN_IN) {
+                        composable(StepFragments.SIGN_IN) {
                             SignInUI(LocalContext.current, onClick = {
                                 if (it) {
                                     sharedPreference.save(PreferencesKeys.USER, stepUser.toJSON())
@@ -135,9 +164,9 @@ class MainActivity : ComponentActivity() {
                                         PreferencesKeys.USER_REGISTRATION,
                                         RegistrationTypes.REGISTERED
                                     )
-                                    navController.navigate(StepAPI.MAIN)
+                                    navController.navigate(StepFragments.MAIN)
                                 } else {
-                                    navController.navigate(StepAPI.SIGN_IN)
+                                    navController.navigate(StepFragments.SIGN_IN)
                                 }
                             }).UI()
                         }
