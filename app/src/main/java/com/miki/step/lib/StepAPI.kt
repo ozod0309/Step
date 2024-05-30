@@ -51,7 +51,7 @@ data class User(
 
 fun String.toStepUser(): User {
     val json = try {
-         JSONObject(this)
+        JSONObject(this)
     } catch (e: Exception) {
         JSONObject()
     }
@@ -77,35 +77,47 @@ val LanguageCodes: ArrayList<LanguageCode> = arrayListOf(
 )
 
 data class Answer(
+    val id: Int,
     val answer: String,
-    val image: String,
+    val image: String = "",
     val correct: Boolean
 )
+
 data class Test(
+    val id: Int,
     val question: String,
-    val image: String,
-    val answer: ArrayList<Answer>
+    val image: String = "",
+    val answers: ArrayList<Answer>
+
+
 )
 
-fun JSONArray.toTest() {
+fun JSONArray.toTest(): ArrayList<Test> {
+    val ques = arrayListOf<Test>()
     for (i in 0 until this.length()) {
-        val item = this[i]
-        val test = Test(
-            question =
+        val item = this[i] as JSONObject
+        val answers = item.optJSONArray(StepGlobal.ANSWER_LIST)
+        val answerList = arrayListOf<Answer>()
+        for (j in 0 until answers!!.length()) {
+            val answerItem = answers[j] as JSONObject
+            answerList.add(
+                Answer(
+                    id = answerItem.optInt(StepGlobal.ID),
+                    answer = answerItem.optString(StepGlobal.NAME),
+                    image = answerItem.optString(StepGlobal.IMAGE),
+                    correct = answerItem.optBoolean(StepGlobal.IS_CORRECT)
+                )
+            )
+        }
+        ques.add(
+            Test(
+                id = item.optInt(StepGlobal.ID),
+                question = item.optString(StepGlobal.NAME),
+                image = item.optString(StepGlobal.IMAGE),
+                answers = answerList
+            )
         )
     }
-    val json = try {
-        JSONObject(this)
-    } catch (e: Exception) {
-        JSONObject()
-    }
-    return User(
-        accountName = json.optString(PreferencesKeys.GOOGLE_ACCOUNT_NAME),
-        name = json.optString(PreferencesKeys.NAME),
-        surname = json.optString(PreferencesKeys.SURNAME),
-        googleToken = json.optString(PreferencesKeys.GOOGLE_TOKEN),
-        stepToken = json.optString(PreferencesKeys.STEP_TOKEN),
-        pictureURL = json.optString(PreferencesKeys.PICTURE_URL)
-    )
+    return ques
 }
 

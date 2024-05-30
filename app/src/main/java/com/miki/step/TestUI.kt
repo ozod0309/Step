@@ -85,23 +85,6 @@ class TestUI(context: Context?) {
         }
         var bottomHeight by remember { mutableIntStateOf(0) }
 
-        data class Answer(
-            val id: Int,
-            val text: String
-        )
-
-        val answers: List<Answer> = listOf(
-            Answer(1, "aasdfasdf vzcxv dasfv sdfvs dfv sdf v sdfv sd fv sdf vs dfvsdf"),
-            Answer(
-                2,
-                "basdfasdfasd sdfvs dfv sdfv sdfv sdfv sdfv sdfv sdfv sdfv sdf vsdf vsfd vsdf vsdfv sdfv"
-            ),
-            Answer(
-                3,
-                "clkdjf;sljdf sdfv sdfv sdf vsdf v sdfv sdfv sdf vsdf vs fv sdfv sdf vs dfv sfdv sfd v"
-            )
-        )
-
         val listState = rememberLazyListState()
         var selectedIndex by remember { mutableIntStateOf(-1) }
 
@@ -174,7 +157,7 @@ class TestUI(context: Context?) {
                             )
                             Spacer(modifier = Modifier.weight(1f))
                             Text(
-                                text = MainActivity.tests. .toString(),
+                                text = MainActivity.tests.size.toString(),
                                 color = MaterialTheme.colorScheme.onTertiary,
                                 modifier = Modifier.padding(5.dp, 0.dp)
                             )
@@ -192,12 +175,12 @@ class TestUI(context: Context?) {
                     Text(
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth(),
-                        text = "Test Test Test Test"
+                        text = MainActivity.tests[MainActivity.activeQuestion].question
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     HorizontalDivider()
                     LazyColumn(state = listState) {
-                        items(items = answers) { answer ->
+                        items(items = MainActivity.tests[MainActivity.activeQuestion].answers) { answer ->
                             Spacer(modifier = Modifier.height(20.dp))
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -226,7 +209,7 @@ class TestUI(context: Context?) {
                                 Spacer(modifier = Modifier.width(15.dp))
 
                                 Text(
-                                    text = answer.text,
+                                    text = answer.answer,
                                     modifier = Modifier.fillMaxWidth(),
                                 )
                             }
@@ -324,8 +307,8 @@ class TestUI(context: Context?) {
             ),
             label = ""
         )
-        val hh = if (Math.floorDiv(questionCount - 1, 10) < 5) (Math.floorDiv(
-            questionCount - 1,
+        val hh = if (Math.floorDiv(MainActivity.tests.size - 1, 10) < 5) (Math.floorDiv(
+            MainActivity.tests.size - 1,
             10
         ) + 1) * 50 else 200
         val animatedBoxHeight by animateDpAsState(
@@ -366,7 +349,7 @@ class TestUI(context: Context?) {
                     .height(animatedBoxHeight)
                     .clickable { }
             ) {
-                val numbers = (1..questionCount).toList()
+                val numbers = (1..MainActivity.tests.size).toList()
                 Column(
                     Modifier.verticalScroll(rememberScrollState())
                 ) {

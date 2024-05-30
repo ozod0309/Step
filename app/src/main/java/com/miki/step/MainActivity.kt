@@ -24,11 +24,12 @@ import com.miki.step.lib.RegistrationTypes
 import com.miki.step.lib.SharedPreference
 import com.miki.step.lib.StepFragments
 import com.miki.step.lib.StepGlobal
+import com.miki.step.lib.Test
 import com.miki.step.lib.URLDownload
 import com.miki.step.lib.User
 import com.miki.step.lib.toStepUser
+import com.miki.step.lib.toTest
 import com.miki.step.ui.theme.StepTheme
-import org.json.JSONArray
 import org.json.JSONObject
 import java.util.Locale
 
@@ -38,7 +39,8 @@ class MainActivity : ComponentActivity() {
         var userRegistration = RegistrationTypes.UNREGISTERED
         var langCode: String = ""
         var stepUser = User()
-        var tests = JSONArray()
+        var tests = arrayListOf<Test>()
+        var activeQuestion = 1
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,7 +87,7 @@ class MainActivity : ComponentActivity() {
                                         onResult = { result ->
                                             try {
                                                 val json = JSONObject(result)
-                                                tests = json.optJSONArray(StepGlobal.DATA)!!
+                                                tests = json.optJSONArray(StepGlobal.DATA)!!.toTest()
                                                 navController.navigate(StepFragments.TEST)
                                             } catch (e: Exception) {
                                                 Toast.makeText(
@@ -96,7 +98,6 @@ class MainActivity : ComponentActivity() {
                                             }
                                         }
                                     )
-                                    navController.navigate(StepFragments.TEST)
                                 },
                                 onSettings = {
                                     navController.navigate(StepFragments.SETTINGS)
