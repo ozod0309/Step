@@ -40,7 +40,6 @@ class MainActivity : ComponentActivity() {
         var langCode: String = ""
         var stepUser = User()
         var tests = arrayListOf<Test>()
-        var activeQuestion = 1
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,7 +86,8 @@ class MainActivity : ComponentActivity() {
                                         onResult = { result ->
                                             try {
                                                 val json = JSONObject(result)
-                                                tests = json.optJSONArray(StepGlobal.DATA)!!.toTest()
+                                                tests =
+                                                    json.optJSONArray(StepGlobal.DATA)!!.toTest()
                                                 navController.navigate(StepFragments.TEST)
                                             } catch (e: Exception) {
                                                 Toast.makeText(
@@ -146,6 +146,9 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate(StepFragments.MAIN)
                                 },
                                 onTimeOut = {
+                                    navController.navigate(StepFragments.RESULT)
+                                },
+                                onFinishTest = {
                                     navController.navigate(StepFragments.RESULT)
                                 }
                             )

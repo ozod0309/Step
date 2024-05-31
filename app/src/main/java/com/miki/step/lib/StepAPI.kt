@@ -1,11 +1,10 @@
 package com.miki.step.lib
 
-import com.miki.step.MainActivity
 import org.json.JSONArray
 import org.json.JSONObject
 
 object StepGlobal {
-    const val ID = "Id"
+    const val ID = "id"
     const val DATA = "data"
     const val NAME = "name"
     const val CATEGORY_ID = "category_id"
@@ -87,9 +86,8 @@ data class Test(
     val id: Int,
     val question: String,
     val image: String = "",
-    val answers: ArrayList<Answer>
-
-
+    val answers: ArrayList<Answer>,
+    var answered: Int = 0
 )
 
 fun JSONArray.toTest(): ArrayList<Test> {

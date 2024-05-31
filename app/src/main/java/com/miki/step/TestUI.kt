@@ -32,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Dataset
@@ -65,6 +66,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.miki.step.lib.EquationItem
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
@@ -74,8 +76,8 @@ class TestUI(context: Context?) {
     @Composable
     fun UI(
         onBackPressed: () -> Unit,
-        onTimeOut: () -> Unit
-
+        onTimeOut: () -> Unit,
+        onFinishTest: () -> Unit
     ) {
         val totalTime = 300
         var testTimer by remember { mutableIntStateOf(totalTime) }
@@ -86,7 +88,13 @@ class TestUI(context: Context?) {
         var bottomHeight by remember { mutableIntStateOf(0) }
 
         val listState = rememberLazyListState()
-        var selectedIndex by remember { mutableIntStateOf(-1) }
+        var activeQuestionIndex by remember {
+            mutableIntStateOf(0)
+        }
+        var activeQuestion by remember {
+            mutableStateOf(MainActivity.tests[activeQuestionIndex])
+        }
+        var selectedAnswer by remember { mutableIntStateOf(-1) }
 
         LaunchedEffect(Unit) {
             while (true) {
@@ -142,22 +150,26 @@ class TestUI(context: Context?) {
                                 )
                             )
                     ) {
+                        val answered = MainActivity.tests.count { it.answered != 0 }
+                        val progressBarValue = answered.toFloat() / MainActivity.tests.size
                         Box(
                             modifier = Modifier
-                                .width(150.dp)
+                                .fillMaxWidth(progressBarValue)
                                 .fillMaxHeight()
                                 .background(MaterialTheme.colorScheme.primary)
                         )
-                        Row (modifier =  Modifier
-                            .clip(RoundedCornerShape(100))){
+                        Row(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(100))
+                        ) {
                             Text(
-                                text = testProgressBarAlpha.toString(),
+                                text = answered.toString(),
                                 color = MaterialTheme.colorScheme.onTertiary,
                                 modifier = Modifier.padding(5.dp, 0.dp)
                             )
                             Spacer(modifier = Modifier.weight(1f))
                             Text(
-                                text = MainActivity.tests.size.toString(),
+                                text = MainActivity.tests.count { it.answered == 0 }.toString(),
                                 color = MaterialTheme.colorScheme.onTertiary,
                                 modifier = Modifier.padding(5.dp, 0.dp)
                             )
@@ -171,35 +183,48 @@ class TestUI(context: Context?) {
                     modifier = Modifier
                         .padding(innerPadding)
                 ) {
+                    Column {
+                        EquationItem(
+                            line = EquationItem(
+                                line = EquationItem(
+                                    line = "x",
+                                    superscript = "2"
+                                ),
+                                underline = "y"
+                            ),
+                            sqrt = 2
+                        ).Show()
+                    }
                     Spacer(modifier = Modifier.height(20.dp))
                     Text(
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth(),
-                        text = MainActivity.tests[MainActivity.activeQuestion].question
+                        text = activeQuestion.question
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     HorizontalDivider()
                     LazyColumn(state = listState) {
-                        items(items = MainActivity.tests[MainActivity.activeQuestion].answers) { answer ->
+                        items(items = activeQuestion.answers) { answer ->
                             Spacer(modifier = Modifier.height(20.dp))
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
-                                    .fillMaxWidth()
                                     .border(
-                                        if (answer.id == selectedIndex) 2.dp else 0.dp,
-                                        MaterialTheme.colorScheme.primary
+                                        if (answer.id == selectedAnswer) 2.dp else 0.dp,
+                                        if (answer.id == selectedAnswer) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
                                     )
                                     .selectable(
-                                        selected = answer.id == selectedIndex,
+                                        selected = answer.id == selectedAnswer,
                                         onClick = {
-                                            selectedIndex = if (selectedIndex != answer.id)
+                                            selectedAnswer = if (selectedAnswer != answer.id)
                                                 answer.id else -1
                                         })
+                                    .padding(5.dp, 10.dp)
+                                    .fillMaxWidth()
                             ) {
                                 Spacer(modifier = Modifier.width(15.dp))
                                 Icon(
-                                    imageVector = if (answer.id == selectedIndex)
+                                    imageVector = if (answer.id == selectedAnswer)
                                         Icons.Filled.RadioButtonChecked
                                     else
                                         Icons.Filled.RadioButtonUnchecked,
@@ -222,7 +247,14 @@ class TestUI(context: Context?) {
                     containerColor = MaterialTheme.colorScheme.primary,
                     actions = {
                         Button(
-                            onClick = { /*TODO*/ },
+                            onClick = {
+                                do {
+                                    activeQuestionIndex--
+                                    if (activeQuestionIndex < 0) activeQuestionIndex =
+                                        MainActivity.tests.size - 1
+                                } while (MainActivity.tests[activeQuestionIndex].answered > 0)
+                                activeQuestion = MainActivity.tests[activeQuestionIndex]
+                            },
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(15.dp, 0.dp)
@@ -263,7 +295,23 @@ class TestUI(context: Context?) {
                         }
 
                         Button(
-                            onClick = { /*TODO*/ },
+                            onClick = {
+                                if (selectedAnswer != -1) {
+                                    MainActivity.tests[activeQuestionIndex].answered =
+                                        selectedAnswer
+                                    selectedAnswer = -1
+                                }
+                                if (MainActivity.tests.count { it.answered <= 0 } > 0) {
+                                    do {
+                                        activeQuestionIndex++
+                                        if (activeQuestionIndex == MainActivity.tests.size) activeQuestionIndex =
+                                            0
+                                    } while (MainActivity.tests[activeQuestionIndex].answered > 0)
+                                    activeQuestion = MainActivity.tests[activeQuestionIndex]
+                                } else {
+                                    onFinishTest()
+                                }
+                            },
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(15.dp, 0.dp)
@@ -274,7 +322,7 @@ class TestUI(context: Context?) {
                             )
                         ) {
                             Icon(
-                                imageVector = if (selectedIndex >= 0)
+                                imageVector = if (selectedAnswer >= 0)
                                     Icons.Filled.Check
                                 else
                                     Icons.Filled.ChevronRight,
@@ -289,13 +337,25 @@ class TestUI(context: Context?) {
         if (showTestResult.value) {
             OpenTestResults(
                 testResultShow = showTestResult,
-                bottomHeight = bottomHeight
+                bottomHeight = bottomHeight,
+                onChosen = { index ->
+                    if (index >= 0 && index < MainActivity.tests.size) {
+                        activeQuestionIndex = index
+                        activeQuestion = MainActivity.tests[activeQuestionIndex]
+                        selectedAnswer =
+                            if (activeQuestion.answered > 0) activeQuestion.answered else -1
+                    }
+                }
             )
         }
     }
 
     @Composable
-    fun OpenTestResults(testResultShow: MutableState<Boolean>, bottomHeight: Int) {
+    fun OpenTestResults(
+        testResultShow: MutableState<Boolean>,
+        bottomHeight: Int,
+        onChosen: (index: Int) -> Unit
+    ) {
         var anim by remember {
             mutableStateOf(false)
         }
@@ -362,7 +422,8 @@ class TestUI(context: Context?) {
                                         .weight(1f)
                                         .height(50.dp)
                                         .clickable {
-
+                                            testResultShow.value = !testResultShow.value
+                                            onChosen(index)
                                         },
                                     contentAlignment = Alignment.Center
                                 ) {
@@ -371,11 +432,16 @@ class TestUI(context: Context?) {
                                             horizontalAlignment = Alignment.CenterHorizontally
                                         ) {
                                             Icon(
-                                                imageVector = Icons.Filled.CheckBox,
+                                                imageVector = if (MainActivity.tests[index].answered != 0)
+                                                    Icons.Filled.CheckBox
+                                                else
+                                                    Icons.Filled.CheckBoxOutlineBlank,
+                                                tint = MaterialTheme.colorScheme.primary,
                                                 contentDescription = ""
                                             )
                                             Text(
-                                                text = numbers[index].toString()
+                                                text = numbers[index].toString(),
+                                                color = MaterialTheme.colorScheme.primary,
                                             )
                                         }
                                     }
@@ -384,22 +450,6 @@ class TestUI(context: Context?) {
                         }
                     }
                 }
-
-//                LazyVerticalGrid(
-//                    columns = GridCells.Fixed(10),
-//                ) {
-//                    items(
-//                        numbers.size,
-//                        key = {
-//                            it
-//                        }
-//                    ) {
-//                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-//                            Icon(imageVector = Icons.Filled.CheckBox, contentDescription = "")
-//                            Text(text = "  $it")
-//                        }
-//                    }
-//                }
             }
         }
     }

@@ -212,6 +212,13 @@ class MainUI(context: Context) {
                         selected = false,
                         onClick = { onLogout() }
                     )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(
+                        text = "Created by Miki Corp. 2024",
+                        style = MaterialTheme.typography.labelSmall,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
         ) {
@@ -231,6 +238,7 @@ class MainUI(context: Context) {
                         title = {
                             Text(
                                 text = "Student Exam Preparation",
+
                                 color = MaterialTheme.colorScheme.secondary,
                                 maxLines = 1,
                                 textAlign = TextAlign.Center,
