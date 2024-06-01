@@ -192,18 +192,6 @@ class MainUI(val context: Context) {
                     NavigationDrawerItem(
                         icon = {
                             Icon(
-                                Icons.Filled.Code,
-                                tint = Color.Gray,
-                                contentDescription = context.resources.getString(R.string.coders)
-                            )
-                        },
-                        label = { Text(text = context.resources.getString(R.string.coders)) },
-                        selected = false,
-                        onClick = { onCoders() }
-                    )
-                    NavigationDrawerItem(
-                        icon = {
-                            Icon(
                                 Icons.AutoMirrored.Filled.Logout,
                                 tint = Color.Gray,
                                 contentDescription = context.resources.getString(R.string.logout)

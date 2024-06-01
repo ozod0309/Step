@@ -24,6 +24,10 @@ object StepFragments {
     const val SIGN_IN = "SignIn"
 }
 
+object SettingsKeys {
+    const val LANG = "lang"
+}
+
 data class User(
     val accountName: String = "",
     val name: String = "",

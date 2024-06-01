@@ -21,6 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.miki.step.lib.APIURLS
+import com.miki.step.lib.LocaleHelper
 import com.miki.step.lib.PostData
 import com.miki.step.lib.PreferencesKeys
 import com.miki.step.lib.RegistrationTypes
@@ -142,7 +143,18 @@ class MainActivity : ComponentActivity() {
                             })
                         }
                         composable(StepFragments.SETTINGS) {
-                            SettingsUI(LocalContext.current).UI()
+                            SettingsUI(LocalContext.current).UI(
+                                onBackPressed = {
+                                    navController.navigate(StepFragments.MAIN)
+                                },
+                                onLanguageChange = {lang ->
+                                    langCode = lang
+                                    sharedPreference.save(PreferencesKeys.LANG_CODE, lang)
+                                    LocaleHelper().setLocale(this@MainActivity, langCode)
+                                    recreate()
+//                                    applyNewLocale(Locale(lang, lang))
+                                }
+                            )
                         }
                         composable(StepFragments.TEST) {
                             TestUI(LocalContext.current).UI(
