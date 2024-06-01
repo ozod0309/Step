@@ -2,4 +2,21 @@
 <resources>
     <string name="login">Авторизоваться</string>
     <string name="google_sign_in">Авторизуйтесь с помощью Google</string>
+
+    <string name="home">Главная</string>
+    <string name="achievements">Успехи</string>
+    <string name="history">История</string>
+    <string name="profile">Профиль</string>
+
+    <string name="settings">Настройки</string>
+    <string name="invite_friends">Пригласить друзей</string>
+    <string name="share">Поделиться</string>
+    <string name="coders">Разработчики</string>
+    <string name="logout">Выйти</string>
+
+    <string name="menu">Меню</string>
+    <string name="notificaations">Уведомления</string>
+
+    <string name="fast_test">Турбо тест</string>
+
 </resources>

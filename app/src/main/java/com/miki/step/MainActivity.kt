@@ -14,6 +14,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -40,6 +43,7 @@ class MainActivity : ComponentActivity() {
         var langCode: String = ""
         var stepUser = User()
         var tests = arrayListOf<Test>()
+        val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

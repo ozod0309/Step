@@ -2,4 +2,21 @@
 <resources>
     <string name="login">Tizimga kirish</string>
     <string name="google_sign_in">Google orqali tizimga kiring</string>
+
+    <string name="home">Asosiy</string>
+    <string name="achievements">Yutuqlar</string>
+    <string name="history">Tarix</string>
+    <string name="profile">Profil</string>
+
+    <string name="settings">Sozlamalar</string>
+    <string name="invite_friends">Do\'stlarga taklif</string>
+    <string name="share">Ulashish</string>
+    <string name="coders">Dasturchilar</string>
+    <string name="logout">Chiqish</string>
+
+    <string name="menu">Menyu</string>
+    <string name="notificaations">Bildirishnomalar</string>
+
+    <string name="fast_test">Turbo Test</string>
+
 </resources>

@@ -53,7 +53,7 @@ android {
 dependencies {
 
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.1")
     implementation("androidx.activity:activity-compose:1.9.0")
     implementation(platform("androidx.compose:compose-bom:2024.05.00"))
     implementation("androidx.compose.ui:ui")
@@ -61,6 +61,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended:1.6.7")
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.7")
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("androidx.compose.animation:animation:1.6.7")
     implementation("androidx.compose.animation:animation-graphics:1.6.7")
@@ -76,6 +77,9 @@ dependencies {
     implementation("com.google.firebase:firebase-auth:23.0.0")
     implementation("com.google.android.gms:play-services-auth:21.2.0")
     implementation("androidx.wear.compose:compose-material:1.3.1")
+
+    implementation("com.github.JamalMulla:ComposePrefs3:1.0.5")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     implementation("io.coil-kt:coil-compose:2.0.0-rc01")
     testImplementation("junit:junit:4.13.2")

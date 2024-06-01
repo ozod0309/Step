@@ -1,5 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">Step</string>
+    <string name="app_full_name" translatable="false">Student Exam Preparation</string>
     <string name="created_by" translatable="false">Created by Miki Corp. 2024</string>
     <string name="default_web_client_id" translatable="false">827898636912-5222fva58l1bda9ci4pdom8tuvm2pv54.apps.googleusercontent.com</string>
     <!-- Preference Titles -->
@@ -19,5 +21,21 @@
 
     <string name="login">Sign In</string>
     <string name="google_sign_in">Sign in with Google</string>
+
+    <string name="home">Home</string>
+    <string name="achievements">Achievements</string>
+    <string name="history">History</string>
+    <string name="profile">Profile</string>
+
+    <string name="settings">Settings</string>
+    <string name="invite_friends">Invite Friends</string>
+    <string name="share">Share</string>
+    <string name="coders">Coders</string>
+    <string name="logout">Logout</string>
+
+    <string name="menu">Menu</string>
+    <string name="notificaations">Notifications</string>
+
+    <string name="fast_test">Turbo Test</string>
 
 </resources>

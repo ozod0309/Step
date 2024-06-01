@@ -14,6 +14,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,8 +39,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -82,7 +83,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.miki.step.lib.LanguageCodes
 import kotlinx.coroutines.launch
 
-class MainUI(context: Context) {
+class MainUI(val context: Context) {
 
     companion object {
         var categoryTop = 0.dp
@@ -157,10 +158,10 @@ class MainUI(context: Context) {
                             Icon(
                                 Icons.Filled.Settings,
                                 tint = Color.Gray,
-                                contentDescription = ""
+                                contentDescription = context.resources.getString(R.string.settings)
                             )
                         },
-                        label = { Text(text = "Settings") },
+                        label = { Text(text = context.resources.getString(R.string.settings)) },
                         selected = false,
                         onClick = { onSettings() }
                     )
@@ -169,10 +170,10 @@ class MainUI(context: Context) {
                             Icon(
                                 Icons.Filled.PersonAdd,
                                 tint = Color.Gray,
-                                contentDescription = ""
+                                contentDescription = context.resources.getString(R.string.invite_friends)
                             )
                         },
-                        label = { Text(text = "Invite Friends") },
+                        label = { Text(text = context.resources.getString(R.string.invite_friends)) },
                         selected = false,
                         onClick = { onInviteFriends() }
                     )
@@ -181,10 +182,10 @@ class MainUI(context: Context) {
                             Icon(
                                 Icons.Filled.Share,
                                 tint = Color.Gray,
-                                contentDescription = ""
+                                contentDescription = context.resources.getString(R.string.share)
                             )
                         },
-                        label = { Text(text = "Share") },
+                        label = { Text(text = context.resources.getString(R.string.share)) },
                         selected = false,
                         onClick = { onShare() }
                     )
@@ -193,10 +194,10 @@ class MainUI(context: Context) {
                             Icon(
                                 Icons.Filled.Code,
                                 tint = Color.Gray,
-                                contentDescription = ""
+                                contentDescription = context.resources.getString(R.string.coders)
                             )
                         },
-                        label = { Text(text = "Coders") },
+                        label = { Text(text = context.resources.getString(R.string.coders)) },
                         selected = false,
                         onClick = { onCoders() }
                     )
@@ -205,16 +206,16 @@ class MainUI(context: Context) {
                             Icon(
                                 Icons.AutoMirrored.Filled.Logout,
                                 tint = Color.Gray,
-                                contentDescription = ""
+                                contentDescription = context.resources.getString(R.string.logout)
                             )
                         },
-                        label = { Text(text = "Logout") },
+                        label = { Text(text = context.resources.getString(R.string.logout)) },
                         selected = false,
                         onClick = { onLogout() }
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
-                        text = "Created by Miki Corp. 2024",
+                        text = context.resources.getString(R.string.created_by),
                         style = MaterialTheme.typography.labelSmall,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
@@ -237,7 +238,7 @@ class MainUI(context: Context) {
                         ),
                         title = {
                             Text(
-                                text = "Student Exam Preparation",
+                                text = context.resources.getString(R.string.app_full_name),
 
                                 color = MaterialTheme.colorScheme.secondary,
                                 maxLines = 1,
@@ -256,7 +257,7 @@ class MainUI(context: Context) {
                             }) {
                                 Icon(
                                     imageVector = Icons.Filled.Menu,
-                                    contentDescription = "",
+                                    contentDescription = context.resources.getString(R.string.menu),
                                     tint = MaterialTheme.colorScheme.secondary
                                 )
                             }
@@ -267,7 +268,7 @@ class MainUI(context: Context) {
                             }) {
                                 Icon(
                                     imageVector = Icons.Filled.Notifications,
-                                    contentDescription = "",
+                                    contentDescription = context.resources.getString(R.string.notificaations),
                                     tint = MaterialTheme.colorScheme.secondary
                                 )
                             }
@@ -284,22 +285,27 @@ class MainUI(context: Context) {
                     ) {
                         LazyColumn {
                             items(LanguageCodes.size) { index ->
-                                Button(
+                                Spacer(modifier = Modifier.height(20.dp))
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier
+                                        .padding(5.dp, 10.dp)
                                         .fillMaxWidth()
-                                        .padding(20.dp, 10.dp),
-                                    shape = RoundedCornerShape(20.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primary
-                                    ),
-                                    onClick = {
-                                        onStartTest(index)
-                                    }
+                                        .clickable {
+                                            onStartTest(index)
+                                        }
                                 ) {
+                                    Spacer(modifier = Modifier.width(15.dp))
+                                    Icon(
+                                        imageVector = Icons.Filled.Star,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        contentDescription = null
+                                    )
+                                    Spacer(modifier = Modifier.width(15.dp))
+
                                     Text(
                                         text = LanguageCodes[index].name,
-                                        fontSize = 20.sp,
-                                        color = MaterialTheme.colorScheme.onTertiary
+                                        modifier = Modifier.fillMaxWidth(),
                                     )
                                 }
                             }
@@ -312,69 +318,69 @@ class MainUI(context: Context) {
                     BottomAppBar(
                         containerColor = MaterialTheme.colorScheme.primary,
                         actions = {
-                            IconButton(
-                                modifier = Modifier.weight(1f),
-                                onClick = { /* do something */ }
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clickable {
+
+                                    },
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Icon(
-                                        Icons.Filled.Home,
-                                        contentDescription = "",
-                                    )
-                                    Text(
-                                        text = "Home"
-                                    )
-                                }
+                                Icon(
+                                    Icons.Filled.Home,
+                                    contentDescription = context.resources.getString(R.string.home)
+                                )
+                                Text(
+                                    text = context.resources.getString(R.string.home)
+                                )
                             }
-                            IconButton(
-                                modifier = Modifier.weight(1f),
-                                onClick = { /* do something */ }
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clickable {
+
+                                    },
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Icon(
-                                        Icons.Filled.BarChart,
-                                        contentDescription = ""
-                                    )
-                                    Text(
-                                        text = "Achievements"
-                                    )
-                                }
+                                Icon(
+                                    Icons.Filled.BarChart,
+                                    contentDescription = context.resources.getString(R.string.achievements)
+                                )
+                                Text(
+                                    text = context.resources.getString(R.string.achievements)
+                                )
                             }
-                            IconButton(
-                                modifier = Modifier.weight(1f),
-                                onClick = { /* do something */ }
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clickable {
+
+                                    },
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Icon(
-                                        Icons.Filled.History,
-                                        contentDescription = "",
-                                    )
-                                    Text(
-                                        text = "History"
-                                    )
-                                }
+                                Icon(
+                                    Icons.Filled.History,
+                                    contentDescription = context.resources.getString(R.string.history)
+                                )
+                                Text(
+                                    text = context.resources.getString(R.string.history)
+                                )
                             }
-                            IconButton(
-                                modifier = Modifier.weight(1f),
-                                onClick = { /* do something */ }
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clickable {
+
+                                    },
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Icon(
-                                        Icons.Filled.Person,
-                                        contentDescription = "Localized description",
-                                    )
-                                    Text(
-                                        text = "Profile"
-                                    )
-                                }
+                                Icon(
+                                    Icons.Filled.Person,
+                                    contentDescription = context.resources.getString(R.string.profile)
+                                )
+                                Text(
+                                    text = context.resources.getString(R.string.profile)
+                                )
                             }
                         }
                     )
@@ -401,7 +407,9 @@ class MainUI(context: Context) {
                                     tint = MaterialTheme.colorScheme.secondary
                                 )
                                 Text(
-                                    text = "Fast Test"
+                                    text = context.resources.getString(R.string.fast_test),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center
                                 )
                             }
                         }
