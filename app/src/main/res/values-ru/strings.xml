@@ -2,6 +2,7 @@
 <resources>
     <string name="login">Авторизоваться</string>
     <string name="google_sign_in">Авторизуйтесь с помощью Google</string>
+    <string name="server_error">Ошибка соединения с сервером</string>
 
     <string name="home">Главная</string>
     <string name="achievements">Успехи</string>

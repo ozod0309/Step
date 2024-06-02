@@ -30,7 +30,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsRun
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
@@ -97,7 +96,6 @@ class MainUI(val context: Context) {
         onSettings: () -> Unit,
         onInviteFriends: () -> Unit,
         onShare: () -> Unit,
-        onCoders: () -> Unit,
         onLogout: () -> Unit
     ) {
         val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)

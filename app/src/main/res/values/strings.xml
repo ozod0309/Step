@@ -21,6 +21,7 @@
 
     <string name="login">Sign In</string>
     <string name="google_sign_in">Sign in with Google</string>
+    <string name="server_error">Server connection error</string>
 
     <string name="home">Home</string>
     <string name="achievements">Achievements</string>

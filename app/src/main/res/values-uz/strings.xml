@@ -2,6 +2,7 @@
 <resources>
     <string name="login">Tizimga kirish</string>
     <string name="google_sign_in">Google orqali tizimga kiring</string>
+    <string name="server_error">Server bilan bog\'lanishda xatolik</string>
 
     <string name="home">Asosiy</string>
     <string name="achievements">Yutuqlar</string>
