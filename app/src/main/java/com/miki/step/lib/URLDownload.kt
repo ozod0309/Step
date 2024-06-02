@@ -40,7 +40,7 @@ object URLDownload {
         }
     }
 
-    private fun getInetData(
+    fun getInetData(
         sURL: String,
         sRequestBody: ArrayList<PostData>? = null
     ): String {
@@ -86,7 +86,7 @@ object URLDownload {
             .url(sURL)
             .addHeader("Accept", "application/json")
             .addHeader(StepGlobal.ANDROID_ID, MainActivity.androidId)
-            .addHeader(StepGlobal.AUTH, "Bearer "+MainActivity.stepUser.stepToken)
+            .addHeader(StepGlobal.AUTH, "Bearer " + MainActivity.stepUser.stepToken)
 
         if (sRequestBody != null) {
             val form = FormBody.Builder()

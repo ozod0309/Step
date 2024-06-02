@@ -25,6 +25,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.miki.step.lib.APIURLS
 import com.miki.step.lib.Category
+import com.miki.step.lib.InternetAvailable
 import com.miki.step.lib.LocaleHelper
 import com.miki.step.lib.PostData
 import com.miki.step.lib.PreferencesKeys
@@ -41,6 +42,7 @@ import com.miki.step.lib.toTest
 import com.miki.step.ui.theme.StepTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.util.Locale
@@ -74,49 +76,17 @@ class MainActivity : ComponentActivity() {
                     RegistrationTypes.REGISTERED -> {
                         stepUser =
                             sharedPreference.getValueString(PreferencesKeys.USER)!!.toStepUser()
-                        var loadingCategory = true
-                        var errorExcepted = false
-                        val job = CoroutineScope(Dispatchers.Main).launch(Dispatchers.IO) {
-                            URLDownload.urlDownload(
-                                context = context,
-                                sURL = APIURLS.GET_CATS,
-                                onResult = { result ->
-                                    val json = try {
-                                        JSONObject(result)
-                                    } catch (e: Exception) {
-                                        JSONObject()
-                                    }
-                                    if (json.has(StepGlobal.SUCCESS)) {
-                                        try {
-                                            val data = json.optJSONArray(StepGlobal.DATA)!!
-                                            category = data.toCategories()
-                                        } catch (e: Exception) {
-                                            errorExcepted = true
-                                        }
-                                    } else {
-                                        errorExcepted = true
-                                    }
-                                }
-                            )
-                        }
-                        job.join()
-                        while (loadingCategory) {
-                            if (category.size > 0) {
-                                loadingCategory = false
-                            }
-                            if (errorExcepted) {
-                                Toast.makeText(
-                                    this,
-                                    resources.getString(R.string.server_error),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                loadingCategory = false
-                            }
-                        }
-                        if (errorExcepted)
-                            StepFragments.ERROR
-                        else
+                        if (loadCategories(this))
                             StepFragments.MAIN
+                        else {
+                            Toast.makeText(
+                                context,
+                                resources.getString(R.string.server_error),
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                            StepFragments.ERROR
+                        }
                     }
 
                     else -> StepFragments.SIGN_IN
@@ -309,6 +279,39 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    fun loadCategories(context: Context): Boolean {
+        var result = false
+        var urlResult = ""
+        if (InternetAvailable.internetAvailable(context)) {
+//            CoroutineScope(Dispatchers.Main).launch(Dispatchers.IO) {
+            lifecycleScope.launch {
+                val job = async {
+                    URLDownload.getInetData(APIURLS.GET_CATS)
+                }
+                urlResult = job.await()
+                val json = try {
+                    JSONObject(urlResult)
+                } catch (e: Exception) {
+                    JSONObject()
+                }
+                if (json.has(StepGlobal.SUCCESS)) {
+                    var res = true
+                    try {
+                        val data = json.optJSONArray(StepGlobal.DATA)!!
+                        category = data.toCategories()
+                    } catch (e: Exception) {
+                        res = false
+                    } finally {
+                        result = res
+                    }
+                } else {
+                    result = false
+                }
+            }
+        }
+        return result
     }
 
     override fun onResume() {
