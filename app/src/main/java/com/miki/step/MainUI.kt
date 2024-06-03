@@ -2,6 +2,7 @@ package com.miki.step
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.webkit.URLUtil
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -76,6 +77,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -493,13 +495,23 @@ class MainUI(val context: Context) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Image(
-                                    alignment = Alignment.Center,
-                                    painter = rememberAsyncImagePainter(MainActivity.stepUser.pictureURL),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .size(64.dp)
-                                )
+                                if(URLUtil.isValidUrl(MainActivity.category[index].image)) {
+                                    Image(
+                                        alignment = Alignment.Center,
+                                        painter = rememberAsyncImagePainter(MainActivity.stepUser.pictureURL),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(64.dp)
+                                    )
+                                } else {
+                                    Image(
+                                        alignment = Alignment.Center,
+                                        painter = painterResource(id =  R.drawable.ic_test),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(64.dp)
+                                    )
+                                }
                                 Text(
                                     text = MainActivity.category[index].name,
                                     fontSize = 14.sp,
