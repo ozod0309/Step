@@ -1,7 +1,10 @@
 package com.miki.step
 
 import android.annotation.SuppressLint
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
@@ -15,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ShareCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -22,7 +26,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.miki.step.lib.APIURLS
+import com.miki.step.lib.ApiURLS
 import com.miki.step.lib.Category
 import com.miki.step.lib.InternetAvailable
 import com.miki.step.lib.LocaleHelper
@@ -105,12 +109,18 @@ class MainActivity : ComponentActivity() {
                         composable(StepFragments.MAIN) {
                             MainUI(LocalContext.current).UI(
                                 onStartTest = { subCategoryId ->
-                                    URLDownload.urlDownload(
+                                    URLDownload.getUrlDownload(
                                         context = context,
-                                        sURL = APIURLS.GET_TEST,
+                                        sURL = ApiURLS.GET_TEST,
                                         requestBody = arrayListOf(
-                                            PostData(StepGlobal.CATEGORY_ID, activeCategory.toString()),
-                                            PostData(StepGlobal.SUBCATEGORY_ID, subCategoryId.toString())
+                                            PostData(
+                                                StepGlobal.CATEGORY_ID,
+                                                activeCategory.toString()
+                                            ),
+                                            PostData(
+                                                StepGlobal.SUBCATEGORY_ID,
+                                                subCategoryId.toString()
+                                            )
                                         ),
                                         onResult = { result ->
                                             try {
@@ -132,15 +142,34 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate(StepFragments.SETTINGS)
                                 },
                                 onInviteFriends = {
-
+                                    navController.navigate(StepFragments.INVITE_FRIENDS)
                                 },
                                 onShare = {
-
+                                    ShareCompat
+                                        .IntentBuilder(this@MainActivity)
+                                        .setType("text/plain")
+                                        .setChooserTitle(resources.getString(R.string.share))
+                                        .setText("http://play.google.com/store/apps/details?id=" + context.packageName)
+                                        .startChooser()
+                                },
+                                onRateUs = {
+                                    val uri =
+                                        Uri.parse("market://details?id=" + context.packageName)
+                                    val myAppLinkToMarket = Intent(Intent.ACTION_VIEW, uri)
+                                    try {
+                                        startActivity(myAppLinkToMarket)
+                                    } catch (e: ActivityNotFoundException) {
+                                        Toast.makeText(
+                                            context,
+                                            "Impossible to find an application for the market",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
                                 },
                                 onLogout = {
                                     URLDownload.urlDownload(
                                         context = context,
-                                        sURL = APIURLS.LOGOUT,
+                                        sURL = ApiURLS.LOGOUT,
                                         requestBody = arrayListOf(
                                             PostData(StepGlobal.ID_TOKEN, stepUser.stepToken)
                                         ),
@@ -200,6 +229,16 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
+                        composable(StepFragments.INVITE_FRIENDS) {
+                            InviteFriendsUI(LocalContext.current).UI(
+                                onBackPressed = {
+                                    navController.navigate(StepFragments.MAIN)
+                                },
+                                onInvite = {
+
+                                }
+                            )
+                        }
                         composable(StepFragments.TEST) {
                             TestUI(LocalContext.current).UI(
                                 onBackPressed = {
@@ -225,7 +264,7 @@ class MainActivity : ComponentActivity() {
                                 if (it) {
                                     URLDownload.urlDownload(
                                         context = context,
-                                        sURL = APIURLS.SIGN_IN_GOOGLE,
+                                        sURL = ApiURLS.SIGN_IN_GOOGLE,
                                         requestBody = arrayListOf(
                                             PostData(StepGlobal.ID_TOKEN, stepUser.googleToken)
                                         ),
@@ -271,7 +310,7 @@ class MainActivity : ComponentActivity() {
                             }).UI()
                         }
                         composable(StepFragments.ERROR) {
-                            ResultUI(LocalContext.current).UI(
+                            ErrorUI(LocalContext.current).UI(
                                 onDone = {
                                     navController.navigate(StepFragments.MAIN)
                                 }
@@ -288,7 +327,7 @@ class MainActivity : ComponentActivity() {
         if (InternetAvailable.internetAvailable(context)) {
             val urlResult = runBlocking {
                 withContext(Dispatchers.IO) {
-                    val urlResult = URLDownload.getInetData(APIURLS.GET_CATS)
+                    val urlResult = URLDownload.getInetData(ApiURLS.GET_CATS)
                     urlResult
                 }
             }

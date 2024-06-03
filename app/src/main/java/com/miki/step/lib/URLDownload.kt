@@ -40,6 +40,33 @@ object URLDownload {
         }
     }
 
+
+    internal fun getUrlDownload(
+        context: Context,
+        sURL: String,
+        requestBody: ArrayList<PostData>? = arrayListOf(),
+        onResult: (json: String) -> Unit
+    ) {
+        if (InternetAvailable.internetAvailable(context)) {
+            CoroutineScope(Dispatchers.Main).launch(Dispatchers.IO) {
+                var sGetURl = sURL
+                if (requestBody!!.size > 0) {
+                    requestBody.forEachIndexed { index, postData ->
+                        sGetURl += if (index == 0) "?" else "&"
+                        sGetURl = sGetURl + postData.name + '=' + postData.value
+                    }
+                }
+                val sData = async { getInetData(sURL) }
+                val result = sData.await()
+                launch(Dispatchers.Main) {
+                    onResult(result)
+                }
+            }
+        } else {
+            onResult("")
+        }
+    }
+
     fun getInetData(
         sURL: String,
         sRequestBody: ArrayList<PostData>? = null

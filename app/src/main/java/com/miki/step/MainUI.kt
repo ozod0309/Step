@@ -99,6 +99,7 @@ class MainUI(val context: Context) {
         onSettings: () -> Unit,
         onInviteFriends: () -> Unit,
         onShare: () -> Unit,
+        onRateUs: () -> Unit,
         onLogout: () -> Unit
     ) {
         val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -192,6 +193,18 @@ class MainUI(val context: Context) {
                         label = { Text(text = context.resources.getString(R.string.share)) },
                         selected = false,
                         onClick = { onShare() }
+                    )
+                    NavigationDrawerItem(
+                        icon = {
+                            Icon(
+                                Icons.Filled.Star,
+                                tint = Color.Gray,
+                                contentDescription = context.resources.getString(R.string.rate_us)
+                            )
+                        },
+                        label = { Text(text = context.resources.getString(R.string.rate_us)) },
+                        selected = false,
+                        onClick = { onRateUs() }
                     )
                     NavigationDrawerItem(
                         icon = {

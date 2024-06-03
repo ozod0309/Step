@@ -84,7 +84,8 @@ class SignInUI(private val context: Context?, val onClick: (result: Boolean) -> 
             content = { padding ->
                 Column(
                     modifier = Modifier
-                        .fillMaxHeight(),
+                        .fillMaxHeight()
+                        .padding(padding),
                     verticalArrangement = Arrangement.Center
                 ) {
                     Button(
