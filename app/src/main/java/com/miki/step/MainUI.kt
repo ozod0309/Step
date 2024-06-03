@@ -62,8 +62,10 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -79,7 +81,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.miki.step.lib.LanguageCodes
 import kotlinx.coroutines.launch
 
 class MainUI(val context: Context) {
@@ -92,7 +93,7 @@ class MainUI(val context: Context) {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun UI(
-        onStartTest: (testID: Int) -> Unit,
+        onStartTest: (subCategoryId: Int) -> Unit,
         onSettings: () -> Unit,
         onInviteFriends: () -> Unit,
         onShare: () -> Unit,
@@ -102,6 +103,9 @@ class MainUI(val context: Context) {
         val scope = rememberCoroutineScope()
         val categoryShow = remember {
             mutableStateOf(false)
+        }
+        val activeCategory = remember {
+            mutableIntStateOf(MainActivity.activeCategory)
         }
         ModalNavigationDrawer(
             drawerState = drawerState,
@@ -224,8 +228,7 @@ class MainUI(val context: Context) {
                         ),
                         title = {
                             Text(
-                                text = context.resources.getString(R.string.app_full_name),
-
+                                text = MainActivity.category[activeCategory.intValue].name,
                                 color = MaterialTheme.colorScheme.secondary,
                                 maxLines = 1,
                                 textAlign = TextAlign.Center,
@@ -270,7 +273,7 @@ class MainUI(val context: Context) {
                             .fillMaxSize()
                     ) {
                         LazyColumn {
-                            items(LanguageCodes.size) { index ->
+                            items(MainActivity.category[activeCategory.intValue].subCategory.size) { index ->
                                 Spacer(modifier = Modifier.height(20.dp))
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
@@ -288,9 +291,8 @@ class MainUI(val context: Context) {
                                         contentDescription = null
                                     )
                                     Spacer(modifier = Modifier.width(15.dp))
-
                                     Text(
-                                        text = LanguageCodes[index].name,
+                                        text = MainActivity.category[activeCategory.intValue].subCategory[index].name,
                                         modifier = Modifier.fillMaxWidth(),
                                     )
                                 }
@@ -405,12 +407,15 @@ class MainUI(val context: Context) {
             )
         }
         if (categoryShow.value) {
-            OpenCategory(categoryShow)
+            OpenCategory(categoryShow, activeCategory)
         }
     }
 
     @Composable
-    fun OpenCategory(categoryShow: MutableState<Boolean>) {
+    fun OpenCategory(
+        categoryShow: MutableState<Boolean>,
+        activeCategory: MutableIntState
+    ) {
         var anim by remember {
             mutableStateOf(false)
         }
@@ -461,7 +466,7 @@ class MainUI(val context: Context) {
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                items(1) {
+                items(MainActivity.category.size) { index ->
                     Spacer(modifier = Modifier.width(20.dp))
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -471,7 +476,10 @@ class MainUI(val context: Context) {
                                 .height(20.dp)
                         )
                         OutlinedButton(
-                            onClick = { },
+                            onClick = {
+                                activeCategory.intValue = index
+                                categoryShow.value = !categoryShow.value
+                            },
                             border = BorderStroke(
                                 3.dp,
                                 MaterialTheme.colorScheme.primary
@@ -493,7 +501,7 @@ class MainUI(val context: Context) {
                                         .size(64.dp)
                                 )
                                 Text(
-                                    text = "DTM",
+                                    text = MainActivity.category[index].name,
                                     fontSize = 14.sp,
                                     modifier = Modifier
                                         .padding(0.dp, 10.dp, 0.dp, 0.dp)

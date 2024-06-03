@@ -5,6 +5,7 @@ import org.json.JSONObject
 
 object StepGlobal {
     const val ID = "id"
+    const val USER = "user"
     const val DATA = "data"
     const val NAME = "name"
     const val SURNAME = "surname"
@@ -22,6 +23,7 @@ object StepGlobal {
     const val AUTH = "Authorization"
     const val ID_TOKEN = "id_token"
     const val ACCESS_TOKEN = "access_token"
+    const val TOKEN_TYPE = "token_type"
     const val ANDROID_ID = "android_id"
 
 }
@@ -46,6 +48,7 @@ data class User(
     var surname: String = "",
     val googleToken: String = "",
     var stepToken: String = "",
+    var tokenType: String = "",
     val pictureURL: String = ""
 ) {
     fun toJSON(): String {

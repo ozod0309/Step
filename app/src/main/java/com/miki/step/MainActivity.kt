@@ -19,7 +19,6 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -40,10 +39,9 @@ import com.miki.step.lib.toCategories
 import com.miki.step.lib.toStepUser
 import com.miki.step.lib.toTest
 import com.miki.step.ui.theme.StepTheme
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.util.Locale
 
@@ -55,7 +53,7 @@ class MainActivity : ComponentActivity() {
         var langCode: String = ""
         var stepUser = User()
         var category = arrayListOf<Category>()
-        var activeCategory = 1
+        var activeCategory = 0
         var tests = arrayListOf<Test>()
         val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
     }
@@ -106,12 +104,13 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = startDestination) {
                         composable(StepFragments.MAIN) {
                             MainUI(LocalContext.current).UI(
-                                onStartTest = { testID ->
+                                onStartTest = { subCategoryId ->
                                     URLDownload.urlDownload(
                                         context = context,
                                         sURL = APIURLS.GET_TEST,
                                         requestBody = arrayListOf(
-                                            PostData(StepGlobal.ID, testID.toString())
+                                            PostData(StepGlobal.CATEGORY_ID, activeCategory.toString()),
+                                            PostData(StepGlobal.SUBCATEGORY_ID, subCategoryId.toString())
                                         ),
                                         onResult = { result ->
                                             try {
@@ -238,11 +237,14 @@ class MainActivity : ComponentActivity() {
                                             }
                                             if (json.optBoolean(StepGlobal.SUCCESS)) {
                                                 val data = json.optJSONObject(StepGlobal.DATA)!!
-                                                stepUser.name = data.optString(StepGlobal.NAME)
+                                                val user = data.optJSONObject(StepGlobal.USER)!!
+                                                stepUser.name = user.optString(StepGlobal.NAME)
                                                 stepUser.surname =
-                                                    data.optString(StepGlobal.SURNAME)
+                                                    user.optString(StepGlobal.SURNAME)
                                                 stepUser.stepToken =
                                                     data.optString(StepGlobal.ACCESS_TOKEN)
+                                                stepUser.tokenType =
+                                                    data.optString(StepGlobal.TOKEN_TYPE)
                                                 sharedPreference.save(
                                                     PreferencesKeys.USER,
                                                     stepUser.toJSON()
@@ -281,34 +283,32 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun loadCategories(context: Context): Boolean {
+    private fun loadCategories(context: Context): Boolean {
         var result = false
-        var urlResult = ""
         if (InternetAvailable.internetAvailable(context)) {
-//            CoroutineScope(Dispatchers.Main).launch(Dispatchers.IO) {
-            lifecycleScope.launch {
-                val job = async {
-                    URLDownload.getInetData(APIURLS.GET_CATS)
+            val urlResult = runBlocking {
+                withContext(Dispatchers.IO) {
+                    val urlResult = URLDownload.getInetData(APIURLS.GET_CATS)
+                    urlResult
                 }
-                urlResult = job.await()
-                val json = try {
-                    JSONObject(urlResult)
+            }
+            val json = try {
+                JSONObject(urlResult)
+            } catch (e: Exception) {
+                JSONObject()
+            }
+            if (json.has(StepGlobal.SUCCESS)) {
+                var res = true
+                try {
+                    val data = json.optJSONArray(StepGlobal.DATA)!!
+                    category = data.toCategories()
                 } catch (e: Exception) {
-                    JSONObject()
+                    res = false
+                } finally {
+                    result = res
                 }
-                if (json.has(StepGlobal.SUCCESS)) {
-                    var res = true
-                    try {
-                        val data = json.optJSONArray(StepGlobal.DATA)!!
-                        category = data.toCategories()
-                    } catch (e: Exception) {
-                        res = false
-                    } finally {
-                        result = res
-                    }
-                } else {
-                    result = false
-                }
+            } else {
+                result = false
             }
         }
         return result
