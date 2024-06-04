@@ -493,6 +493,7 @@ class MainUI(val context: Context) {
                         OutlinedButton(
                             onClick = {
                                 activeCategory.intValue = index
+                                MainActivity.activeCategory = activeCategory.intValue
                                 categoryShow.value = !categoryShow.value
                             },
                             border = BorderStroke(

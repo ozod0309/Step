@@ -56,7 +56,7 @@ object URLDownload {
                         sGetURl = sGetURl + postData.name + '=' + postData.value
                     }
                 }
-                val sData = async { getInetData(sURL) }
+                val sData = async { getInetData(sGetURl) }
                 val result = sData.await()
                 launch(Dispatchers.Main) {
                     onResult(result)

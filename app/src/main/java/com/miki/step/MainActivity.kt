@@ -115,11 +115,11 @@ class MainActivity : ComponentActivity() {
                                         requestBody = arrayListOf(
                                             PostData(
                                                 StepGlobal.CATEGORY_ID,
-                                                activeCategory.toString()
+                                                category[activeCategory].id.toString()
                                             ),
                                             PostData(
                                                 StepGlobal.SUBCATEGORY_ID,
-                                                subCategoryId.toString()
+                                                category[activeCategory].subCategory[subCategoryId].id.toString()
                                             )
                                         ),
                                         onResult = { result ->
