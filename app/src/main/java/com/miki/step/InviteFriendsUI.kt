@@ -4,12 +4,6 @@ import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Context
 import android.provider.ContactsContract
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,12 +21,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Textsms
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
@@ -50,9 +47,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.miki.step.lib.PhoneContact
@@ -125,6 +120,7 @@ class InviteFriendsUI(val context: Context?) {
                                         .padding(5.dp, 10.dp)
                                         .fillMaxWidth()
                                         .clickable {
+                                            selectedContactIndex.value = index
                                             openNumbersList.value = !openNumbersList.value
                                         }
                                 ) {
@@ -179,7 +175,10 @@ class InviteFriendsUI(val context: Context?) {
             }
         )
         if (openNumbersList.value) {
-            ShowNumbers(showNumbersList = openNumbersList, numbers = phoneContactList[selectedContactIndex.intValue].number)
+            ShowNumbers(
+                showNumbersList = openNumbersList,
+                numbers = phoneContactList[selectedContactIndex.intValue].number
+            )
         }
     }
 
@@ -235,82 +234,68 @@ class InviteFriendsUI(val context: Context?) {
         cursor.close()
     }
 
+    @ExperimentalMaterial3Api
     @Composable
     fun ShowNumbers(
         showNumbersList: MutableState<Boolean>,
         numbers: MutableList<PhoneContactNumber>
     ) {
-        var anim by remember {
-            mutableStateOf(false)
-        }
-        val animateAlpha by animateFloatAsState(
-            targetValue = if (anim) 0.5f else 0f,
-            animationSpec = tween(
-                durationMillis = 200,
-                easing = LinearEasing
-            ),
-            label = ""
-        )
-        val animatedBoxHeight by animateDpAsState(
-            targetValue = if (anim) 150.dp else 0.dp,
-            animationSpec = tween(
-                durationMillis = 200,
-                easing = LinearEasing
-            ),
-            label = ""
-        )
-        LaunchedEffect(Unit) {
-            anim = true
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable(onClick = { showNumbersList.value = !showNumbersList.value })
-                .graphicsLayer { alpha = animateAlpha }
-                .background(Color.Black)
-        )
-        Box(
-            modifier = Modifier
-                .padding(top = 100.dp)
-                .clip(shape = RoundedCornerShape(0.dp, 0.dp, 15.dp, 15.dp))
-                .border(2.dp, MaterialTheme.colorScheme.primary)
-                .background(MaterialTheme.colorScheme.secondary)
-                .fillMaxWidth()
-                .height(animatedBoxHeight)
-        ) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+        if (showNumbersList.value) {
+            AlertDialog(
+                onDismissRequest = { showNumbersList.value = false }
             ) {
-                items(numbers.size) { index ->
-                    Spacer(modifier = Modifier.width(20.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .padding(5.dp, 10.dp)
-                            .fillMaxWidth()
-                            .clickable {
-//                                openNumbersList.value = !openNumbersList.value
-                            }
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color.LightGray
+                ) {
+                    Box(
+                        contentAlignment = Alignment.Center
                     ) {
-                        Spacer(modifier = Modifier.width(15.dp))
-                        Icon(
-                            imageVector = Icons.Filled.Phone,
-                            tint = MaterialTheme.colorScheme.primary,
-                            contentDescription = null
-                        )
-                        Spacer(modifier = Modifier.width(15.dp))
                         Text(
-                            text = numbers[index].number,
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.align(Alignment.TopCenter),
+                            text = "top"
+                        )
+
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            items(numbers.size) { index ->
+                                Spacer(modifier = Modifier.width(20.dp))
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .padding(5.dp, 10.dp)
+                                        .fillMaxWidth()
+                                        .clickable {
+//                                openNumbersList.value = !openNumbersList.value
+                                        }
+                                ) {
+                                    Spacer(modifier = Modifier.width(15.dp))
+                                    Icon(
+                                        imageVector = Icons.Filled.Textsms,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        contentDescription = null
+                                    )
+                                    Spacer(modifier = Modifier.width(15.dp))
+                                    Text(
+                                        text = numbers[index].number,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                }
+                            }
+                        }
+
+
+                        Text(
+                            modifier = Modifier.align(Alignment.BottomCenter),
+                            text = "bottom"
                         )
                     }
                 }
-
             }
         }
     }
-
-
 }
