@@ -2,17 +2,17 @@
     xmlns:aapt="http://schemas.android.com/aapt">
     <aapt:attr name="android:drawable">
         <vector
-            android:width="97dp"
-            android:height="97dp"
-            android:viewportWidth="97"
-            android:viewportHeight="97">
+            android:width="150dp"
+            android:height="150dp"
+            android:viewportWidth="150"
+            android:viewportHeight="150">
             <group android:name="_R_G">
                 <group
                     android:name="_R_G_L_5_G_T_1"
-                    android:scaleX="0.19602"
-                    android:scaleY="0.19602"
-                    android:translateX="9.801"
-                    android:translateY="73.157">
+                    android:scaleX="0.25"
+                    android:scaleY="0.25"
+                    android:translateX="25"
+                    android:translateY="105.5">
                     <group
                         android:name="_R_G_L_5_G"
                         android:translateX="-50"
@@ -35,10 +35,10 @@
                 </group>
                 <group
                     android:name="_R_G_L_4_G_T_1"
-                    android:scaleX="0.19602"
-                    android:scaleY="0.19602"
-                    android:translateX="29.403"
-                    android:translateY="73.157">
+                    android:scaleX="0.25"
+                    android:scaleY="0.25"
+                    android:translateX="50"
+                    android:translateY="105.5">
                     <group
                         android:name="_R_G_L_4_G"
                         android:translateX="-150"
@@ -61,10 +61,10 @@
                 </group>
                 <group
                     android:name="_R_G_L_3_G_T_1"
-                    android:scaleX="0.19602"
-                    android:scaleY="0.19602"
-                    android:translateX="49.005"
-                    android:translateY="73.157">
+                    android:scaleX="0.25"
+                    android:scaleY="0.25"
+                    android:translateX="75"
+                    android:translateY="105.5">
                     <group
                         android:name="_R_G_L_3_G"
                         android:translateX="-250"
@@ -87,10 +87,10 @@
                 </group>
                 <group
                     android:name="_R_G_L_2_G_T_1"
-                    android:scaleX="0.19602"
-                    android:scaleY="0.19602"
-                    android:translateX="68.607"
-                    android:translateY="73.157">
+                    android:scaleX="0.25"
+                    android:scaleY="0.25"
+                    android:translateX="100"
+                    android:translateY="105.5">
                     <group
                         android:name="_R_G_L_2_G"
                         android:translateX="-350"
@@ -113,10 +113,10 @@
                 </group>
                 <group
                     android:name="_R_G_L_1_G_T_1"
-                    android:scaleX="0.19602"
-                    android:scaleY="0.19602"
-                    android:translateX="88.209"
-                    android:translateY="73.157">
+                    android:scaleX="0.25"
+                    android:scaleY="0.25"
+                    android:translateX="125"
+                    android:translateY="105.5">
                     <group
                         android:name="_R_G_L_1_G"
                         android:translateX="-450"
@@ -139,10 +139,10 @@
                 </group>
                 <group
                     android:name="_R_G_L_0_G_T_1"
-                    android:scaleX="0.19602"
-                    android:scaleY="0.19602"
-                    android:translateX="-9.801"
-                    android:translateY="67.668">
+                    android:scaleX="0.25"
+                    android:scaleY="0.25"
+                    android:translateX="-7.778"
+                    android:translateY="98.75">
                     <group
                         android:name="_R_G_L_0_G"
                         android:translateX="-50"
@@ -164,7 +164,7 @@
             <set android:ordering="together">
                 <objectAnimator
                     android:duration="967"
-                    android:pathData="M 9.801,73.157C 9.801,73.11399999999999 9.801,73.094 9.801,73.157"
+                    android:pathData="M 25,105.5C 25,105.446 25,105.419 25,105.5"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
@@ -175,7 +175,7 @@
                 </objectAnimator>
                 <objectAnimator
                     android:duration="333"
-                    android:pathData="M 9.801,73.157C 9.801,73.11399999999999 9.801,67.27199999999999 9.801,67.335"
+                    android:pathData="M 25,105.5C 25,105.446 25,97.994 25,98.075"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
@@ -186,7 +186,7 @@
                 </objectAnimator>
                 <objectAnimator
                     android:duration="2333"
-                    android:pathData="M 9.801,67.335C 9.801,67.509 9.801,67.27199999999999 9.801,67.335"
+                    android:pathData="M 25,98.075C 25,98.297 25,97.994 25,98.075"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
@@ -197,7 +197,7 @@
                 </objectAnimator>
                 <objectAnimator
                     android:duration="333"
-                    android:pathData="M 9.801,67.335C 9.801,67.509 9.801,73.756 9.801,73.157"
+                    android:pathData="M 25,98.075C 25,98.297 25,106.264 25,105.5"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
@@ -214,7 +214,7 @@
             <set android:ordering="together">
                 <objectAnimator
                     android:duration="967"
-                    android:pathData="M 29.403,73.157C 29.403,71.36 29.403,74.954 29.403,73.157"
+                    android:pathData="M 50,105.5C 50,103.208 50,107.792 50,105.5"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
@@ -225,7 +225,7 @@
                 </objectAnimator>
                 <objectAnimator
                     android:duration="667"
-                    android:pathData="M 29.403,73.157C 29.403,71.36 29.403,64.173 29.403,62.376"
+                    android:pathData="M 50,105.5C 50,103.208 50,94.042 50,91.75"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
@@ -236,7 +236,7 @@
                 </objectAnimator>
                 <objectAnimator
                     android:duration="2667"
-                    android:pathData="M 29.403,62.376C 29.403,62.376 29.403,62.376 29.403,62.376"
+                    android:pathData="M 50,91.75C 50,91.75 50,91.75 50,91.75"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
@@ -247,7 +247,7 @@
                 </objectAnimator>
                 <objectAnimator
                     android:duration="333"
-                    android:pathData="M 29.403,62.376C 29.403,62.583999999999996 29.403,73.157 29.403,73.157"
+                    android:pathData="M 50,91.75C 50,92.015 50,105.5 50,105.5"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
@@ -264,7 +264,7 @@
             <set android:ordering="together">
                 <objectAnimator
                     android:duration="967"
-                    android:pathData="M 49.005,73.157C 49.005,70.38 49.005,75.934 49.005,73.157"
+                    android:pathData="M 75,105.5C 75,101.958 75,109.042 75,105.5"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
@@ -275,7 +275,7 @@
                 </objectAnimator>
                 <objectAnimator
                     android:duration="1000"
-                    android:pathData="M 49.005,73.157C 49.005,70.38 49.005,59.272 49.005,56.495"
+                    android:pathData="M 75,105.5C 75,101.958 75,87.792 75,84.25"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
@@ -286,7 +286,7 @@
                 </objectAnimator>
                 <objectAnimator
                     android:duration="3000"
-                    android:pathData="M 49.005,56.495C 49.005,56.495 49.005,56.495 49.005,56.495"
+                    android:pathData="M 75,84.25C 75,84.25 75,84.25 75,84.25"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
@@ -297,7 +297,7 @@
                 </objectAnimator>
                 <objectAnimator
                     android:duration="333"
-                    android:pathData="M 49.005,56.495C 49.005,59.272 49.005,70.38 49.005,73.157"
+                    android:pathData="M 75,84.25C 75,87.792 75,101.958 75,105.5"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
@@ -314,7 +314,7 @@
             <set android:ordering="together">
                 <objectAnimator
                     android:duration="967"
-                    android:pathData="M 68.607,73.157C 68.607,69.39999999999999 68.607,76.914 68.607,73.157"
+                    android:pathData="M 100,105.5C 100,100.708 100,110.292 100,105.5"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
@@ -325,7 +325,7 @@
                 </objectAnimator>
                 <objectAnimator
                     android:duration="1333"
-                    android:pathData="M 68.607,73.157C 68.607,69.39999999999999 68.607,54.372 68.607,50.615"
+                    android:pathData="M 100,105.5C 100,100.708 100,81.542 100,76.75"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
@@ -336,7 +336,7 @@
                 </objectAnimator>
                 <objectAnimator
                     android:duration="3333"
-                    android:pathData="M 68.607,50.615C 68.607,50.615 68.607,50.615 68.607,50.615"
+                    android:pathData="M 100,76.75C 100,76.75 100,76.75 100,76.75"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
@@ -347,7 +347,7 @@
                 </objectAnimator>
                 <objectAnimator
                     android:duration="333"
-                    android:pathData="M 68.607,50.615C 68.607,54.372 68.607,69.39999999999999 68.607,73.157"
+                    android:pathData="M 100,76.75C 100,81.542 100,100.708 100,105.5"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
@@ -364,7 +364,7 @@
             <set android:ordering="together">
                 <objectAnimator
                     android:duration="967"
-                    android:pathData="M 88.209,73.157C 88.209,68.42 88.209,77.89399999999999 88.209,73.157"
+                    android:pathData="M 125,105.5C 125,99.458 125,111.542 125,105.5"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
@@ -375,7 +375,7 @@
                 </objectAnimator>
                 <objectAnimator
                     android:duration="1667"
-                    android:pathData="M 88.209,73.157C 88.209,68.42 88.209,49.471000000000004 88.209,44.734"
+                    android:pathData="M 125,105.5C 125,99.458 125,75.292 125,69.25"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
@@ -386,7 +386,7 @@
                 </objectAnimator>
                 <objectAnimator
                     android:duration="3667"
-                    android:pathData="M 88.209,44.734C 88.209,44.734 88.209,44.734 88.209,44.734"
+                    android:pathData="M 125,69.25C 125,69.25 125,69.25 125,69.25"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
@@ -397,7 +397,7 @@
                 </objectAnimator>
                 <objectAnimator
                     android:duration="333"
-                    android:pathData="M 88.209,44.734C 88.209,49.471000000000004 88.209,68.42 88.209,73.157"
+                    android:pathData="M 125,69.25C 125,75.292 125,99.458 125,105.5"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
@@ -541,79 +541,79 @@
             <set android:ordering="together">
                 <objectAnimator
                     android:duration="2967"
-                    android:pathData="M -9.801,67.668C -7.972,49.830000000000005 -12.94,55.51500000000001 -9.801,67.668"
+                    android:pathData="M -7.778,98.75C -7.731,98.703 0,98.5 0,98.5"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
                     android:startOffset="0">
                     <aapt:attr name="android:interpolator">
-                        <pathInterpolator android:pathData="M 0.0,0.0 c0.167,0.51 0.833,0.49 1.0,1.0" />
+                        <pathInterpolator android:pathData="M 0.0,0.0 c0.017,1 0.99,0.996 1.0,1.0" />
                     </aapt:attr>
                 </objectAnimator>
                 <objectAnimator
                     android:duration="667"
-                    android:pathData="M -9.801,67.668C -7.972,49.830000000000005 6.662000000000001,49.635 9.801,61.788"
+                    android:pathData="M 0,98.5C 2.333,75.75 20.996000000000002,75.5 25,91"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
                     android:startOffset="2967">
                     <aapt:attr name="android:interpolator">
-                        <pathInterpolator android:pathData="M 0.0,0.0 c0.167,0.51 0.833,0.49 1.0,1.0" />
+                        <pathInterpolator android:pathData="M 0.0,0.0 c0.167,0.4 0.833,0.6 1.0,1.0" />
                     </aapt:attr>
                 </objectAnimator>
                 <objectAnimator
                     android:duration="667"
-                    android:pathData="M 9.801,61.788C 14.594999999999999,37.931 27.671999999999997,46.653 29.403,55.907"
+                    android:pathData="M 25,91C 31.115000000000002,60.573 47.792,71.69800000000001 50,83.5"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
                     android:startOffset="3633">
                     <aapt:attr name="android:interpolator">
-                        <pathInterpolator android:pathData="M 0.0,0.0 c0.167,0.489 0.833,0.511 1.0,1.0" />
+                        <pathInterpolator android:pathData="M 0.0,0.0 c0.167,0.384 0.833,0.616 1.0,1.0" />
                     </aapt:attr>
                 </objectAnimator>
                 <objectAnimator
                     android:duration="667"
-                    android:pathData="M 29.403,55.907C 32.461999999999996,39.391 43.582,35.031 49.005,50.027"
+                    android:pathData="M 50,83.5C 53.900999999999996,62.435 68.083,56.875 75,76"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
                     android:startOffset="4300">
                     <aapt:attr name="android:interpolator">
-                        <pathInterpolator android:pathData="M 0.0,0.0 c0.167,0.5 0.833,0.5 1.0,1.0" />
+                        <pathInterpolator android:pathData="M 0.0,0.0 c0.167,0.392 0.833,0.608 1.0,1.0" />
                     </aapt:attr>
                 </objectAnimator>
                 <objectAnimator
                     android:duration="667"
-                    android:pathData="M 49.005,50.027C 52.958000000000006,34.673 64.458,31.993000000000002 68.607,44.146"
+                    android:pathData="M 75,76C 80.042,56.418 94.708,53 100,68.5"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
                     android:startOffset="4967">
                     <aapt:attr name="android:interpolator">
-                        <pathInterpolator android:pathData="M 0.0,0.0 c0.167,0.542 0.833,0.458 1.0,1.0" />
+                        <pathInterpolator android:pathData="M 0.0,0.0 c0.167,0.425 0.833,0.575 1.0,1.0" />
                     </aapt:attr>
                 </objectAnimator>
                 <objectAnimator
                     android:duration="667"
-                    android:pathData="M 68.607,44.146C 72.995,26.46 84.452,27.288 88.209,38.265"
+                    android:pathData="M 100,68.5C 105.596,45.943 120.208,47 125,61"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
                     android:startOffset="5633">
                     <aapt:attr name="android:interpolator">
-                        <pathInterpolator android:pathData="M 0.0,0.0 c0.167,0.533 0.833,0.467 1.0,1.0" />
+                        <pathInterpolator android:pathData="M 0.0,0.0 c0.167,0.418 0.833,0.582 1.0,1.0" />
                     </aapt:attr>
                 </objectAnimator>
                 <objectAnimator
                     android:duration="667"
-                    android:pathData="M 88.209,38.265C 94.28200000000001,21.507 102.78,21.113999999999997 107.811,32.385"
+                    android:pathData="M 125,61C 132.745,39.626999999999995 152.833,38.375 159.25,52.75"
                     android:propertyName="translateXY"
                     android:propertyXName="translateX"
                     android:propertyYName="translateY"
                     android:startOffset="6300">
                     <aapt:attr name="android:interpolator">
-                        <pathInterpolator android:pathData="M 0.0,0.0 c0.167,0.546 0.833,0.454 1.0,1.0" />
+                        <pathInterpolator android:pathData="M 0.0,0.0 c0.167,0.358 0.833,0.642 1.0,1.0" />
                     </aapt:attr>
                 </objectAnimator>
             </set>

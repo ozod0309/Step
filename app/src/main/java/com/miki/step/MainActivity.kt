@@ -1,15 +1,18 @@
 package com.miki.step
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -18,7 +21,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
 import androidx.core.app.ShareCompat
+import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -43,6 +48,8 @@ import com.miki.step.lib.toCategories
 import com.miki.step.lib.toStepUser
 import com.miki.step.lib.toTest
 import com.miki.step.ui.theme.StepTheme
+import com.zumo.mikitodo.libs.PermissionArray
+import com.zumo.mikitodo.libs.PermissionKeys
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -71,6 +78,7 @@ class MainActivity : ComponentActivity() {
         androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
         userRegistration = sharedPreference.getValueInt(PreferencesKeys.USER_REGISTRATION)
         langCode = sharedPreference.getValueString(PreferencesKeys.LANG_CODE).toString()
+        val activity = this
         val context = this
         val startUI: String =
             if (sharedPreference.getValueBoolean(PreferencesKeys.NOT_FIRST_RUN) && langCode.isNotEmpty()) {
@@ -142,6 +150,29 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate(StepFragments.SETTINGS)
                                 },
                                 onInviteFriends = {
+                                    when {
+                                        ContextCompat.checkSelfPermission(
+                                            context,
+                                            PermissionArray[PermissionKeys.READ_CONTACTS].name
+                                        ) == PackageManager.PERMISSION_GRANTED -> {
+                                            // You can use the API that requires the permission.
+                                        }
+
+                                        ActivityCompat.shouldShowRequestPermissionRationale(
+                                            activity,
+                                            PermissionArray[PermissionKeys.READ_CONTACTS].name
+                                        ) -> {
+
+                                        }
+
+                                        else -> {
+                                            requestPermissionLauncher.launch(
+                                                Manifest.permission.READ_CONTACTS
+                                            )
+                                        }
+                                    }
+
+
                                     navController.navigate(StepFragments.INVITE_FRIENDS)
                                 },
                                 onShare = {
@@ -352,6 +383,22 @@ class MainActivity : ComponentActivity() {
         }
         return result
     }
+
+    val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                // Permission is granted. Continue the action or workflow in your
+                // app.
+            } else {
+                // Explain to the user that the feature is unavailable because the
+                // feature requires a permission that the user has denied. At the
+                // same time, respect the user's decision. Don't link to system
+                // settings in an effort to convince the user to change their
+                // decision.
+            }
+        }
 
     override fun onResume() {
         super.onResume()
