@@ -22,5 +22,6 @@
     <string name="fast_test">Турбо тест</string>
     <string name="language">Язык</string>
     <string name="contact_search">Искать контакт</string>
+    <string name="close">Закрыть</string>
 
 </resources>

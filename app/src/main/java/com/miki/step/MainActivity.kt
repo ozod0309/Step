@@ -73,7 +73,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
-
         val sharedPreference = SharedPreference(applicationContext)
         androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
         userRegistration = sharedPreference.getValueInt(PreferencesKeys.USER_REGISTRATION)

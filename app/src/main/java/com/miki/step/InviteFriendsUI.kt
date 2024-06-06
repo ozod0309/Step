@@ -6,23 +6,24 @@ import android.content.Context
 import android.provider.ContactsContract
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Textsms
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -47,9 +49,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import com.miki.step.lib.PhoneContact
 import com.miki.step.lib.PhoneContactNumber
 import kotlinx.coroutines.Dispatchers
@@ -67,10 +69,25 @@ class InviteFriendsUI(val context: Context?) {
         val phoneContactList = remember {
             mutableStateListOf<PhoneContact>()
         }
+        val filteredContactList = remember {
+            mutableStateListOf<PhoneContact>()
+        }
+        val phoneContactSize = remember {
+            mutableIntStateOf(0)
+        }
+        val enableSearch = remember {
+            mutableStateOf(false)
+        }
         val scope = rememberCoroutineScope()
         LaunchedEffect(key1 = Unit) {
             scope.launch(Dispatchers.IO) {
-                loadContacts(context!!, phoneContactList)
+                loadContacts(
+                    context!!,
+                    phoneContactList,
+                    filteredContactList,
+                    phoneContactSize,
+                    enableSearch
+                )
             }
         }
         val selectedContactIndex = remember {
@@ -80,7 +97,8 @@ class InviteFriendsUI(val context: Context?) {
         val listState = rememberLazyListState()
         Scaffold(
             topBar = {
-                Column {
+                Column(
+                ) {
                     TopAppBar(
                         title = {
                             Text(text = stringResource(id = R.string.invite_friends))
@@ -110,32 +128,32 @@ class InviteFriendsUI(val context: Context?) {
                     modifier = Modifier
                         .padding(innerPadding)
                 ) {
-                    LazyColumn(state = listState) {
-                        items(phoneContactList.size) { index ->
-                            if (!phoneContactList[index].hidden.value) {
-                                Spacer(modifier = Modifier.height(20.dp))
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .padding(5.dp, 10.dp)
-                                        .fillMaxWidth()
-                                        .clickable {
-                                            selectedContactIndex.value = index
-                                            openNumbersList.value = !openNumbersList.value
-                                        }
-                                ) {
-                                    Spacer(modifier = Modifier.width(15.dp))
-                                    Icon(
-                                        imageVector = Icons.Filled.Phone,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        contentDescription = null
-                                    )
-                                    Spacer(modifier = Modifier.width(15.dp))
-                                    Text(
-                                        text = phoneContactList[index].name,
-                                        modifier = Modifier.fillMaxWidth(),
-                                    )
-                                }
+                    LazyColumn(
+                        state = listState
+                    ) {
+                        items(phoneContactSize.intValue) { index ->
+                            Spacer(modifier = Modifier.height(20.dp))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .padding(5.dp, 10.dp)
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        selectedContactIndex.intValue = index
+                                        openNumbersList.value = !openNumbersList.value
+                                    }
+                            ) {
+                                Spacer(modifier = Modifier.width(15.dp))
+                                Icon(
+                                    imageVector = Icons.Filled.Phone,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    contentDescription = null
+                                )
+                                Spacer(modifier = Modifier.width(15.dp))
+                                Text(
+                                    text = filteredContactList[index].name,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
                             }
                         }
                     }
@@ -147,26 +165,18 @@ class InviteFriendsUI(val context: Context?) {
                     actions = {
                         TextField(
                             modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = KeyboardOptions(),
                             value = searchContact,
+                            readOnly = !enableSearch.value,
                             onValueChange = { textValue ->
                                 searchContact = textValue
-                                if (textValue.isNotEmpty()) {
-                                    scope.launch {
-                                        val iterate = phoneContactList.iterator()
-                                        while (iterate.hasNext()) {
-                                            val item = iterate.next()
-                                            item.hidden.value = item.name.contains(textValue)
-                                        }
-                                    }
-                                } else {
-                                    scope.launch {
-                                        val iterate = phoneContactList.iterator()
-                                        while (iterate.hasNext()) {
-                                            val item = iterate.next()
-                                            item.hidden.value = false
-                                        }
-                                    }
+                                filteredContactList.clear()
+                                phoneContactList.map {
+                                    if (it.name.contains(textValue, true)) filteredContactList.add(
+                                        it
+                                    )
                                 }
+                                phoneContactSize.intValue = filteredContactList.size
                             },
                             label = { Text(stringResource(id = R.string.contact_search)) }
                         )
@@ -177,13 +187,20 @@ class InviteFriendsUI(val context: Context?) {
         if (openNumbersList.value) {
             ShowNumbers(
                 showNumbersList = openNumbersList,
-                numbers = phoneContactList[selectedContactIndex.intValue].number
+                numbers = phoneContactList[selectedContactIndex.intValue].number,
+                filteredContactList[selectedContactIndex.intValue].name,
             )
         }
     }
 
     @SuppressLint("Range")
-    private fun loadContacts(context: Context, phoneContactList: MutableList<PhoneContact>) {
+    private fun loadContacts(
+        context: Context,
+        phoneContactList: MutableList<PhoneContact>,
+        filteredContactList: MutableList<PhoneContact>,
+        phoneContactSize: MutableState<Int>,
+        enableSearch: MutableState<Boolean>
+    ) {
         val contentResolver: ContentResolver = context.contentResolver
         val cursor =
             contentResolver.query(
@@ -218,45 +235,74 @@ class InviteFriendsUI(val context: Context?) {
                                 .filter { !it.isWhitespace() }
                         if (!numbers.contains(
                                 PhoneContactNumber(
-                                    phoneNo,
-                                    false
+                                    phoneNo
                                 )
                             )
                         ) {
-                            numbers.add(PhoneContactNumber(phoneNo, false))
+                            numbers.add(PhoneContactNumber(phoneNo))
                         }
                     }
                     pCur.close()
                 }
                 phoneContactList.add(PhoneContact(name, numbers))
+                filteredContactList.add(PhoneContact(name, numbers))
+                phoneContactSize.value = phoneContactList.size
             }
         }
         cursor.close()
+        enableSearch.value = true
     }
 
     @ExperimentalMaterial3Api
     @Composable
     fun ShowNumbers(
         showNumbersList: MutableState<Boolean>,
-        numbers: MutableList<PhoneContactNumber>
+        numbers: MutableList<PhoneContactNumber>,
+        contactName: String
     ) {
         if (showNumbersList.value) {
-            AlertDialog(
+            BasicAlertDialog(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth(),
+                properties = DialogProperties(
+                    dismissOnBackPress = true,
+                    dismissOnClickOutside = true
+
+                ),
                 onDismissRequest = { showNumbersList.value = false }
             ) {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    shape = RoundedCornerShape(16.dp),
-                    color = Color.LightGray
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .wrapContentHeight(),
+                    tonalElevation = AlertDialogDefaults.TonalElevation,
                 ) {
-                    Box(
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            modifier = Modifier.align(Alignment.TopCenter),
-                            text = "top"
-                        )
 
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        TopAppBar(
+                            colors = TopAppBarDefaults.topAppBarColors(
+                                titleContentColor = MaterialTheme.colorScheme.secondary,
+                                containerColor = MaterialTheme.colorScheme.primary
+                            ),
+
+                            title = {
+                                Text(text = contactName)
+                            },
+                            navigationIcon = {
+                                IconButton(
+                                    onClick = {
+                                        showNumbersList.value = !showNumbersList.value
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        tint = MaterialTheme.colorScheme.secondary,
+                                        contentDescription = ""
+                                    )
+                                }
+                            }
+                        )
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxWidth(),
@@ -274,25 +320,28 @@ class InviteFriendsUI(val context: Context?) {
                                         }
                                 ) {
                                     Spacer(modifier = Modifier.width(15.dp))
+                                    Text(
+                                        text = numbers[index].number,
+                                        modifier = Modifier.weight(1f),
+                                    )
+                                    Spacer(modifier = Modifier.width(15.dp))
                                     Icon(
                                         imageVector = Icons.Filled.Textsms,
                                         tint = MaterialTheme.colorScheme.primary,
                                         contentDescription = null
                                     )
-                                    Spacer(modifier = Modifier.width(15.dp))
-                                    Text(
-                                        text = numbers[index].number,
-                                        modifier = Modifier.fillMaxWidth(),
-                                    )
                                 }
                             }
                         }
-
-
-                        Text(
-                            modifier = Modifier.align(Alignment.BottomCenter),
-                            text = "bottom"
-                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        TextButton(
+                            onClick = {
+                                showNumbersList.value = false
+                            },
+                            modifier = Modifier.align(Alignment.End)
+                        ) {
+                            Text(text = stringResource(id = R.string.close))
+                        }
                     }
                 }
             }

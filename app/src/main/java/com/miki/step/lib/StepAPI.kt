@@ -1,7 +1,5 @@
 package com.miki.step.lib
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -185,12 +183,10 @@ fun JSONArray.toTest(): ArrayList<Test> {
 
 data class PhoneContact(
     var name: String,
-    val number: ArrayList<PhoneContactNumber>,
-    var hidden: MutableState<Boolean>  = mutableStateOf(false)
+    val number: ArrayList<PhoneContactNumber>
 )
 
 data class PhoneContactNumber(
-    val number: String,
-    var registered: Boolean,
+    val number: String
 )
 

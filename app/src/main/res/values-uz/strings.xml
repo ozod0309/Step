@@ -22,5 +22,7 @@
     <string name="fast_test">Turbo Test</string>
     <string name="language">Tilni o\'zgartirish</string>
     <string name="contact_search">Kontaktni izlash</string>
+    <string name="close">Yopish</string>
+
 
 </resources>
