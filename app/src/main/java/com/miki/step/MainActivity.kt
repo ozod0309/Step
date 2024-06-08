@@ -32,6 +32,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.miki.step.lib.ApiURLS
+import com.miki.step.lib.AppNotification
 import com.miki.step.lib.Category
 import com.miki.step.lib.InternetAvailable
 import com.miki.step.lib.LocaleHelper
@@ -53,6 +54,7 @@ import com.zumo.mikitodo.libs.PermissionKeys
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
 import org.json.JSONObject
 import java.util.Locale
 
@@ -65,6 +67,7 @@ class MainActivity : ComponentActivity() {
         var stepUser = User()
         var category = arrayListOf<Category>()
         var activeCategory = 0
+        var testSessionID = 0
         var tests = arrayListOf<Test>()
         val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
     }
@@ -104,19 +107,44 @@ class MainActivity : ComponentActivity() {
                 sharedPreference.save(PreferencesKeys.NOT_FIRST_RUN, true)
                 StepFragments.LANGUAGE
             }
+        val requestPermissionLauncher =
+            registerForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { isGranted: Boolean ->
+                if (isGranted) {
+//                    navController.navigate(StepFragments.INVITE_FRIENDS)
+                } else {
+//                                                showNotificationText =
+//                                                    resources.getString(R.string.error_permission)
+//                                                showNotification.value = true
+                    // Explain to the user that the feature is unavailable because the
+                    // feature requires a permission that the user has denied. At the
+                    // same time, respect the user's decision. Don't link to system
+                    // settings in an effort to convince the user to change their
+                    // decision.
+                }
+            }
         setContent {
             val navController = rememberNavController()
             val startDestination by remember { mutableStateOf(startUI) }
+            val newNotification = remember {
+                mutableStateOf(false)
+            }
+
+            var newNotificationText = ""
             StepTheme {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colorScheme.tertiary
                 ) {
-                    NavHost(navController = navController, startDestination = startDestination) {
+                    NavHost(
+                        navController = navController,
+                        startDestination = startDestination
+                    ) {
                         composable(StepFragments.MAIN) {
                             MainUI(LocalContext.current).UI(
                                 onStartTest = { subCategoryId ->
-                                    URLDownload.getUrlDownload(
+                                    URLDownload.urlDownload(
                                         context = context,
                                         sURL = ApiURLS.GET_TEST,
                                         requestBody = arrayListOf(
@@ -132,8 +160,9 @@ class MainActivity : ComponentActivity() {
                                         onResult = { result ->
                                             try {
                                                 val json = JSONObject(result)
-                                                tests =
-                                                    json.optJSONArray(StepGlobal.DATA)!!.toTest()
+                                                val data = json.optJSONObject(StepGlobal.DATA)!!
+                                                testSessionID = data.optInt(StepGlobal.SESSION_ID)
+                                                tests = data.optJSONArray(StepGlobal.QUESTION_LIST)!!.toTest()
                                                 navController.navigate(StepFragments.TEST)
                                             } catch (e: Exception) {
                                                 Toast.makeText(
@@ -154,7 +183,7 @@ class MainActivity : ComponentActivity() {
                                             context,
                                             PermissionArray[PermissionKeys.READ_CONTACTS].name
                                         ) == PackageManager.PERMISSION_GRANTED -> {
-                                            // You can use the API that requires the permission.
+                                            navController.navigate(StepFragments.INVITE_FRIENDS)
                                         }
 
                                         ActivityCompat.shouldShowRequestPermissionRationale(
@@ -170,9 +199,6 @@ class MainActivity : ComponentActivity() {
                                             )
                                         }
                                     }
-
-
-                                    navController.navigate(StepFragments.INVITE_FRIENDS)
                                 },
                                 onShare = {
                                     ShareCompat
@@ -196,6 +222,10 @@ class MainActivity : ComponentActivity() {
                                         ).show()
                                     }
                                 },
+                                onNotification = { message ->
+                                    newNotification.value = true
+                                    newNotificationText = message
+                                },
                                 onLogout = {
                                     URLDownload.urlDownload(
                                         context = context,
@@ -211,7 +241,8 @@ class MainActivity : ComponentActivity() {
                                             }
                                             if (json.has(StepGlobal.SUCCESS)) {
                                                 stepUser = User()
-                                                userRegistration = RegistrationTypes.UNREGISTERED
+                                                userRegistration =
+                                                    RegistrationTypes.UNREGISTERED
                                                 sharedPreference.save(PreferencesKeys.USER, "")
                                                 sharedPreference.save(
                                                     PreferencesKeys.USER_REGISTRATION,
@@ -264,7 +295,7 @@ class MainActivity : ComponentActivity() {
                                 onBackPressed = {
                                     navController.navigate(StepFragments.MAIN)
                                 },
-                                onInvite = {
+                                onInvite = { number ->
 
                                 }
                             )
@@ -275,10 +306,20 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate(StepFragments.MAIN)
                                 },
                                 onTimeOut = {
-                                    navController.navigate(StepFragments.RESULT)
+                                    checkForTestResults(
+                                        context,
+                                        onResult = {
+                                            navController.navigate(StepFragments.RESULT)
+                                        }
+                                    )
                                 },
                                 onFinishTest = {
-                                    navController.navigate(StepFragments.RESULT)
+                                    checkForTestResults(
+                                        context,
+                                        onResult = {
+                                            navController.navigate(StepFragments.RESULT)
+                                        }
+                                    )
                                 }
                             )
                         }
@@ -348,8 +389,43 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
+                if (newNotification.value) {
+                    AppNotification.Add(
+                        icon = AppNotification.IconType.NOTIFICATION,
+                        message = newNotificationText,
+                        onFinish = {
+                            newNotification.value = false
+                        }
+                    )
+                }
             }
         }
+    }
+
+    private fun checkForTestResults(context: Context, onResult: () -> Unit) {
+        val data = JSONArray()
+        tests.forEach { item ->
+            val json = JSONObject()
+                .put(StepGlobal.QUESTION_ID, item.id)
+                .put(StepGlobal.ANSWER_ID, item.answered)
+            data.put(json)
+        }
+        URLDownload.urlDownload(
+            context = context,
+            sURL = "${ApiURLS.GET_TEST}/${testSessionID}/finish",
+            requestBody = arrayListOf(
+                PostData(StepGlobal.DATA, data.toString())
+            ),
+            onResult = { result ->
+                val json = try {
+                    JSONObject(result)
+                } catch (e: Exception) {
+                    JSONObject()
+                }
+                onResult()
+            }
+        )
+
     }
 
     private fun loadCategories(context: Context): Boolean {
@@ -382,22 +458,6 @@ class MainActivity : ComponentActivity() {
         }
         return result
     }
-
-    val requestPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                // Permission is granted. Continue the action or workflow in your
-                // app.
-            } else {
-                // Explain to the user that the feature is unavailable because the
-                // feature requires a permission that the user has denied. At the
-                // same time, respect the user's decision. Don't link to system
-                // settings in an effort to convince the user to change their
-                // decision.
-            }
-        }
 
     override fun onResume() {
         super.onResume()

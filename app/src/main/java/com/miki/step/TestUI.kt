@@ -82,15 +82,11 @@ class TestUI(context: Context?) {
         val totalTime = 300
         var testTimer by remember { mutableIntStateOf(totalTime) }
         var testProgressBarAlpha by remember { mutableIntStateOf(0) }
-        val showTestResult = remember {
-            mutableStateOf(false)
-        }
+        val showTestResult = remember { mutableStateOf(false) }
         var bottomHeight by remember { mutableIntStateOf(0) }
 
         val listState = rememberLazyListState()
-        var activeQuestionIndex by remember {
-            mutableIntStateOf(0)
-        }
+        var activeQuestionIndex by remember { mutableIntStateOf(0) }
         var activeQuestion by remember {
             mutableStateOf(MainActivity.tests[activeQuestionIndex])
         }

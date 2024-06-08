@@ -13,12 +13,15 @@ object StepGlobal {
     const val SUBCATEGORIES = "subcategories"
     const val CATEGORY_ID = "category_id"
     const val SUBCATEGORY_ID = "subcategory_id"
-    const val ANSWER_LIST = "answer"
-    const val ANSWER = "answer"
-    const val QUESTION_ID = "question_id"
     const val QUESTION = "question"
-    const val IS_CORRECT = "is_correct"
+    const val QUESTION_ID = "question_id"
+    const val QUESTION_LIST = "question_list"
+    const val ANSWER = "answer"
+    const val ANSWER_ID = "answer_id"
+    const val ANSWER_LIST = "answer_list"
+    const val SESSION_ID = "session_id"
     const val IMAGE = "image"
+    const val IS_CORRECT = "is_correct"
 
     const val RESULT = "result"
     const val SUCCESS = "success"
@@ -27,7 +30,6 @@ object StepGlobal {
     const val ACCESS_TOKEN = "access_token"
     const val TOKEN_TYPE = "token_type"
     const val ANDROID_ID = "android_id"
-
 }
 
 object StepFragments {
@@ -147,8 +149,7 @@ data class Test(
 data class Answer(
     val id: Int,
     val answer: String,
-    val image: String = "",
-    val correct: Boolean
+    val image: String = ""
 )
 
 fun JSONArray.toTest(): ArrayList<Test> {
@@ -164,7 +165,6 @@ fun JSONArray.toTest(): ArrayList<Test> {
                     id = answerItem.optInt(StepGlobal.ID),
                     answer = answerItem.optString(StepGlobal.ANSWER),
                     image = answerItem.optString(StepGlobal.IMAGE),
-                    correct = answerItem.optBoolean(StepGlobal.IS_CORRECT)
                 )
             )
         }

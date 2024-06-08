@@ -100,6 +100,7 @@ class MainUI(val context: Context) {
         onInviteFriends: () -> Unit,
         onShare: () -> Unit,
         onRateUs: () -> Unit,
+        onNotification: (message: String) -> Unit,
         onLogout: () -> Unit
     ) {
         val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -391,7 +392,9 @@ class MainUI(val context: Context) {
                 floatingActionButton = {
                     Box {
                         FloatingActionButton(
-                            onClick = { /* stub */ },
+                            onClick = {
+                                      onNotification("New Turbo Test")
+                            },
 //                            shape = CircleShape,
                             containerColor = MaterialTheme.colorScheme.primary,
                             modifier = Modifier

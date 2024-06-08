@@ -23,6 +23,7 @@
     <string name="language">Tilni o\'zgartirish</string>
     <string name="contact_search">Kontaktni izlash</string>
     <string name="close">Yopish</string>
+    <string name="error_permission">Ruxsat berilmadi</string>
 
 
 </resources>

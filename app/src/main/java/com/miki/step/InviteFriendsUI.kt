@@ -63,7 +63,7 @@ class InviteFriendsUI(val context: Context?) {
     @Composable
     fun UI(
         onBackPressed: () -> Unit,
-        onInvite: () -> Unit
+        onInvite: (number: String) -> Unit
     ) {
         val openNumbersList = remember { mutableStateOf(false) }
         val phoneContactList = remember {
@@ -97,8 +97,7 @@ class InviteFriendsUI(val context: Context?) {
         val listState = rememberLazyListState()
         Scaffold(
             topBar = {
-                Column(
-                ) {
+                Column {
                     TopAppBar(
                         title = {
                             Text(text = stringResource(id = R.string.invite_friends))
@@ -189,6 +188,9 @@ class InviteFriendsUI(val context: Context?) {
                 showNumbersList = openNumbersList,
                 numbers = phoneContactList[selectedContactIndex.intValue].number,
                 filteredContactList[selectedContactIndex.intValue].name,
+                onInvite = {
+                    onInvite(it)
+                }
             )
         }
     }
@@ -258,7 +260,8 @@ class InviteFriendsUI(val context: Context?) {
     fun ShowNumbers(
         showNumbersList: MutableState<Boolean>,
         numbers: MutableList<PhoneContactNumber>,
-        contactName: String
+        contactName: String,
+        onInvite: (number: String) -> Unit
     ) {
         if (showNumbersList.value) {
             BasicAlertDialog(
@@ -328,7 +331,10 @@ class InviteFriendsUI(val context: Context?) {
                                     Icon(
                                         imageVector = Icons.Filled.Textsms,
                                         tint = MaterialTheme.colorScheme.primary,
-                                        contentDescription = null
+                                        contentDescription = null,
+                                        modifier = Modifier.clickable {
+                                            onInvite(numbers[index].number)
+                                        }
                                     )
                                 }
                             }
