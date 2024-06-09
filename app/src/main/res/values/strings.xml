@@ -24,7 +24,7 @@
     <string name="server_error">Server connection error</string>
 
     <string name="home">Home</string>
-    <string name="achievements">Successes</string>
+    <string name="success">Successes</string>
     <string name="history">History</string>
     <string name="profile">Profile</string>
 

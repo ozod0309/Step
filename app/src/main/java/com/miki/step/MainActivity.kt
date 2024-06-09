@@ -432,7 +432,7 @@ class MainActivity : ComponentActivity() {
                 }
                 if(jsonResult.optBoolean(StepGlobal.SUCCESS)) {
                     val dataResult = jsonResult.optJSONObject(StepGlobal.DATA)
-                    if(dataResult!!.optInt(StepGlobal.SESSION_ID) == MainActivity.testSessionID) {
+                    if(dataResult!!.optInt(StepGlobal.SESSION_ID) == testSessionID) {
                         val answerResults = dataResult.optJSONArray(StepGlobal.RESULTS)
                         for (i in 0 until answerResults!!.length()) {
                             val item = answerResults[i] as JSONObject

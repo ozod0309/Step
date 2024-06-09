@@ -51,7 +51,8 @@ fun CircularProgressbar(
     name: String = "",
     size: Dp = 150.dp,
     foregroundIndicatorColor: Color = MaterialTheme.colorScheme.primary,
-    shadowColor: Color = Color.LightGray,
+    shadowColor: Color = MaterialTheme.colorScheme.secondary,
+    shadowColor2: Color = MaterialTheme.colorScheme.onSecondary,
     indicatorThickness: Dp = 8.dp,
     dataUsage: Float = 60f,
     animationDuration: Int = 5000,
@@ -89,7 +90,7 @@ fun CircularProgressbar(
             // Draw the shadow around the circular progress bar
             drawCircle(
                 brush = Brush.radialGradient(
-                    colors = listOf(shadowColor, Color.White),
+                    colors = listOf(shadowColor, shadowColor2),
                     center = Offset(x = this.size.width / 2, y = this.size.height / 2),
                     radius = this.size.height / 2
                 ),
@@ -99,7 +100,7 @@ fun CircularProgressbar(
 
             // Draw the white background of the circular progress bar
             drawCircle(
-                color = Color.White,
+                color = shadowColor2,
                 radius = (size / 2 - indicatorThickness).toPx(),
                 center = Offset(x = this.size.width / 2, y = this.size.height / 2)
             )

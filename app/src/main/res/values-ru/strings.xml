@@ -5,7 +5,7 @@
     <string name="server_error">Ошибка соединения с сервером</string>
 
     <string name="home">Главная</string>
-    <string name="achievements">Успехи</string>
+    <string name="success">Успехи</string>
     <string name="history">История</string>
     <string name="profile">Профиль</string>
 

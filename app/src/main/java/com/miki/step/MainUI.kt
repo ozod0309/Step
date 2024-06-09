@@ -15,6 +15,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -58,7 +59,9 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -76,8 +79,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -91,6 +96,11 @@ class MainUI(val context: Context) {
         var categoryTop = 0.dp
     }
 
+    data class BottomItem(
+        val icon: ImageVector,
+        val text: String
+    )
+
     @SuppressLint("NotConstructor")
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -103,6 +113,12 @@ class MainUI(val context: Context) {
         onNotification: (message: String) -> Unit,
         onLogout: () -> Unit
     ) {
+        val bottomBarData = arrayListOf(
+            BottomItem(Icons.Filled.Home, context.resources.getString(R.string.home)),
+            BottomItem(Icons.Filled.BarChart, context.resources.getString(R.string.success)),
+            BottomItem(Icons.Filled.History, context.resources.getString(R.string.history)),
+            BottomItem(Icons.Filled.Person, context.resources.getString(R.string.profile))
+        )
         val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
         val categoryShow = remember {
@@ -110,6 +126,9 @@ class MainUI(val context: Context) {
         }
         val activeCategory = remember {
             mutableIntStateOf(MainActivity.activeCategory)
+        }
+        val bottomBarSelector = remember {
+            mutableIntStateOf(0)
         }
         ModalNavigationDrawer(
             drawerState = drawerState,
@@ -236,155 +255,64 @@ class MainUI(val context: Context) {
                 modifier = Modifier
                     .nestedScroll(scrollBehavior.nestedScrollConnection),
                 topBar = {
-                    LargeTopAppBar(
-                        colors = TopAppBarDefaults.largeTopAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            titleContentColor = MaterialTheme.colorScheme.secondary,
-                            scrolledContainerColor = MaterialTheme.colorScheme.primary,
-                        ),
-                        title = {
-                            Text(
-                                text = MainActivity.category[activeCategory.intValue].name,
-                                color = MaterialTheme.colorScheme.secondary,
-                                maxLines = 1,
-                                textAlign = TextAlign.Center,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable(onClick = {
-                                        categoryShow.value = !categoryShow.value
-                                    })
-                            )
-                        },
-                        navigationIcon = {
-                            IconButton(onClick = {
+                    when(bottomBarSelector.intValue) {
+                        0 -> MainTop(
+                            activeCategory = activeCategory,
+                            categoryShow = categoryShow,
+                            scrollBehavior = scrollBehavior,
+                            onOpenDrawer = {
                                 scope.launch { drawerState.open() }
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Menu,
-                                    contentDescription = context.resources.getString(R.string.menu),
-                                    tint = MaterialTheme.colorScheme.secondary
-                                )
                             }
-                        },
-                        actions = {
-                            IconButton(onClick = {
-                                /* do something */
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Notifications,
-                                    contentDescription = context.resources.getString(R.string.notificaations),
-                                    tint = MaterialTheme.colorScheme.secondary
-                                )
-                            }
-                        },
-                        scrollBehavior = scrollBehavior,
-                    )
+                        )
+                        1 -> SuccessTop()
+                        2 -> HistoryTop()
+                        3 -> ProfileTop()
+                    }
                 },
                 content = { innerPadding ->
                     categoryTop = innerPadding.calculateTopPadding()
-                    Box(
-                        modifier = Modifier
-                            .padding(innerPadding)
-                            .fillMaxSize()
-                    ) {
-                        LazyColumn {
-                            items(MainActivity.category[activeCategory.intValue].subCategory.size) { index ->
-                                Spacer(modifier = Modifier.height(20.dp))
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .padding(5.dp, 10.dp)
-                                        .fillMaxWidth()
-                                        .clickable {
-                                            onStartTest(index)
-                                        }
-                                ) {
-                                    Spacer(modifier = Modifier.width(15.dp))
-                                    Icon(
-                                        imageVector = Icons.Filled.Star,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        contentDescription = null
-                                    )
-                                    Spacer(modifier = Modifier.width(15.dp))
-                                    Text(
-                                        text = MainActivity.category[activeCategory.intValue].subCategory[index].name,
-                                        modifier = Modifier.fillMaxWidth(),
-                                    )
-                                }
+                    when(bottomBarSelector.intValue) {
+                        0 -> MainContent(
+                            activeCategory = activeCategory,
+                            innerPadding = innerPadding,
+                            onStartTest = {index ->
+                                onStartTest(index)
                             }
-                        }
+                        )
+                        1 -> SuccessContent()
+                        2 -> HistoryContent()
+                        3 -> ProfileContent()
                     }
-
-
                 },
                 bottomBar = {
                     BottomAppBar(
                         containerColor = MaterialTheme.colorScheme.primary,
                         actions = {
-                            Column(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clickable {
-
-                                    },
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(
-                                    Icons.Filled.Home,
-                                    contentDescription = context.resources.getString(R.string.home)
-                                )
-                                Text(
-                                    text = context.resources.getString(R.string.home)
-                                )
-                            }
-                            Column(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clickable {
-
-                                    },
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(
-                                    Icons.Filled.BarChart,
-                                    contentDescription = context.resources.getString(R.string.achievements)
-                                )
-                                Text(
-                                    text = context.resources.getString(R.string.achievements)
-                                )
-                            }
-                            Column(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clickable {
-
-                                    },
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(
-                                    Icons.Filled.History,
-                                    contentDescription = context.resources.getString(R.string.history)
-                                )
-                                Text(
-                                    text = context.resources.getString(R.string.history)
-                                )
-                            }
-                            Column(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clickable {
-
-                                    },
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(
-                                    Icons.Filled.Person,
-                                    contentDescription = context.resources.getString(R.string.profile)
-                                )
-                                Text(
-                                    text = context.resources.getString(R.string.profile)
-                                )
+                            bottomBarData.forEachIndexed { index, item ->
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .clickable {
+                                            bottomBarSelector.intValue = index
+                                        },
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Icon(
+                                        item.icon,
+                                        tint = if (bottomBarSelector.intValue == index) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSecondary,
+                                        contentDescription = item.text
+                                    )
+                                    Text(
+                                        text = item.text,
+                                        color = if (bottomBarSelector.intValue == index) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSecondary,
+                                    )
+                                    if (bottomBarSelector.intValue == index) {
+                                        HorizontalDivider(
+                                            thickness = 2.dp,
+                                            color = MaterialTheme.colorScheme.secondary
+                                        )
+                                    }
+                                }
                             }
                         }
                     )
@@ -393,7 +321,7 @@ class MainUI(val context: Context) {
                     Box {
                         FloatingActionButton(
                             onClick = {
-                                      onNotification("New Turbo Test")
+                                onNotification("New Turbo Test")
                             },
 //                            shape = CircleShape,
                             containerColor = MaterialTheme.colorScheme.primary,
@@ -428,6 +356,168 @@ class MainUI(val context: Context) {
             OpenCategory(categoryShow, activeCategory)
         }
     }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    private fun MainTop(
+        activeCategory: MutableIntState,
+        categoryShow: MutableState<Boolean>,
+        scrollBehavior: TopAppBarScrollBehavior,
+        onOpenDrawer: () -> Unit
+    ) {
+        LargeTopAppBar(
+            colors = TopAppBarDefaults.largeTopAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                titleContentColor = MaterialTheme.colorScheme.secondary,
+                scrolledContainerColor = MaterialTheme.colorScheme.primary,
+            ),
+            title = {
+                Text(
+                    text = MainActivity.category[activeCategory.intValue].name,
+                    color = MaterialTheme.colorScheme.secondary,
+                    maxLines = 1,
+                    textAlign = TextAlign.Center,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(onClick = {
+                            categoryShow.value = !categoryShow.value
+                        })
+                )
+            },
+            navigationIcon = {
+                IconButton(onClick = {
+                    onOpenDrawer()
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Menu,
+                        contentDescription = context.resources.getString(R.string.menu),
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            },
+            actions = {
+                IconButton(onClick = {
+                    /* do something */
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Notifications,
+                        contentDescription = context.resources.getString(R.string.notificaations),
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            },
+            scrollBehavior = scrollBehavior,
+        )
+    }
+
+    @Composable
+    private fun MainContent(
+        activeCategory: MutableIntState,
+        innerPadding: PaddingValues,
+        onStartTest: (subCategoryId: Int) -> Unit
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+            LazyColumn {
+                items(MainActivity.category[activeCategory.intValue].subCategory.size) { index ->
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .padding(5.dp, 10.dp)
+                            .fillMaxWidth()
+                            .clickable {
+                                onStartTest(index)
+                            }
+                    ) {
+                        Spacer(modifier = Modifier.width(15.dp))
+                        Icon(
+                            imageVector = Icons.Filled.Star,
+                            tint = MaterialTheme.colorScheme.primary,
+                            contentDescription = null
+                        )
+                        Spacer(modifier = Modifier.width(15.dp))
+                        Text(
+                            text = MainActivity.category[activeCategory.intValue].subCategory[index].name,
+                            color = MaterialTheme.colorScheme.onTertiary,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    private fun SuccessTop() {
+        TopAppBar(
+            title = {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(id = R.string.success),
+                    textAlign = TextAlign.Center
+                )
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                titleContentColor = MaterialTheme.colorScheme.secondary,
+                containerColor = MaterialTheme.colorScheme.primary
+            )
+        )
+    }
+
+    @Composable
+    private fun SuccessContent() {
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    private fun HistoryTop() {
+        TopAppBar(
+            title = {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(id = R.string.history),
+                    textAlign = TextAlign.Center
+                )
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                titleContentColor = MaterialTheme.colorScheme.secondary,
+                containerColor = MaterialTheme.colorScheme.primary
+            )
+        )
+    }
+
+    @Composable
+    private fun HistoryContent() {
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    private fun ProfileTop() {
+        TopAppBar(
+            title = {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(id = R.string.profile),
+                    textAlign = TextAlign.Center
+                )
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                titleContentColor = MaterialTheme.colorScheme.secondary,
+                containerColor = MaterialTheme.colorScheme.primary
+            )
+        )
+    }
+
+    @Composable
+    private fun ProfileContent() {
+    }
+
 
     @Composable
     fun OpenCategory(
@@ -512,7 +602,7 @@ class MainUI(val context: Context) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                if(URLUtil.isValidUrl(MainActivity.category[index].image)) {
+                                if (URLUtil.isValidUrl(MainActivity.category[index].image)) {
                                     Image(
                                         alignment = Alignment.Center,
                                         painter = rememberAsyncImagePainter(MainActivity.stepUser.pictureURL),
@@ -523,7 +613,7 @@ class MainUI(val context: Context) {
                                 } else {
                                     Image(
                                         alignment = Alignment.Center,
-                                        painter = painterResource(id =  R.drawable.ic_test),
+                                        painter = painterResource(id = R.drawable.ic_test),
                                         contentDescription = null,
                                         modifier = Modifier
                                             .size(64.dp)

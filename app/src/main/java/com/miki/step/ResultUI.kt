@@ -1,7 +1,9 @@
 package com.miki.step
 
 import android.content.Context
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,11 +11,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.AccessTimeFilled
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Quiz
@@ -29,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -77,6 +85,7 @@ class ResultUI(val context: Context?) {
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                     HorizontalDivider()
+                    Spacer(modifier = Modifier.height(20.dp))
                     Text(
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth(),
@@ -94,20 +103,20 @@ class ResultUI(val context: Context?) {
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            textAlign = TextAlign.Center,
                             modifier = Modifier
-                                .fillMaxWidth()
                                 .weight(1f),
+                            color = MaterialTheme.colorScheme.onTertiary,
                             text = stringResource(id = R.string.questions_count)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Right,
+                            color = MaterialTheme.colorScheme.onTertiary,
                             text = testQuestionsCount.toString()
                         )
                         Spacer(modifier = Modifier.width(20.dp))
                     }
+                    Spacer(modifier = Modifier.height(10.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                     ) {
@@ -119,20 +128,20 @@ class ResultUI(val context: Context?) {
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            textAlign = TextAlign.Center,
                             modifier = Modifier
-                                .fillMaxWidth()
                                 .weight(1f),
+                            color = MaterialTheme.colorScheme.onTertiary,
                             text = stringResource(id = R.string.correct_answered)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Right,
+                            color = MaterialTheme.colorScheme.onTertiary,
                             text = correctAnswerCount.toString()
                         )
                         Spacer(modifier = Modifier.width(20.dp))
                     }
+                    Spacer(modifier = Modifier.height(10.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                     ) {
@@ -144,20 +153,20 @@ class ResultUI(val context: Context?) {
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            textAlign = TextAlign.Center,
                             modifier = Modifier
-                                .fillMaxWidth()
                                 .weight(1f),
+                            color = MaterialTheme.colorScheme.onTertiary,
                             text = stringResource(id = R.string.incorrect_answered)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Right,
+                            color = MaterialTheme.colorScheme.onTertiary,
                             text = incorrectAnswerCount.toString()
                         )
                         Spacer(modifier = Modifier.width(20.dp))
                     }
+                    Spacer(modifier = Modifier.height(10.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                     ) {
@@ -169,22 +178,22 @@ class ResultUI(val context: Context?) {
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            textAlign = TextAlign.Center,
                             modifier = Modifier
-                                .fillMaxWidth()
                                 .weight(1f),
+                            color = MaterialTheme.colorScheme.onTertiary,
                             text = stringResource(id = R.string.unanswered_questions)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Right,
+                            color = MaterialTheme.colorScheme.onTertiary,
                             text = unAnswered.toString()
                         )
                         Spacer(modifier = Modifier.width(20.dp))
                     }
-
+                    Spacer(modifier = Modifier.height(10.dp))
                     HorizontalDivider()
+                    Spacer(modifier = Modifier.height(10.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                     ) {
@@ -196,20 +205,20 @@ class ResultUI(val context: Context?) {
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            textAlign = TextAlign.Center,
                             modifier = Modifier
-                                .fillMaxWidth()
                                 .weight(1f),
+                            color = MaterialTheme.colorScheme.onTertiary,
                             text = stringResource(id = R.string.total_time)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
-                            text = 300.toString()
+                            textAlign = TextAlign.Right,
+                            color = MaterialTheme.colorScheme.onTertiary,
+                            text = showTimer(300)
                         )
                         Spacer(modifier = Modifier.width(20.dp))
                     }
+                    Spacer(modifier = Modifier.height(10.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                     ) {
@@ -221,20 +230,69 @@ class ResultUI(val context: Context?) {
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            textAlign = TextAlign.Center,
                             modifier = Modifier
-                                .fillMaxWidth()
                                 .weight(1f),
+                            color = MaterialTheme.colorScheme.onTertiary,
                             text = stringResource(id = R.string.spent_time)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
-                            text = 200.toString()
+                            textAlign = TextAlign.Right,
+                            color = MaterialTheme.colorScheme.onTertiary,
+                            text = showTimer(200)
                         )
                         Spacer(modifier = Modifier.width(20.dp))
                     }
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Column {
+                        Box(
+                            modifier = Modifier
+                                .border(1.dp, MaterialTheme.colorScheme.primary)
+                                .fillMaxWidth()
+                                .wrapContentHeight()
+                        ) {
+                            val numbers = (1..MainActivity.tests.size).toList()
+                            Column(
+                                Modifier.verticalScroll(rememberScrollState())
+                            ) {
+                                for (i in 0 until Math.floorDiv(numbers.size - 1, 10) + 1) {
+                                    Row {
+                                        repeat(10) { j ->
+                                            val index = i * 10 + j
+                                            Box(
+                                                Modifier
+                                                    .weight(1f)
+                                                    .height(50.dp),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                if (index < numbers.size) {
+                                                    Column(
+                                                        horizontalAlignment = Alignment.CenterHorizontally
+                                                    ) {
+                                                        Icon(
+                                                            imageVector = if (MainActivity.tests[index].answered != 0)
+                                                                Icons.Filled.CheckBox
+                                                            else
+                                                                Icons.Filled.CheckBoxOutlineBlank,
+                                                            tint = MaterialTheme.colorScheme.primary,
+                                                            contentDescription = ""
+                                                        )
+                                                        Text(
+                                                            text = numbers[index].toString(),
+                                                            color = MaterialTheme.colorScheme.primary,
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+
+
                 }
             },
             bottomBar = {
@@ -264,4 +322,10 @@ class ResultUI(val context: Context?) {
             }
         )
     }
+    private fun showTimer(timer: Int): String {
+        return "${(timer / 3600)}:${
+            ((timer % 3600) / 60).toString().padStart(2, '0')
+        }:${(timer % 60).toString().padStart(2, '0')}"
+    }
+
 }
