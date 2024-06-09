@@ -24,6 +24,14 @@
     <string name="contact_search">Kontaktni izlash</string>
     <string name="close">Yopish</string>
     <string name="error_permission">Ruxsat berilmadi</string>
+    <string name="result">Natija</string>
+    <string name="questions_count">Savollar soni</string>
+    <string name="correct_answered">To\'g\'ri berilgan javoblar</string>
+    <string name="incorrect_answered">Noto\'g\'ri berilgan javoblar</string>
+    <string name="unanswered_questions">Javob berilmagan savollar</string>
+    <string name="total_time">Berilgan vaqt</string>
+    <string name="spent_time">Ketgan vaqt</string>
+
 
 
 </resources>

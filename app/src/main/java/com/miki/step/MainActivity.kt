@@ -308,16 +308,24 @@ class MainActivity : ComponentActivity() {
                                 onTimeOut = {
                                     checkForTestResults(
                                         context,
-                                        onResult = {
-                                            navController.navigate(StepFragments.RESULT)
+                                        onResult = { result ->
+                                            if(result) {
+                                                navController.navigate(StepFragments.RESULT)
+                                            } else {
+                                                navController.navigate(StepFragments.ERROR)
+                                            }
                                         }
                                     )
                                 },
                                 onFinishTest = {
                                     checkForTestResults(
                                         context,
-                                        onResult = {
-                                            navController.navigate(StepFragments.RESULT)
+                                        onResult = { result ->
+                                            if(result) {
+                                                navController.navigate(StepFragments.RESULT)
+                                            } else {
+                                                navController.navigate(StepFragments.ERROR)
+                                            }
                                         }
                                     )
                                 }
@@ -402,7 +410,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun checkForTestResults(context: Context, onResult: () -> Unit) {
+    private fun checkForTestResults(context: Context, onResult: (result: Boolean) -> Unit) {
         val data = JSONArray()
         tests.forEach { item ->
             val json = JSONObject()
@@ -417,12 +425,26 @@ class MainActivity : ComponentActivity() {
                 PostData(StepGlobal.DATA, data.toString())
             ),
             onResult = { result ->
-                val json = try {
+                val jsonResult = try {
                     JSONObject(result)
                 } catch (e: Exception) {
                     JSONObject()
                 }
-                onResult()
+                if(jsonResult.optBoolean(StepGlobal.SUCCESS)) {
+                    val dataResult = jsonResult.optJSONObject(StepGlobal.DATA)
+                    if(dataResult!!.optInt(StepGlobal.SESSION_ID) == MainActivity.testSessionID) {
+                        val answerResults = dataResult.optJSONArray(StepGlobal.RESULTS)
+                        for (i in 0 until answerResults!!.length()) {
+                            val item = answerResults[i] as JSONObject
+                            tests.find { it.id == item.optInt(StepGlobal.QUESTION_ID) }!!.isCorrect = item.optInt(StepGlobal.IS_CORRECT) == 1
+                        }
+                        onResult(true)
+                    } else {
+                        onResult(false)
+                    }
+                } else {
+                    onResult(false)
+                }
             }
         )
 

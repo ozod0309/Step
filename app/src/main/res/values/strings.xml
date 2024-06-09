@@ -43,5 +43,12 @@
     <string name="contact_search">Contact Search</string>
     <string name="close">Close</string>
     <string name="error_permission">Permission not granted</string>
+    <string name="result">Result</string>
+    <string name="questions_count">Questions count</string>
+    <string name="correct_answered">Correct answered questions</string>
+    <string name="incorrect_answered">Incorrect answered questions</string>
+    <string name="unanswered_questions">Unanswered_questions</string>
+    <string name="total_time">Total time</string>
+    <string name="spent_time">Spent time</string>
 
 </resources>

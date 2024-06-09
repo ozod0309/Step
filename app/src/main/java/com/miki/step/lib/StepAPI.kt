@@ -24,6 +24,7 @@ object StepGlobal {
     const val IS_CORRECT = "is_correct"
 
     const val RESULT = "result"
+    const val RESULTS = "results"
     const val SUCCESS = "success"
     const val AUTH = "Authorization"
     const val ID_TOKEN = "id_token"
@@ -143,7 +144,8 @@ data class Test(
     val question: String,
     val image: String = "",
     val answers: ArrayList<Answer>,
-    var answered: Int = 0
+    var answered: Int = 0,
+    var isCorrect: Boolean = false
 )
 
 data class Answer(

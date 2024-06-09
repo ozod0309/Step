@@ -24,5 +24,13 @@
     <string name="contact_search">Искать контакт</string>
     <string name="close">Закрыть</string>
     <string name="error_permission">Разрешение не предоставлено</string>
+    <string name="result">Результат</string>
+    <string name="questions_count">Количество вопросов</string>
+    <string name="correct_answered">Правильно отвеченные вопросы</string>
+    <string name="incorrect_answered">Неправильно отвеченные вопросы</string>
+    <string name="unanswered_questions">Неотвеченные вопросы</string>
+    <string name="total_time">Общее время</string>
+    <string name="spent_time">Потраченное время</string>
+
 
 </resources>
