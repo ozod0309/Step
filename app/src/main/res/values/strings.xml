@@ -50,5 +50,6 @@
     <string name="unanswered_questions">Unanswered_questions</string>
     <string name="total_time">Total time</string>
     <string name="spent_time">Spent time</string>
+    <string name="invite_sms">You are invited to Step.\nhttp://play.google.com/store/apps/details?id=com.miki.step</string>
 
 </resources>

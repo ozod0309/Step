@@ -40,6 +40,7 @@ import com.miki.step.lib.PostData
 import com.miki.step.lib.PreferencesKeys
 import com.miki.step.lib.RegistrationTypes
 import com.miki.step.lib.SharedPreference
+import com.miki.step.lib.SimUtil
 import com.miki.step.lib.StepFragments
 import com.miki.step.lib.StepGlobal
 import com.miki.step.lib.Test
@@ -162,7 +163,9 @@ class MainActivity : ComponentActivity() {
                                                 val json = JSONObject(result)
                                                 val data = json.optJSONObject(StepGlobal.DATA)!!
                                                 testSessionID = data.optInt(StepGlobal.SESSION_ID)
-                                                tests = data.optJSONArray(StepGlobal.QUESTION_LIST)!!.toTest()
+                                                tests =
+                                                    data.optJSONArray(StepGlobal.QUESTION_LIST)!!
+                                                        .toTest()
                                                 navController.navigate(StepFragments.TEST)
                                             } catch (e: Exception) {
                                                 Toast.makeText(
@@ -291,12 +294,66 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(StepFragments.INVITE_FRIENDS) {
+
                             InviteFriendsUI(LocalContext.current).UI(
                                 onBackPressed = {
                                     navController.navigate(StepFragments.MAIN)
                                 },
                                 onInvite = { number ->
+                                    when {
+                                        ContextCompat.checkSelfPermission(
+                                            context,
+                                            PermissionArray[PermissionKeys.READ_PHONE_STATE].name
+                                        ) == PackageManager.PERMISSION_GRANTED -> {
 
+                                        }
+
+                                        ActivityCompat.shouldShowRequestPermissionRationale(
+                                            activity,
+                                            PermissionArray[PermissionKeys.READ_PHONE_STATE].name
+                                        ) -> {
+
+                                        }
+                                        else -> {
+                                            requestPermissionLauncher.launch(
+                                                Manifest.permission.READ_PHONE_NUMBERS
+                                            )
+                                        }
+                                    }
+
+                                    when {
+                                        ContextCompat.checkSelfPermission(
+                                            context,
+                                            PermissionArray[PermissionKeys.READ_PHONE_STATE].name
+                                        ) == PackageManager.PERMISSION_GRANTED -> {
+                                            SimUtil(
+                                                onSMSDelivered = {
+
+                                                },
+                                                onSMSSend = {
+
+                                                }
+                                            ).sendSMS(
+                                                context = context,
+                                                message = context.resources.getString(R.string.invite_sms),
+                                                phoneNumber = number,
+                                                simSelected = 0
+                                            )
+                                        }
+
+                                        ActivityCompat.shouldShowRequestPermissionRationale(
+                                            activity,
+                                            PermissionArray[PermissionKeys.READ_PHONE_NUMBERS].name
+                                        ) -> {
+
+                                        }
+
+                                        else -> {
+                                            requestPermissionLauncher.launch(
+                                                Manifest.permission.READ_PHONE_NUMBERS
+                                            )
+                                        }
+                                    }
                                 }
                             )
                         }
@@ -309,7 +366,7 @@ class MainActivity : ComponentActivity() {
                                     checkForTestResults(
                                         context,
                                         onResult = { result ->
-                                            if(result) {
+                                            if (result) {
                                                 navController.navigate(StepFragments.RESULT)
                                             } else {
                                                 navController.navigate(StepFragments.ERROR)
@@ -321,7 +378,7 @@ class MainActivity : ComponentActivity() {
                                     checkForTestResults(
                                         context,
                                         onResult = { result ->
-                                            if(result) {
+                                            if (result) {
                                                 navController.navigate(StepFragments.RESULT)
                                             } else {
                                                 navController.navigate(StepFragments.ERROR)
@@ -430,13 +487,14 @@ class MainActivity : ComponentActivity() {
                 } catch (e: Exception) {
                     JSONObject()
                 }
-                if(jsonResult.optBoolean(StepGlobal.SUCCESS)) {
+                if (jsonResult.optBoolean(StepGlobal.SUCCESS)) {
                     val dataResult = jsonResult.optJSONObject(StepGlobal.DATA)
-                    if(dataResult!!.optInt(StepGlobal.SESSION_ID) == testSessionID) {
+                    if (dataResult!!.optInt(StepGlobal.SESSION_ID) == testSessionID) {
                         val answerResults = dataResult.optJSONArray(StepGlobal.RESULTS)
                         for (i in 0 until answerResults!!.length()) {
                             val item = answerResults[i] as JSONObject
-                            tests.find { it.id == item.optInt(StepGlobal.QUESTION_ID) }!!.isCorrect = item.optInt(StepGlobal.IS_CORRECT) == 1
+                            tests.find { it.id == item.optInt(StepGlobal.QUESTION_ID) }!!.isCorrect =
+                                item.optInt(StepGlobal.IS_CORRECT) == 1
                         }
                         onResult(true)
                     } else {

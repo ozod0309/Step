@@ -1,6 +1,9 @@
 package com.miki.step
 
 import android.content.Context
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,6 +39,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,11 +56,50 @@ class ResultUI(val context: Context?) {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun UI(onDone: () -> Unit) {
+        val animDuration = 5000
         val testQuestionsCount = MainActivity.tests.size
         val correctAnswerCount = MainActivity.tests.count { it.isCorrect && it.answered > 0 }
         val incorrectAnswerCount = MainActivity.tests.count { !it.isCorrect && it.answered > 0}
         val unAnswered = MainActivity.tests.count { !it.isCorrect && it.answered  == 0}
         val progress = correctAnswerCount.toFloat()/testQuestionsCount * 100
+        var anim by remember {
+            mutableStateOf(false)
+        }
+        val animTestQuestionsCount by animateIntAsState(
+            targetValue = if (anim) testQuestionsCount else 0,
+            animationSpec = tween(
+                durationMillis = animDuration,
+                easing = LinearEasing
+            ),
+            label = ""
+        )
+        val animCorrectAnswerCount by animateIntAsState(
+            targetValue = if (anim) correctAnswerCount else 0,
+            animationSpec = tween(
+                durationMillis = animDuration,
+                easing = LinearEasing
+            ),
+            label = ""
+        )
+        val animIncorrectAnswerCount by animateIntAsState(
+            targetValue = if (anim) incorrectAnswerCount else 0,
+            animationSpec = tween(
+                durationMillis = animDuration,
+                easing = LinearEasing
+            ),
+            label = ""
+        )
+        val animUnAnswered by animateIntAsState(
+            targetValue = if (anim) unAnswered else 0,
+            animationSpec = tween(
+                durationMillis = animDuration,
+                easing = LinearEasing
+            ),
+            label = ""
+        )
+        LaunchedEffect(Unit) {
+            anim = true
+        }
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -80,7 +127,9 @@ class ResultUI(val context: Context?) {
                         horizontalArrangement = Arrangement.Center
                     ) {
                         CircularProgressbar(
-                            dataUsage = progress, name = "Test"
+                            dataUsage = progress,
+                            name = "Test",
+                            animationDuration = animDuration
                         )
                     }
                     Spacer(modifier = Modifier.height(20.dp))
@@ -112,7 +161,7 @@ class ResultUI(val context: Context?) {
                         Text(
                             textAlign = TextAlign.Right,
                             color = MaterialTheme.colorScheme.onTertiary,
-                            text = testQuestionsCount.toString()
+                            text = animTestQuestionsCount.toString()
                         )
                         Spacer(modifier = Modifier.width(20.dp))
                     }
@@ -123,7 +172,7 @@ class ResultUI(val context: Context?) {
                         Spacer(modifier = Modifier.width(20.dp))
                         Icon(
                             imageVector = Icons.Filled.CheckCircle,
-                            tint = Color.Green,
+                            tint = MaterialTheme.colorScheme.primary,
                             contentDescription = null
                         )
                         Spacer(modifier = Modifier.width(10.dp))
@@ -137,7 +186,7 @@ class ResultUI(val context: Context?) {
                         Text(
                             textAlign = TextAlign.Right,
                             color = MaterialTheme.colorScheme.onTertiary,
-                            text = correctAnswerCount.toString()
+                            text = animCorrectAnswerCount.toString()
                         )
                         Spacer(modifier = Modifier.width(20.dp))
                     }
@@ -162,7 +211,7 @@ class ResultUI(val context: Context?) {
                         Text(
                             textAlign = TextAlign.Right,
                             color = MaterialTheme.colorScheme.onTertiary,
-                            text = incorrectAnswerCount.toString()
+                            text = animIncorrectAnswerCount.toString()
                         )
                         Spacer(modifier = Modifier.width(20.dp))
                     }
@@ -187,7 +236,7 @@ class ResultUI(val context: Context?) {
                         Text(
                             textAlign = TextAlign.Right,
                             color = MaterialTheme.colorScheme.onTertiary,
-                            text = unAnswered.toString()
+                            text = animUnAnswered.toString()
                         )
                         Spacer(modifier = Modifier.width(20.dp))
                     }

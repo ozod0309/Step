@@ -186,7 +186,7 @@ class InviteFriendsUI(val context: Context?) {
         if (openNumbersList.value) {
             ShowNumbers(
                 showNumbersList = openNumbersList,
-                numbers = phoneContactList[selectedContactIndex.intValue].number,
+                numbers = filteredContactList[selectedContactIndex.intValue].number,
                 filteredContactList[selectedContactIndex.intValue].name,
                 onInvite = {
                     onInvite(it)

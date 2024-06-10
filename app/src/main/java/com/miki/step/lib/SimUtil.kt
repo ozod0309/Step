@@ -14,6 +14,7 @@ import android.telephony.SubscriptionManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.getSystemService
 
+@Suppress("DEPRECATION")
 class SimUtil (
     val onSMSSend: (result: Boolean) -> Unit,
     val onSMSDelivered: (result: Boolean) -> Unit
@@ -62,7 +63,12 @@ class SimUtil (
         val simInfo = localList[simSelected] as SubscriptionInfo
 //        val smsManager: SmsManager = SmsManager.getDefault()
 //        val smsManager: SmsManager = context.getSystemService(SmsManager::class.java)
-        val smsManager = SmsManager.getSmsManagerForSubscriptionId(simInfo.subscriptionId)
+
+        val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            getSystemService(context, SmsManager::class.java)!!.createForSubscriptionId(simInfo.subscriptionId)
+        } else {
+            SmsManager.getSmsManagerForSubscriptionId(simInfo.subscriptionId)
+        }
 
         smsManager.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI)
 
