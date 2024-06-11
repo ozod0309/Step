@@ -333,6 +333,7 @@ class InviteFriendsUI(val context: Context?) {
                                         tint = MaterialTheme.colorScheme.primary,
                                         contentDescription = null,
                                         modifier = Modifier.clickable {
+
                                             onInvite(numbers[index].number)
                                         }
                                     )

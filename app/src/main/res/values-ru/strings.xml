@@ -31,6 +31,10 @@
     <string name="unanswered_questions">Неотвеченные вопросы</string>
     <string name="total_time">Общее время</string>
     <string name="spent_time">Потраченное время</string>
+    <string name="permission_denied">Отказано в доступе</string>
+    <string name="sms_sent">SMS отправлен</string>
+    <string name="sms_delivered">SMS доставлен</string>
+    <string name="send_sms_error">Ошибка при отправке SMS</string>
     <string name="invite_sms">You are invited to Step.\nhttp://play.google.com/store/apps/details?id=com.miki.step</string>
 
 

@@ -11,8 +11,10 @@ import android.os.Build
 import android.telephony.SmsManager
 import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.getSystemService
+import com.miki.step.R
 
 @Suppress("DEPRECATION")
 class SimUtil (
@@ -69,8 +71,11 @@ class SimUtil (
         } else {
             SmsManager.getSmsManagerForSubscriptionId(simInfo.subscriptionId)
         }
-
-        smsManager.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI)
+        try {
+            smsManager.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI)
+        } catch (e: Exception) {
+            Toast.makeText(context, context.resources.getString(R.string.send_sms_error), Toast.LENGTH_SHORT).show()
+        }
 
     }
 }

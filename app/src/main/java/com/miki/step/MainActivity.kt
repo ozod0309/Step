@@ -1,17 +1,16 @@
 package com.miki.step
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
@@ -21,9 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.app.ActivityCompat
 import androidx.core.app.ShareCompat
-import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -36,6 +33,7 @@ import com.miki.step.lib.AppNotification
 import com.miki.step.lib.Category
 import com.miki.step.lib.InternetAvailable
 import com.miki.step.lib.LocaleHelper
+import com.miki.step.lib.PermissionManager
 import com.miki.step.lib.PostData
 import com.miki.step.lib.PreferencesKeys
 import com.miki.step.lib.RegistrationTypes
@@ -50,14 +48,12 @@ import com.miki.step.lib.toCategories
 import com.miki.step.lib.toStepUser
 import com.miki.step.lib.toTest
 import com.miki.step.ui.theme.StepTheme
-import com.zumo.mikitodo.libs.PermissionArray
 import com.zumo.mikitodo.libs.PermissionKeys
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
-import java.util.Locale
 
 class MainActivity : ComponentActivity() {
 
@@ -71,20 +67,31 @@ class MainActivity : ComponentActivity() {
         var testSessionID = 0
         var tests = arrayListOf<Test>()
         val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+        lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+        lateinit var permissionManager: PermissionManager
     }
 
     @SuppressLint("HardwareIds")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
+
+        permissionManager = PermissionManager(this)
+        requestPermissionLauncher =
+            registerForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { isGranted: Boolean ->
+                permissionManager.onResult(isGranted)
+            }
+
         val sharedPreference = SharedPreference(applicationContext)
         androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
         userRegistration = sharedPreference.getValueInt(PreferencesKeys.USER_REGISTRATION)
         langCode = sharedPreference.getValueString(PreferencesKeys.LANG_CODE).toString()
-        val activity = this
         val context = this
+        val notFirstRun = sharedPreference.getValueBoolean(PreferencesKeys.NOT_FIRST_RUN)
         val startUI: String =
-            if (sharedPreference.getValueBoolean(PreferencesKeys.NOT_FIRST_RUN) && langCode.isNotEmpty()) {
+            if (notFirstRun && langCode.isNotEmpty()) {
                 when (userRegistration) {
                     RegistrationTypes.REGISTERED -> {
                         stepUser =
@@ -107,23 +114,6 @@ class MainActivity : ComponentActivity() {
             } else {
                 sharedPreference.save(PreferencesKeys.NOT_FIRST_RUN, true)
                 StepFragments.LANGUAGE
-            }
-        val requestPermissionLauncher =
-            registerForActivityResult(
-                ActivityResultContracts.RequestPermission()
-            ) { isGranted: Boolean ->
-                if (isGranted) {
-//                    navController.navigate(StepFragments.INVITE_FRIENDS)
-                } else {
-//                                                showNotificationText =
-//                                                    resources.getString(R.string.error_permission)
-//                                                showNotification.value = true
-                    // Explain to the user that the feature is unavailable because the
-                    // feature requires a permission that the user has denied. At the
-                    // same time, respect the user's decision. Don't link to system
-                    // settings in an effort to convince the user to change their
-                    // decision.
-                }
             }
         setContent {
             val navController = rememberNavController()
@@ -181,27 +171,18 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate(StepFragments.SETTINGS)
                                 },
                                 onInviteFriends = {
-                                    when {
-                                        ContextCompat.checkSelfPermission(
-                                            context,
-                                            PermissionArray[PermissionKeys.READ_CONTACTS].name
-                                        ) == PackageManager.PERMISSION_GRANTED -> {
-                                            navController.navigate(StepFragments.INVITE_FRIENDS)
-                                        }
-
-                                        ActivityCompat.shouldShowRequestPermissionRationale(
-                                            activity,
-                                            PermissionArray[PermissionKeys.READ_CONTACTS].name
-                                        ) -> {
-
-                                        }
-
-                                        else -> {
-                                            requestPermissionLauncher.launch(
-                                                Manifest.permission.READ_CONTACTS
-                                            )
-                                        }
+                                    permissionManager.onGranted = {
+                                        navController.navigate(StepFragments.INVITE_FRIENDS)
                                     }
+                                    permissionManager.onDenied = {
+                                        Toast.makeText(
+                                            context,
+                                            context.resources.getString(R.string.permission_denied),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                    permissionManager
+                                        .requestPermission(PermissionKeys.READ_CONTACTS)
                                 },
                                 onShare = {
                                     ShareCompat
@@ -271,12 +252,30 @@ class MainActivity : ComponentActivity() {
                                     PreferencesKeys.LANG_CODE,
                                     langCode
                                 )
+                                LocaleHelper().setLocale(this@MainActivity, langCode)
+                                recreate()
+                                if(!notFirstRun) {
+                                    permissionManager.onGranted = {
+                                        Toast.makeText(
+                                            context,
+                                            context.resources.getString(R.string.permission_denied),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                    permissionManager.onDenied = {
+                                        Toast.makeText(
+                                            context,
+                                            context.resources.getString(R.string.permission_denied),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                    permissionManager.requestPermission(PermissionKeys.POST_NOTIFICATIONS)
+                                }
                                 if (userRegistration == RegistrationTypes.REGISTERED) {
                                     navController.navigate(StepFragments.MAIN)
                                 } else {
                                     navController.navigate(StepFragments.SIGN_IN)
                                 }
-                                applyNewLocale(Locale(langCode, langCode))
                             })
                         }
                         composable(StepFragments.SETTINGS) {
@@ -289,7 +288,6 @@ class MainActivity : ComponentActivity() {
                                     sharedPreference.save(PreferencesKeys.LANG_CODE, lang)
                                     LocaleHelper().setLocale(this@MainActivity, langCode)
                                     recreate()
-//                                    applyNewLocale(Locale(lang, lang))
                                 }
                             )
                         }
@@ -300,60 +298,62 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate(StepFragments.MAIN)
                                 },
                                 onInvite = { number ->
-                                    when {
-                                        ContextCompat.checkSelfPermission(
-                                            context,
-                                            PermissionArray[PermissionKeys.READ_PHONE_STATE].name
-                                        ) == PackageManager.PERMISSION_GRANTED -> {
-
+                                    permissionManager.onGranted = {
+                                        permissionManager.onGranted = {
+                                            permissionManager.onGranted = {
+                                                SimUtil(
+                                                    onSMSDelivered = {
+                                                        Toast.makeText(
+                                                            context,
+                                                            context.resources.getString(R.string.sms_delivered),
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                    },
+                                                    onSMSSend = {
+                                                        Toast.makeText(
+                                                            context,
+                                                            context.resources.getString(R.string.sms_sent),
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                    }
+                                                ).sendSMS(
+                                                    context = context,
+                                                    message = context.resources.getString(R.string.invite_sms),
+                                                    phoneNumber = number,
+                                                    simSelected = 0
+                                                )
+                                                navController.navigate(StepFragments.MAIN)
+                                            }
+                                            permissionManager.onDenied = {
+                                                Toast.makeText(
+                                                    context,
+                                                    context.resources.getString(R.string.permission_denied),
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                            permissionManager.requestPermission(PermissionKeys.SEND_SMS)
                                         }
-
-                                        ActivityCompat.shouldShowRequestPermissionRationale(
-                                            activity,
-                                            PermissionArray[PermissionKeys.READ_PHONE_STATE].name
-                                        ) -> {
-
+                                        permissionManager.onDenied = {
+                                            Toast.makeText(
+                                                context,
+                                                context.resources.getString(R.string.permission_denied),
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         }
-                                        else -> {
-                                            requestPermissionLauncher.launch(
-                                                Manifest.permission.READ_PHONE_NUMBERS
-                                            )
-                                        }
+                                        permissionManager.requestPermission(
+                                            PermissionKeys.READ_PHONE_NUMBERS
+                                        )
                                     }
-
-                                    when {
-                                        ContextCompat.checkSelfPermission(
+                                    permissionManager.onDenied = {
+                                        Toast.makeText(
                                             context,
-                                            PermissionArray[PermissionKeys.READ_PHONE_STATE].name
-                                        ) == PackageManager.PERMISSION_GRANTED -> {
-                                            SimUtil(
-                                                onSMSDelivered = {
-
-                                                },
-                                                onSMSSend = {
-
-                                                }
-                                            ).sendSMS(
-                                                context = context,
-                                                message = context.resources.getString(R.string.invite_sms),
-                                                phoneNumber = number,
-                                                simSelected = 0
-                                            )
-                                        }
-
-                                        ActivityCompat.shouldShowRequestPermissionRationale(
-                                            activity,
-                                            PermissionArray[PermissionKeys.READ_PHONE_NUMBERS].name
-                                        ) -> {
-
-                                        }
-
-                                        else -> {
-                                            requestPermissionLauncher.launch(
-                                                Manifest.permission.READ_PHONE_NUMBERS
-                                            )
-                                        }
+                                            context.resources.getString(R.string.permission_denied),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
+                                    permissionManager.requestPermission(
+                                        PermissionKeys.READ_PHONE_STATE
+                                    )
                                 }
                             )
                         }
@@ -428,6 +428,7 @@ class MainActivity : ComponentActivity() {
                                                     PreferencesKeys.USER_REGISTRATION,
                                                     RegistrationTypes.REGISTERED
                                                 )
+                                                loadCategories(context)
                                                 navController.navigate(StepFragments.MAIN)
                                             } else {
                                                 Toast.makeText(
@@ -539,26 +540,10 @@ class MainActivity : ComponentActivity() {
         return result
     }
 
-    override fun onResume() {
-        super.onResume()
-        applyNewLocale(Locale(langCode, langCode))
-    }
-
-    override fun attachBaseContext(newBase: Context?) {
-        val sharedPref =
-            androidx.preference.PreferenceManager.getDefaultSharedPreferences(newBase!!)
-        langCode = sharedPref?.getString(PreferencesKeys.LANG_CODE, "").toString()
-        super.attachBaseContext(newBase.applyNewLocale(Locale(langCode, langCode)))
-    }
-
-    private fun Context.applyNewLocale(locale: Locale): Context {
-        val config = this.resources.configuration
-        val sysLocale = config.locales.get(0)
-        if (sysLocale.language != locale.language) {
-            Locale.setDefault(locale)
-            config.setLocale(locale)
-            config.setLayoutDirection(locale)
-        }
-        return createConfigurationContext(config)
-    }
+//    override fun attachBaseContext(newBase: Context?) {
+//        val sharedPref =
+//            androidx.preference.PreferenceManager.getDefaultSharedPreferences(newBase!!)
+//        langCode = sharedPref?.getString(PreferencesKeys.LANG_CODE, "").toString()
+//        super.attachBaseContext(newBase.applyNewLocale(Locale(langCode, langCode)))
+//    }
 }
