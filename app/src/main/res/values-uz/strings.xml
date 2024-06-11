@@ -35,6 +35,9 @@
     <string name="sms_sent">SMS jo\'natildi</string>
     <string name="sms_delivered">SMS yetkazildi</string>
     <string name="send_sms_error">SMS jo\'natishda xatolik</string>
+    <string name="sms_send_confirm_text">SMS jo\'natish orqali taklif yuborishga rozimisiz?</string>
+    <string name="yes">Ha</string>
+    <string name="no">Yo\'q</string>
     <string name="invite_sms">You are invited to Step.\nhttp://play.google.com/store/apps/details?id=com.miki.step</string>
 
 

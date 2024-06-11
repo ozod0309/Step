@@ -66,6 +66,9 @@ class InviteFriendsUI(val context: Context?) {
         onInvite: (number: String) -> Unit
     ) {
         val openNumbersList = remember { mutableStateOf(false) }
+        val openConfirmDialog = remember {
+            mutableStateOf(false)
+        }
         val phoneContactList = remember {
             mutableStateListOf<PhoneContact>()
         }
@@ -183,13 +186,31 @@ class InviteFriendsUI(val context: Context?) {
                 )
             }
         )
+        var selectedNumber = ""
         if (openNumbersList.value) {
             ShowNumbers(
                 showNumbersList = openNumbersList,
                 numbers = filteredContactList[selectedContactIndex.intValue].number,
                 filteredContactList[selectedContactIndex.intValue].name,
                 onInvite = {
+                    selectedNumber = it
+                    openNumbersList.value = false
+                    openConfirmDialog.value = true
+                }
+            )
+        }
+        if (openConfirmDialog.value) {
+            ShowConfirmDialog(
+                openConfirmDialog = openConfirmDialog,
+                number = selectedNumber,
+                filteredContactList[selectedContactIndex.intValue].name,
+                onConfirm = {
                     onInvite(it)
+                    openConfirmDialog.value = false
+                },
+                onReject = {
+                    openConfirmDialog.value = false
+                    openNumbersList.value = true
                 }
             )
         }
@@ -353,5 +374,77 @@ class InviteFriendsUI(val context: Context?) {
                 }
             }
         }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    private fun ShowConfirmDialog(
+        openConfirmDialog: MutableState<Boolean>,
+        number: String,
+        contactName: String,
+        onConfirm: (number: String) -> Unit,
+        onReject: () -> Unit
+    ) {
+        if (openConfirmDialog.value) {
+            BasicAlertDialog(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth(),
+                properties = DialogProperties(
+                    dismissOnBackPress = true,
+                    dismissOnClickOutside = true
+
+                ),
+                onDismissRequest = { openConfirmDialog.value = false }
+            ) {
+                Surface(
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .wrapContentHeight(),
+                    tonalElevation = AlertDialogDefaults.TonalElevation,
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        TopAppBar(
+                            colors = TopAppBarDefaults.topAppBarColors(
+                                titleContentColor = MaterialTheme.colorScheme.secondary,
+                                containerColor = MaterialTheme.colorScheme.primary
+                            ),
+
+                            title = {
+                                Text(text = contactName)
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Text(
+                            text = stringResource(id = R.string.sms_send_confirm_text),
+                            modifier = Modifier.weight(1f),
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+                        BottomAppBar(
+                            actions = {
+                                Text(
+                                    text = stringResource(id = R.string.yes),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .clickable {
+                                            onConfirm(number)
+                                        }
+                                    )
+                                Text(
+                                    text = stringResource(id = R.string.no),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .clickable {
+                                            onReject()
+                                        }
+                                )
+
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
     }
 }
