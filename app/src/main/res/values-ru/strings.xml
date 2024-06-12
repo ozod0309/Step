@@ -7,6 +7,7 @@
     <string name="home">Главная</string>
     <string name="success">Успехи</string>
     <string name="history">История</string>
+    <string name="my_step">My Step</string>
     <string name="profile">Профиль</string>
 
     <string name="settings">Настройки</string>
@@ -36,8 +37,10 @@
     <string name="sms_delivered">SMS доставлен</string>
     <string name="send_sms_error">Ошибка при отправке SMS</string>
     <string name="sms_send_confirm_text">Вы подтверждаете приглашение отправляя SMS?</string>
+    <string name="test_interrupt">Вы уверены прервать тест</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
-    <string name="invite_sms">You are invited to Step.\nhttp://play.google.com/store/apps/details?id=com.miki.step</string>
+    <string name="soon">Скоро …</string>
+    <string name="invite_sms">You are invited to Step.\nhttp://play.google.com/store/apps/details?id=com.mikicorp.step</string>
 
 </resources>

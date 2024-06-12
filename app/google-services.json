@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:827898636912:android:d2d36547875b054ce262b5",
         "android_client_info": {
-          "package_name": "com.miki.step"
+          "package_name": "com.mikicorp.step"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "827898636912-bt36gpdfr4dvu16s35oddd79r3ftmiu1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.miki.step",
+            "package_name": "com.mikicorp.step",
             "certificate_hash": "dbc1e33d6c0766214cad0e9daa30c8e390428e70"
           }
         },

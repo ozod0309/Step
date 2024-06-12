@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.miki.step"
+    namespace = "com.mikicorp.step"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.miki.step"
+        applicationId = "com.mikicorp.step"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

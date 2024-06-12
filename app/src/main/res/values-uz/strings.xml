@@ -7,6 +7,7 @@
     <string name="home">Asosiy</string>
     <string name="success">Yutuqlar</string>
     <string name="history">Tarix</string>
+    <string name="my_step">MyStep</string>
     <string name="profile">Profil</string>
 
     <string name="settings">Sozlamalar</string>
@@ -38,7 +39,8 @@
     <string name="sms_send_confirm_text">SMS jo\'natish orqali taklif yuborishga rozimisiz?</string>
     <string name="yes">Ha</string>
     <string name="no">Yo\'q</string>
-    <string name="invite_sms">You are invited to Step.\nhttp://play.google.com/store/apps/details?id=com.miki.step</string>
+    <string name="soon">Tez orada …</string>
+    <string name="invite_sms">You are invited to Step.\nhttp://play.google.com/store/apps/details?id=com.mikicorp.step</string>
 
 
 </resources>
