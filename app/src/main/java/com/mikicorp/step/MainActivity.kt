@@ -28,7 +28,6 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.miki.step.R
 import com.mikicorp.step.lib.ApiURLS
 import com.mikicorp.step.lib.AppNotification
 import com.mikicorp.step.lib.Category
