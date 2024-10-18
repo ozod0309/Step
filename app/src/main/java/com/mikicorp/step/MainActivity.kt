@@ -234,6 +234,7 @@ class MainActivity : ComponentActivity() {
                                                 userRegistration =
                                                     RegistrationTypes.UNREGISTERED
                                                 sharedPreference.save(PreferencesKeys.USER, "")
+                                                sharedPreference.save(PreferencesKeys.GOOGLE_TOKEN, "")
                                                 sharedPreference.save(
                                                     PreferencesKeys.USER_REGISTRATION,
                                                     userRegistration
