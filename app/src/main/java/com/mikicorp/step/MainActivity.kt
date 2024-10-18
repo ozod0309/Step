@@ -216,6 +216,15 @@ class MainActivity : ComponentActivity() {
                                     newNotification.value = true
                                     newNotificationText = message
                                 },
+                                onMyStep = {
+                                    permissionManager.onGranted = {
+                                        navController.navigate(StepFragments.MY_STEP)
+                                    }
+                                    permissionManager.onDenied = {
+                                        navController.navigate(StepFragments.ERROR)
+                                    }
+                                    permissionManager.requestPermission(context, PermissionKeys.CAMERA)
+                                },
                                 onLogout = {
                                     URLDownload.urlDownload(
                                         context = context,
@@ -452,6 +461,13 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate(StepFragments.SIGN_IN)
                                 }
                             }).UI()
+                        }
+                        composable(StepFragments.MY_STEP) {
+                            MyStepUI(LocalContext.current).UI(
+                                onDone = {
+                                    navController.navigate(StepFragments.MY_STEP)
+                                }
+                            )
                         }
                         composable(StepFragments.ERROR) {
                             ErrorUI(LocalContext.current).UI(

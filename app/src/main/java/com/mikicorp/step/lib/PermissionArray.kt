@@ -42,6 +42,11 @@ val PermissionArray = listOf(
         Manifest.permission.READ_PHONE_NUMBERS,
         26,
         99
+    ),
+    MikiPermission(
+        Manifest.permission.CAMERA,
+        1,
+        99
     )
 )
 
@@ -55,6 +60,7 @@ object PermissionKeys {
     const val POST_NOTIFICATIONS = 5
     const val GET_ACCOUNTS = 6
     const val READ_PHONE_NUMBERS = 7
+    const val CAMERA = 8
 }
 
 data class MikiPermission(

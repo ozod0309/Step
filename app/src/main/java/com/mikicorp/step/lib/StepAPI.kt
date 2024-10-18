@@ -41,6 +41,7 @@ object StepFragments {
     const val TEST = "Test"
     const val RESULT = "Result"
     const val SIGN_IN = "SignIn"
+    const val MY_STEP = "MyStep"
     const val ERROR = "error"
 }
 

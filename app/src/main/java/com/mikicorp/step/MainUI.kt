@@ -113,6 +113,7 @@ class MainUI(val context: Context) {
         onShare: () -> Unit,
         onRateUs: () -> Unit,
         onNotification: (message: String) -> Unit,
+        onMyStep: () -> Unit,
         onLogout: () -> Unit
     ) {
         val bottomBarData = arrayListOf(
@@ -295,7 +296,12 @@ class MainUI(val context: Context) {
                         )
                         1 -> SuccessContent()
                         2 -> HistoryContent()
-                        3 -> MyStepContent(innerPadding)
+                        3 -> MyStepContent(
+                            innerPadding = innerPadding,
+                            onMyStep = {
+                                onMyStep()
+                            }
+                        )
                     }
                 },
                 bottomBar = {
@@ -529,7 +535,10 @@ class MainUI(val context: Context) {
     }
 
     @Composable
-    private fun MyStepContent(innerPadding: PaddingValues) {
+    private fun MyStepContent(
+        innerPadding: PaddingValues,
+        onMyStep: () -> Unit
+    ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -541,6 +550,9 @@ class MainUI(val context: Context) {
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
+                    .clickable {
+                        onMyStep()
+                    }
             )
         }
     }
