@@ -465,7 +465,7 @@ class MainActivity : ComponentActivity() {
                         composable(StepFragments.MY_STEP) {
                             MyStepUI(LocalContext.current).UI(
                                 onDone = {
-                                    navController.navigate(StepFragments.MY_STEP)
+                                    navController.navigate(StepFragments.MAIN)
                                 }
                             )
                         }

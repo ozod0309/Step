@@ -64,7 +64,6 @@ class MyStepUI(val context: Context?) {
                     modifier = Modifier
                         .padding(innerPadding)
                 ) {
-
                     CameraScreen()
                 }
             },
