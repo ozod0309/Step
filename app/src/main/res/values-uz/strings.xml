@@ -37,6 +37,10 @@
     <string name="sms_delivered">SMS yetkazildi</string>
     <string name="send_sms_error">SMS jo\'natishda xatolik</string>
     <string name="sms_send_confirm_text">SMS jo\'natish orqali taklif yuborishga rozimisiz?</string>
+    <string name="test_interrupt">Testni tugatishni hohlaysizmi?</string>
+    <string name="create_test">Test tuzish</string>
+    <string name="edit_test">Testni o\'zgartirish</string>
+    <string name="delete_test">Testni o\'chirish</string>
     <string name="yes">Ha</string>
     <string name="no">Yo\'q</string>
     <string name="soon">Tez orada …</string>

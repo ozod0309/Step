@@ -75,7 +75,6 @@ dependencies {
     implementation("com.google.gms:google-services:4.4.2")
     implementation("com.google.firebase:firebase-core:21.1.1")
     implementation("com.google.firebase:firebase-auth:23.0.0")
-    implementation ("com.google.firebase:firebase-ml-vision:24.1.0")
     implementation("com.google.android.gms:play-services-auth:21.2.0")
     implementation("androidx.wear.compose:compose-material:1.4.0")
 
@@ -93,7 +92,6 @@ dependencies {
     implementation("androidx.camera:camera-extensions:1.3.4")
 
     implementation("com.google.mlkit:text-recognition:16.0.1")
-    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.1")
 
     implementation("com.github.JamalMulla:ComposePrefs3:1.0.5")
     implementation("androidx.datastore:datastore-preferences:1.1.1")

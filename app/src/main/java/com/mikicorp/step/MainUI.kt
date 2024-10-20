@@ -32,7 +32,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsRun
 import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
@@ -43,6 +46,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -113,7 +117,9 @@ class MainUI(val context: Context) {
         onShare: () -> Unit,
         onRateUs: () -> Unit,
         onNotification: (message: String) -> Unit,
-        onMyStep: () -> Unit,
+        onCreateTest: () -> Unit,
+        onEditTest: () -> Unit,
+        onDeleteTest: () -> Unit,
         onLogout: () -> Unit
     ) {
         val bottomBarData = arrayListOf(
@@ -298,8 +304,14 @@ class MainUI(val context: Context) {
                         2 -> HistoryContent()
                         3 -> MyStepContent(
                             innerPadding = innerPadding,
-                            onMyStep = {
-                                onMyStep()
+                            onCreateTest = {
+                                onCreateTest()
+                            },
+                            onEditTest = {
+                                onEditTest()
+                            },
+                            onDeleteTest = {
+                                onDeleteTest()
                             }
                         )
                     }
@@ -537,8 +549,108 @@ class MainUI(val context: Context) {
     @Composable
     private fun MyStepContent(
         innerPadding: PaddingValues,
-        onMyStep: () -> Unit
+        onCreateTest: () -> Unit,
+        onEditTest: () -> Unit,
+        onDeleteTest: () -> Unit
     ) {
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+            Box(
+                Modifier
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    .weight(1f)
+            ) {
+                LazyColumn {
+
+                }
+
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                Button(
+                    onClick = {
+                        onCreateTest()
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(15.dp, 0.dp)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        tint = MaterialTheme.colorScheme.secondary,
+                        contentDescription = null
+                    )
+                }
+                Button(
+                    onClick = {
+                        onEditTest()
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(15.dp, 0.dp)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Edit,
+                        tint = MaterialTheme.colorScheme.secondary,
+                        contentDescription = null
+                    )
+                }
+                Button(
+                    onClick = {
+                        onDeleteTest()
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(15.dp, 0.dp)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        tint = MaterialTheme.colorScheme.secondary,
+                        contentDescription = null
+                    )
+                }
+            }
+        }
+
+/*         Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+            Text(
+                text = stringResource(id = R.string.create_test),
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+                    .clickable {
+                        onCreateTest()
+                    }
+            )
+        }
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -546,15 +658,31 @@ class MainUI(val context: Context) {
                 .fillMaxSize()
         ) {
             Text(
-                text = stringResource(id = R.string.soon),
+                text = stringResource(id = R.string.edit_test),
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
                     .clickable {
-                        onMyStep()
+                        onEditTest()
                     }
             )
         }
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+            Text(
+                text = stringResource(id = R.string.delete_test),
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+                    .clickable {
+                        onDeleteTest()
+                    }
+            )
+        }*/
     }
 
 

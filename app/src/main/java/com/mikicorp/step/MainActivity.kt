@@ -216,7 +216,25 @@ class MainActivity : ComponentActivity() {
                                     newNotification.value = true
                                     newNotificationText = message
                                 },
-                                onMyStep = {
+                                onCreateTest = {
+                                    permissionManager.onGranted = {
+                                        navController.navigate(StepFragments.MY_STEP)
+                                    }
+                                    permissionManager.onDenied = {
+                                        navController.navigate(StepFragments.ERROR)
+                                    }
+                                    permissionManager.requestPermission(context, PermissionKeys.CAMERA)
+                                },
+                                onEditTest = {
+                                    permissionManager.onGranted = {
+                                        navController.navigate(StepFragments.MY_STEP)
+                                    }
+                                    permissionManager.onDenied = {
+                                        navController.navigate(StepFragments.ERROR)
+                                    }
+                                    permissionManager.requestPermission(context, PermissionKeys.CAMERA)
+                                },
+                                onDeleteTest = {
                                     permissionManager.onGranted = {
                                         navController.navigate(StepFragments.MY_STEP)
                                     }
@@ -465,7 +483,7 @@ class MainActivity : ComponentActivity() {
                         composable(StepFragments.MY_STEP) {
                             MyStepUI(LocalContext.current).UI(
                                 onDone = {
-                                    navController.navigate(StepFragments.MAIN)
+                                    navController.navigate(StepFragments.MY_STEP)
                                 }
                             )
                         }
