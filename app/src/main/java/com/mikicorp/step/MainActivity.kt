@@ -47,6 +47,7 @@ import com.mikicorp.step.lib.User
 import com.mikicorp.step.lib.toCategories
 import com.mikicorp.step.lib.toStepUser
 import com.mikicorp.step.lib.toTest
+import com.mikicorp.step.mlkit.MLKit
 import com.mikicorp.step.ui.theme.StepTheme
 import com.zumo.mikitodo.libs.PermissionKeys
 import kotlinx.coroutines.Dispatchers
@@ -68,6 +69,7 @@ class MainActivity : ComponentActivity() {
         var activeSubcategory = 0
         var testSessionID = 0
         var tests = arrayListOf<Test>()
+        var bottomBarSelector = 0
         val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
         lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
         lateinit var permissionManager: PermissionManager
@@ -217,17 +219,18 @@ class MainActivity : ComponentActivity() {
                                     newNotificationText = message
                                 },
                                 onCreateTest = {
-                                    permissionManager.onGranted = {
-                                        navController.navigate(StepFragments.MY_STEP)
-                                    }
-                                    permissionManager.onDenied = {
-                                        navController.navigate(StepFragments.ERROR)
-                                    }
-                                    permissionManager.requestPermission(context, PermissionKeys.CAMERA)
+                                    navController.navigate(StepFragments.CREATE_TEST_SOURCE)
+//                                    permissionManager.onGranted = {
+//                                        navController.navigate(StepFragments.MY_STEP)
+//                                    }
+//                                    permissionManager.onDenied = {
+//                                        navController.navigate(StepFragments.ERROR)
+//                                    }
+//                                    permissionManager.requestPermission(context, PermissionKeys.CAMERA)
                                 },
                                 onEditTest = {
                                     permissionManager.onGranted = {
-                                        navController.navigate(StepFragments.MY_STEP)
+                                        navController.navigate(StepFragments.OCR)
                                     }
                                     permissionManager.onDenied = {
                                         navController.navigate(StepFragments.ERROR)
@@ -236,7 +239,7 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onDeleteTest = {
                                     permissionManager.onGranted = {
-                                        navController.navigate(StepFragments.MY_STEP)
+                                        navController.navigate(StepFragments.OCR)
                                     }
                                     permissionManager.onDenied = {
                                         navController.navigate(StepFragments.ERROR)
@@ -480,10 +483,29 @@ class MainActivity : ComponentActivity() {
                                 }
                             }).UI()
                         }
-                        composable(StepFragments.MY_STEP) {
-                            MyStepUI(LocalContext.current).UI(
+                        composable(StepFragments.CREATE_TEST_SOURCE) {
+                            CreateTestSourceUI(LocalContext.current).UI(
+                                onMSDocs = {
+
+                                },
+                                onPDFDocs = {
+
+                                },
+                                onOCR = {
+                                    navController.navigate(StepFragments.OCR)
+                                },
+                                onAIOCR = {
+
+                                },
+                                onClose = {
+                                    navController.navigate(StepFragments.MAIN)
+                                }
+                            )
+                        }
+                        composable(StepFragments.OCR) {
+                            MLKit(LocalContext.current).UI(
                                 onDone = {
-                                    navController.navigate(StepFragments.MY_STEP)
+                                    navController.navigate(StepFragments.MAIN)
                                 }
                             )
                         }

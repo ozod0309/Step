@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -137,7 +138,10 @@ class MainUI(val context: Context) {
             mutableIntStateOf(MainActivity.activeCategory)
         }
         val bottomBarSelector = remember {
-            mutableIntStateOf(0)
+            mutableIntStateOf(MainActivity.bottomBarSelector)
+        }
+        val showFloatingButton = remember {
+            mutableStateOf(true)
         }
         ModalNavigationDrawer(
             drawerState = drawerState,
@@ -269,6 +273,11 @@ class MainUI(val context: Context) {
                 }
             }
         ) {
+            showFloatingButton.value =
+                when (bottomBarSelector.intValue) {
+                    3 -> false
+                    else -> true
+                }
             // Screen content
             val scrollBehavior =
                 TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
@@ -326,6 +335,7 @@ class MainUI(val context: Context) {
                                         .weight(1f)
                                         .clickable {
                                             bottomBarSelector.intValue = index
+                                            MainActivity.bottomBarSelector = index
                                         },
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
@@ -350,33 +360,35 @@ class MainUI(val context: Context) {
                     )
                 },
                 floatingActionButton = {
-                    Box {
-                        FloatingActionButton(
-                            onClick = {
-                                onNotification("New Turbo Test")
-                            },
+                    if(showFloatingButton.value) {
+                        Box {
+                            FloatingActionButton(
+                                onClick = {
+                                    onNotification("New Turbo Test")
+                                },
 //                            shape = CircleShape,
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier
-                                .align(Alignment.BottomEnd)
-                                .size(80.dp)
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier
+                                    .align(Alignment.BottomEnd)
+                                    .size(80.dp)
 //                                .offset(y = 50.dp)
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.DirectionsRun,
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .size(45.dp),
-                                    tint = MaterialTheme.colorScheme.secondary
-                                )
-                                Text(
-                                    text = context.resources.getString(R.string.fast_test),
-                                    modifier = Modifier.fillMaxWidth(),
-                                    textAlign = TextAlign.Center
-                                )
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.DirectionsRun,
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(45.dp),
+                                        tint = MaterialTheme.colorScheme.secondary
+                                    )
+                                    Text(
+                                        text = context.resources.getString(R.string.fast_test),
+                                        modifier = Modifier.fillMaxWidth(),
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
                         }
                     }
@@ -564,16 +576,17 @@ class MainUI(val context: Context) {
                         width = 2.dp,
                         color = MaterialTheme.colorScheme.primary
                     )
+                    .fillMaxSize()
                     .weight(1f)
             ) {
                 LazyColumn {
-
+//  List of My Tests
                 }
 
             }
             Row(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
             ) {
                 Button(
                     onClick = {

@@ -39,6 +39,12 @@
     <string name="sms_send_confirm_text">SMS jo\'natish orqali taklif yuborishga rozimisiz?</string>
     <string name="test_interrupt">Testni tugatishni hohlaysizmi?</string>
     <string name="create_test">Test tuzish</string>
+    <string name="create_test_source">Test tuzish manbasi</string>
+    <string name="ms_office_docs">Microsoft Office Documentlari</string>
+    <string name="pdf_docs">PDF Documentlari</string>
+    <string name="ocr">OCR</string>
+    <string name="ai_ocr">AI OCR</string>
+
     <string name="edit_test">Testni o\'zgartirish</string>
     <string name="delete_test">Testni o\'chirish</string>
     <string name="yes">Ha</string>

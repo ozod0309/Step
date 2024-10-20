@@ -1,4 +1,4 @@
-package com.mikicorp.step.lib
+package com.mikicorp.step.mlkit
 
 import android.media.Image
 import androidx.annotation.OptIn

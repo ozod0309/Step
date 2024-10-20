@@ -1,4 +1,4 @@
-package com.mikicorp.step
+package com.mikicorp.step.mlkit
 
 import android.content.Context
 import android.view.ViewGroup
@@ -37,9 +37,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
-import com.mikicorp.step.lib.TextRecognitionAnalyzer
+import com.mikicorp.step.R
 
-class MyStepUI(val context: Context?) {
+class MLKit(val context: Context?) {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun UI(onDone: () -> Unit) {

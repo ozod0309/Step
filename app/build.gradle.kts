@@ -91,6 +91,8 @@ dependencies {
     implementation("androidx.camera:camera-view:1.3.4")
     implementation("androidx.camera:camera-extensions:1.3.4")
 
+    implementation("org.apache.poi:poi:5.2.2")
+    implementation("org.apache.poi:poi-ooxml:5.2.2")
     implementation("com.google.mlkit:text-recognition:16.0.1")
 
     implementation("com.github.JamalMulla:ComposePrefs3:1.0.5")

@@ -58,6 +58,11 @@
     <string name="sms_send_confirm_text">Are you sure to invite by sending SMS?</string>
     <string name="test_interrupt">Are you sure to interrupt test</string>
     <string name="create_test">Create Test</string>
+    <string name="create_test_source">Create Test Source</string>
+    <string name="ms_office_docs">Microsoft Office Documents</string>
+    <string name="pdf_docs">PDF Documents</string>
+    <string name="ocr">OCR</string>
+    <string name="ai_ocr">AI OCR</string>
     <string name="edit_test">Edit Test</string>
     <string name="delete_test">Delete Test</string>
     <string name="yes">Yes</string>
