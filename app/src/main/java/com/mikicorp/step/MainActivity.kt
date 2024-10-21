@@ -1,6 +1,7 @@
 package com.mikicorp.step
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -48,6 +49,7 @@ import com.mikicorp.step.lib.toCategories
 import com.mikicorp.step.lib.toStepUser
 import com.mikicorp.step.lib.toTest
 import com.mikicorp.step.mlkit.MLKit
+import com.mikicorp.step.msdocs.MSDocsUI
 import com.mikicorp.step.ui.theme.StepTheme
 import com.zumo.mikitodo.libs.PermissionKeys
 import kotlinx.coroutines.Dispatchers
@@ -73,6 +75,8 @@ class MainActivity : ComponentActivity() {
         val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
         lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
         lateinit var permissionManager: PermissionManager
+        lateinit var requestFileLauncher: ActivityResultLauncher<Intent>
+        lateinit var msDocsUI: MSDocsUI
     }
 
     @SuppressLint("HardwareIds")
@@ -87,7 +91,15 @@ class MainActivity : ComponentActivity() {
             ) { isGranted: Boolean ->
                 permissionManager.onResult(isGranted)
             }
-
+        msDocsUI = MSDocsUI(this)
+        requestFileLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    result.data?.data?.let { uri ->
+                        msDocsUI.handleSelectedFile(uri)
+                    }
+                }
+            }
         val sharedPreference = SharedPreference(applicationContext)
         androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
         userRegistration = sharedPreference.getValueInt(PreferencesKeys.USER_REGISTRATION)
@@ -125,7 +137,6 @@ class MainActivity : ComponentActivity() {
             val newNotification = remember {
                 mutableStateOf(false)
             }
-
             var newNotificationText = ""
             StepTheme {
                 Surface(
@@ -486,7 +497,7 @@ class MainActivity : ComponentActivity() {
                         composable(StepFragments.CREATE_TEST_SOURCE) {
                             CreateTestSourceUI(LocalContext.current).UI(
                                 onMSDocs = {
-
+                                    navController.navigate(StepFragments.MSDOCS)
                                 },
                                 onPDFDocs = {
 
@@ -497,6 +508,13 @@ class MainActivity : ComponentActivity() {
                                 onAIOCR = {
 
                                 },
+                                onClose = {
+                                    navController.navigate(StepFragments.MAIN)
+                                }
+                            )
+                        }
+                        composable(StepFragments.MSDOCS) {
+                            MSDocsUI(LocalContext.current).UI(
                                 onClose = {
                                     navController.navigate(StepFragments.MAIN)
                                 }
