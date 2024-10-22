@@ -53,12 +53,14 @@ android {
 dependencies {
 
     implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
     implementation("androidx.activity:activity-compose:1.9.3")
     implementation(platform("androidx.compose:compose-bom:2024.10.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("org.jetbrains.compose.ui:ui-tooling-preview:1.0.0")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended:1.7.4")
     implementation("androidx.compose.runtime:runtime-livedata:1.7.4")
@@ -74,7 +76,7 @@ dependencies {
 
     implementation("com.google.gms:google-services:4.4.2")
     implementation("com.google.firebase:firebase-core:21.1.1")
-    implementation("com.google.firebase:firebase-auth:23.0.0")
+    implementation("com.google.firebase:firebase-auth:23.1.0")
     implementation("com.google.android.gms:play-services-auth:21.2.0")
     implementation("androidx.wear.compose:compose-material:1.4.0")
 
@@ -91,8 +93,8 @@ dependencies {
     implementation("androidx.camera:camera-view:1.3.4")
     implementation("androidx.camera:camera-extensions:1.3.4")
 
-    implementation("org.apache.poi:poi:5.2.2")
-    implementation("org.apache.poi:poi-ooxml:5.2.2")
+    implementation("org.apache.poi:poi:5.2.3")
+    implementation("org.apache.poi:poi-ooxml:5.2.3")
     implementation("com.google.mlkit:text-recognition:16.0.1")
 
     implementation("com.github.JamalMulla:ComposePrefs3:1.0.5")

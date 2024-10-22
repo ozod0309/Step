@@ -1,7 +1,6 @@
 package com.mikicorp.step
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -37,6 +36,7 @@ import com.mikicorp.step.lib.LocaleHelper
 import com.mikicorp.step.lib.PermissionManager
 import com.mikicorp.step.lib.PostData
 import com.mikicorp.step.lib.PreferencesKeys
+import com.mikicorp.step.lib.ReadMSFiles
 import com.mikicorp.step.lib.RegistrationTypes
 import com.mikicorp.step.lib.SharedPreference
 import com.mikicorp.step.lib.SimUtil
@@ -49,7 +49,6 @@ import com.mikicorp.step.lib.toCategories
 import com.mikicorp.step.lib.toStepUser
 import com.mikicorp.step.lib.toTest
 import com.mikicorp.step.mlkit.MLKit
-import com.mikicorp.step.msdocs.MSDocsUI
 import com.mikicorp.step.ui.theme.StepTheme
 import com.zumo.mikitodo.libs.PermissionKeys
 import kotlinx.coroutines.Dispatchers
@@ -76,7 +75,8 @@ class MainActivity : ComponentActivity() {
         lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
         lateinit var permissionManager: PermissionManager
         lateinit var requestFileLauncher: ActivityResultLauncher<Intent>
-        lateinit var msDocsUI: MSDocsUI
+        lateinit var readMSFiles: ReadMSFiles
+
     }
 
     @SuppressLint("HardwareIds")
@@ -91,16 +91,17 @@ class MainActivity : ComponentActivity() {
             ) { isGranted: Boolean ->
                 permissionManager.onResult(isGranted)
             }
-        msDocsUI = MSDocsUI(this)
+        readMSFiles = ReadMSFiles()
         requestFileLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                if (result.resultCode == Activity.RESULT_OK) {
+                if (result.resultCode == RESULT_OK) {
                     result.data?.data?.let { uri ->
-                        msDocsUI.handleSelectedFile(uri)
+                        readMSFiles.handleSelectedFile(this, uri)
                     }
                 }
             }
         val sharedPreference = SharedPreference(applicationContext)
+        var docText = ""
         androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
         userRegistration = sharedPreference.getValueInt(PreferencesKeys.USER_REGISTRATION)
         langCode = sharedPreference.getValueString(PreferencesKeys.LANG_CODE).toString()
@@ -497,7 +498,14 @@ class MainActivity : ComponentActivity() {
                         composable(StepFragments.CREATE_TEST_SOURCE) {
                             CreateTestSourceUI(LocalContext.current).UI(
                                 onMSDocs = {
-                                    navController.navigate(StepFragments.MSDOCS)
+                                    readMSFiles.onSuccess = {result ->
+                                        docText = result
+                                        navController.navigate(StepFragments.MSDOCS)
+                                    }
+                                    readMSFiles.onError = {
+                                        navController.navigate(StepFragments.ERROR)
+                                    }
+                                    readMSFiles.openFileSelector()
                                 },
                                 onPDFDocs = {
 
@@ -514,7 +522,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(StepFragments.MSDOCS) {
-                            MSDocsUI(LocalContext.current).UI(
+                            CreateTestUI(LocalContext.current, docText).UI(
                                 onClose = {
                                     navController.navigate(StepFragments.MAIN)
                                 }

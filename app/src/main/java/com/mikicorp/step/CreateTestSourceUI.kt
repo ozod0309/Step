@@ -23,6 +23,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 class CreateTestSourceUI(val context: Context?) {
+    companion object {
+        var testText: String = ""
+    }
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun UI(
