@@ -16,13 +16,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mikicorp.step.lib.LanguageCodes
 
 class LanguageUI(val context: Context?) {
     @Composable
-    fun UI(onClick:() -> Unit) {
+    fun UI(onClick:() -> Unit = {}) {
         Box(modifier = Modifier.padding()) {
             LazyColumn(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -55,4 +56,10 @@ class LanguageUI(val context: Context?) {
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun LanguageUIPreview() {
+    LanguageUI(null).UI()
 }

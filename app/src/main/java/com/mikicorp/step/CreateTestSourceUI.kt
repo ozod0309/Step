@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 class CreateTestSourceUI(val context: Context?) {
@@ -27,13 +28,14 @@ class CreateTestSourceUI(val context: Context?) {
         var testText: String = ""
     }
     @OptIn(ExperimentalMaterial3Api::class)
+
     @Composable
     fun UI(
-        onMSDocs: () -> Unit,
-        onPDFDocs: () -> Unit,
-        onOCR: () -> Unit,
-        onAIOCR: () -> Unit,
-        onClose: () -> Unit
+        onMSDocs: () -> Unit = {},
+        onPDFDocs: () -> Unit = {},
+        onOCR: () -> Unit = {},
+        onAIOCR: () -> Unit = {},
+        onClose: () -> Unit = {}
     ) {
         Scaffold(
             topBar = {
@@ -158,4 +160,10 @@ class CreateTestSourceUI(val context: Context?) {
             }
         )
     }
+}
+
+@Preview
+@Composable
+fun CreateTestSourceUIPreview() {
+    CreateTestSourceUI(null).UI()
 }

@@ -56,47 +56,47 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                     modifier = Modifier
                         .padding(innerPadding)
                 ) {
-                    Spacer(modifier = Modifier.height(20.dp))
-                    ShowQuestion(activeQuestion)
-                    Spacer(modifier = Modifier.height(20.dp))
-                    HorizontalDivider()
-                    LazyColumn(state = listState) {
-                        items(items = activeQuestion.answers) { answer ->
-                            Spacer(modifier = Modifier.height(20.dp))
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .border(
-                                        if (answer.id == selectedAnswer) 2.dp else 0.dp,
-                                        if (answer.id == selectedAnswer) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
-                                    )
-                                    .selectable(
-                                        selected = answer.id == selectedAnswer,
-                                        onClick = {
-                                            selectedAnswer = if (selectedAnswer != answer.id)
-                                                answer.id else -1
-                                        })
-                                    .padding(5.dp, 10.dp)
-                                    .fillMaxWidth()
-                            ) {
-                                Spacer(modifier = Modifier.width(15.dp))
-                                Icon(
-                                    imageVector = if (answer.id == selectedAnswer)
-                                        Icons.Filled.RadioButtonChecked
-                                    else
-                                        Icons.Filled.RadioButtonUnchecked,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    contentDescription = null
-                                )
-                                Spacer(modifier = Modifier.width(15.dp))
-
-                                Text(
-                                    text = answer.answer,
-                                    modifier = Modifier.fillMaxWidth(),
-                                )
-                            }
-                        }
-                    }
+//                    Spacer(modifier = Modifier.height(20.dp))
+//                    ShowQuestion(activeQuestion)
+//                    Spacer(modifier = Modifier.height(20.dp))
+//                    HorizontalDivider()
+//                    LazyColumn(state = listState) {
+//                        items(items = activeQuestion.answers) { answer ->
+//                            Spacer(modifier = Modifier.height(20.dp))
+//                            Row(
+//                                verticalAlignment = Alignment.CenterVertically,
+//                                modifier = Modifier
+//                                    .border(
+//                                        if (answer.id == selectedAnswer) 2.dp else 0.dp,
+//                                        if (answer.id == selectedAnswer) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+//                                    )
+//                                    .selectable(
+//                                        selected = answer.id == selectedAnswer,
+//                                        onClick = {
+//                                            selectedAnswer = if (selectedAnswer != answer.id)
+//                                                answer.id else -1
+//                                        })
+//                                    .padding(5.dp, 10.dp)
+//                                    .fillMaxWidth()
+//                            ) {
+//                                Spacer(modifier = Modifier.width(15.dp))
+//                                Icon(
+//                                    imageVector = if (answer.id == selectedAnswer)
+//                                        Icons.Filled.RadioButtonChecked
+//                                    else
+//                                        Icons.Filled.RadioButtonUnchecked,
+//                                    tint = MaterialTheme.colorScheme.primary,
+//                                    contentDescription = null
+//                                )
+//                                Spacer(modifier = Modifier.width(15.dp))
+//
+//                                Text(
+//                                    text = answer.answer,
+//                                    modifier = Modifier.fillMaxWidth(),
+//                                )
+//                            }
+//                        }
+//                    }
                     HorizontalDivider()
                     Text(
                         modifier = Modifier.verticalScroll(scroll),
@@ -135,8 +135,8 @@ class CreateTestUI(val context: Context?, private var docText: String) {
 
 }
 
-@Preview(backgroundColor = 0xFFBBBBBB)
+@Preview
 @Composable
-fun ShowPreview() {
+fun CreateTestUIPreview() {
     CreateTestUI(null, "").UI()
 }

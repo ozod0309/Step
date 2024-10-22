@@ -26,6 +26,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -36,13 +37,13 @@ import com.mikicorp.step.MainActivity.Companion.dataStore
 import com.mikicorp.step.lib.LanguageCodes
 import com.mikicorp.step.lib.SettingsKeys
 
-class SettingsUI(val context: Context) {
+class SettingsUI(val context: Context?) {
 
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
     @Composable
     fun UI(
-        onBackPressed: () -> Unit,
-        onLanguageChange: (lang: String) -> Unit
+        onBackPressed: () -> Unit = {},
+        onLanguageChange: (lang: String) -> Unit = {}
     ) {
         LaunchedEffect(Unit) {
             savePref(SettingsKeys.LANG, MainActivity.langCode)
@@ -112,7 +113,7 @@ class SettingsUI(val context: Context) {
                                         .align(Alignment.CenterVertically),
                                     imageVector = Icons.Filled.Code,
                                     tint = MaterialTheme.colorScheme.primary,
-                                    contentDescription = context.resources.getString(R.string.coders)
+                                    contentDescription = context!!.resources.getString(R.string.coders)
                                 )
                                 Spacer(modifier = Modifier.width(5.dp))
                                 TextPref(
@@ -127,9 +128,15 @@ class SettingsUI(val context: Context) {
     }
 
     private suspend fun savePref(key: String, value: String) {
-        context.dataStore.edit {preference ->
+        context!!.dataStore.edit {preference ->
             preference[stringPreferencesKey(key)] = value
 
         }
     }
+}
+
+@Preview
+@Composable
+fun SettingsUIPreview() {
+    SettingsUI(null).UI()
 }

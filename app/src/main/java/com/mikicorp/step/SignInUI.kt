@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.credentials.CredentialManager
@@ -53,7 +54,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class SignInUI(private val context: Context?, val onClick: (result: Boolean) -> Unit) {
+class SignInUI(private val context: Context?, val onClick: (result: Boolean) -> Unit = {}) {
 
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationGraphicsApi::class)
     @Composable
@@ -211,3 +212,8 @@ class SignInUI(private val context: Context?, val onClick: (result: Boolean) -> 
     }
 }
 
+@Preview
+@Composable
+fun SignInUIPreview() {
+    SignInUI(null).UI()
+}

@@ -49,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mikicorp.step.R
 import com.mikicorp.step.lib.CircularProgressbar
@@ -56,7 +57,7 @@ import com.mikicorp.step.lib.CircularProgressbar
 class ResultUI(val context: Context?) {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun UI(onDone: () -> Unit) {
+    fun UI(onDone: () -> Unit = {}) {
         val animDuration = 5000
         val testQuestionsCount = MainActivity.tests.size
         val correctAnswerCount = MainActivity.tests.count { it.isCorrect && it.answered > 0 }
@@ -378,4 +379,10 @@ class ResultUI(val context: Context?) {
         }:${(timer % 60).toString().padStart(2, '0')}"
     }
 
+}
+
+@Preview
+@Composable
+fun ResultUIPreview() {
+    ResultUI(null).UI()
 }

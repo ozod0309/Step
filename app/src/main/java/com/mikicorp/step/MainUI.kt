@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -91,12 +90,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
 
-class MainUI(val context: Context) {
+class MainUI(val context: Context?) {
 
     companion object {
         var categoryTop = 0.dp
@@ -111,20 +111,20 @@ class MainUI(val context: Context) {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun UI(
-        onStartTest: (subCategoryId: Int) -> Unit,
-        onProfile: () -> Unit,
-        onSettings: () -> Unit,
-        onInviteFriends: () -> Unit,
-        onShare: () -> Unit,
-        onRateUs: () -> Unit,
-        onNotification: (message: String) -> Unit,
-        onCreateTest: () -> Unit,
-        onEditTest: () -> Unit,
-        onDeleteTest: () -> Unit,
-        onLogout: () -> Unit
+        onStartTest: (subCategoryId: Int) -> Unit = {},
+        onProfile: () -> Unit = {},
+        onSettings: () -> Unit = {},
+        onInviteFriends: () -> Unit = {},
+        onShare: () -> Unit = {},
+        onRateUs: () -> Unit = {},
+        onNotification: (message: String) -> Unit = {},
+        onCreateTest: () -> Unit = {},
+        onEditTest: () -> Unit = {},
+        onDeleteTest: () -> Unit = {},
+        onLogout: () -> Unit = {}
     ) {
         val bottomBarData = arrayListOf(
-            BottomItem(Icons.Filled.Home, context.resources.getString(R.string.home)),
+            BottomItem(Icons.Filled.Home, context!!.resources.getString(R.string.home)),
             BottomItem(Icons.Filled.BarChart, context.resources.getString(R.string.success)),
             BottomItem(Icons.Filled.History, context.resources.getString(R.string.history)),
             BottomItem(Icons.AutoMirrored.Filled.ListAlt, context.resources.getString(R.string.my_step))
@@ -435,7 +435,7 @@ class MainUI(val context: Context) {
                 }) {
                     Icon(
                         imageVector = Icons.Filled.Menu,
-                        contentDescription = context.resources.getString(R.string.menu),
+                        contentDescription = context!!.resources.getString(R.string.menu),
                         tint = MaterialTheme.colorScheme.secondary
                     )
                 }
@@ -446,7 +446,7 @@ class MainUI(val context: Context) {
                 }) {
                     Icon(
                         imageVector = Icons.Filled.Notifications,
-                        contentDescription = context.resources.getString(R.string.notificaations),
+                        contentDescription = context!!.resources.getString(R.string.notificaations),
                         tint = MaterialTheme.colorScheme.secondary
                     )
                 }
@@ -817,4 +817,10 @@ class MainUI(val context: Context) {
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun MainUIPreview() {
+    MainUI(null).UI()
 }

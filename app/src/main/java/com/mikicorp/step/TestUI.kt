@@ -67,6 +67,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.mikicorp.step.lib.Test
@@ -78,9 +79,9 @@ class TestUI(context: Context?) {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun UI(
-        onBackPressed: () -> Unit,
-        onTimeOut: () -> Unit,
-        onFinishTest: () -> Unit
+        onBackPressed: () -> Unit = {},
+        onTimeOut: () -> Unit = {},
+        onFinishTest: () -> Unit = {}
     ) {
         val totalTime = 300
         var testTimer by remember { mutableIntStateOf(totalTime) }
@@ -479,4 +480,10 @@ class TestUI(context: Context?) {
             ((timer % 3600) / 60).toString().padStart(2, '0')
         }:${(timer % 60).toString().padStart(2, '0')}"
     }
+}
+
+@Preview
+@Composable
+fun TestUIPreview() {
+    TestUI(null).UI()
 }
