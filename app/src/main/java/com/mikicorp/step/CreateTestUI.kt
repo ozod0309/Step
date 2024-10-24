@@ -1,6 +1,8 @@
 package com.mikicorp.step
 
 import android.content.Context
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,12 +11,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.QuestionAnswer
+import androidx.compose.material.icons.filled.RadioButtonChecked
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
@@ -28,6 +35,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -46,8 +58,10 @@ class CreateTestUI(val context: Context?, private var docText: String) {
         docText.lines().map {str ->
             docList.add(DocToList(str, false))
         }
-        DocToTest()
+        docToTest()
         val scroll = rememberScrollState(0)
+        val listIndex = remember { mutableIntStateOf(0) }
+        var selectedAnswer by remember { mutableIntStateOf(-1) }
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -69,50 +83,61 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                     modifier = Modifier
                         .padding(innerPadding)
                 ) {
-                    Spacer(modifier = Modifier.height(20.dp))
-//                    ShowQuestion(activeQuestion)
-//                    Spacer(modifier = Modifier.height(20.dp))
-//                    HorizontalDivider()
-//                    LazyColumn(state = listState) {
-//                        items(items = activeQuestion.answers) { answer ->
-//                            Spacer(modifier = Modifier.height(20.dp))
-//                            Row(
-//                                verticalAlignment = Alignment.CenterVertically,
-//                                modifier = Modifier
-//                                    .border(
-//                                        if (answer.id == selectedAnswer) 2.dp else 0.dp,
-//                                        if (answer.id == selectedAnswer) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
-//                                    )
-//                                    .selectable(
-//                                        selected = answer.id == selectedAnswer,
-//                                        onClick = {
-//                                            selectedAnswer = if (selectedAnswer != answer.id)
-//                                                answer.id else -1
-//                                        })
-//                                    .padding(5.dp, 10.dp)
-//                                    .fillMaxWidth()
-//                            ) {
-//                                Spacer(modifier = Modifier.width(15.dp))
-//                                Icon(
-//                                    imageVector = if (answer.id == selectedAnswer)
-//                                        Icons.Filled.RadioButtonChecked
-//                                    else
-//                                        Icons.Filled.RadioButtonUnchecked,
-//                                    tint = MaterialTheme.colorScheme.primary,
-//                                    contentDescription = null
-//                                )
-//                                Spacer(modifier = Modifier.width(15.dp))
-//
-//                                Text(
-//                                    text = answer.answer,
-//                                    modifier = Modifier.fillMaxWidth(),
-//                                )
-//                            }
-//                        }
-//                    }
+                    Box(modifier = Modifier
+                        .weight(1f)
+                    ) {
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Text(
+                            text = docList[listIndex.intValue].str,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        listIndex.intValue++
+                        Spacer(modifier = Modifier.height(20.dp))
+                        HorizontalDivider()
+                        LazyColumn {
+                            itemsIndexed(docList) { index, answer ->
+                                Spacer(modifier = Modifier.height(20.dp))
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .border(
+                                            if (index == selectedAnswer) 2.dp else 0.dp,
+                                            if (index == selectedAnswer) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+                                        )
+                                        .selectable(
+                                            selected = index == selectedAnswer,
+                                            onClick = {
+                                                selectedAnswer = if (selectedAnswer != index)
+                                                    index else -1
+                                            })
+                                        .padding(5.dp, 10.dp)
+                                        .fillMaxWidth()
+                                ) {
+                                    Spacer(modifier = Modifier.width(15.dp))
+                                    Icon(
+                                        imageVector = if (index == selectedAnswer)
+                                            Icons.Filled.RadioButtonChecked
+                                        else
+                                            Icons.Filled.RadioButtonUnchecked,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        contentDescription = null
+                                    )
+                                    Spacer(modifier = Modifier.width(15.dp))
+
+                                    Text(
+                                        text = answer.str,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                }
+                            }
+                        }
+                    }
                     HorizontalDivider()
-                    LazyColumn {
-                        items(docList.size) {index ->
+                    LazyColumn(
+                        modifier = Modifier
+                            .weight(1f)
+                    ) {
+                        items(docList) {item ->
                             Row {
                                 Spacer(modifier = Modifier.width(5.dp))
                                 Icon(
@@ -128,7 +153,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                 )
                                 Spacer(modifier = Modifier.width(5.dp))
                                 Icon(
-                                    imageVector = if (docList[index].enabled)
+                                    imageVector = if (item.enabled)
                                         Icons.Filled.Add
                                     else
                                         Icons.Filled.Cancel,
@@ -137,7 +162,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                 )
                                 Spacer(modifier = Modifier.width(15.dp))
                                 Text(
-                                    text = docList[index].str,
+                                    text = item.str,
                                     modifier = Modifier.fillMaxWidth(),
                                 )
                             }
@@ -173,7 +198,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
         )
     }
 
-    private fun DocToTest() {
+    private fun docToTest() {
         var i = 0
         while(i < docList.size) {
             val str = docList[i].str
