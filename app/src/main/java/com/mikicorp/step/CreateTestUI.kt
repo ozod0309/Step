@@ -211,6 +211,20 @@ class CreateTestUI(val context: Context?, private var docText: String) {
         }
     }
 
+    fun isListElement(str: String): Boolean {
+        val regex = """^[a-zA-Z0-9]\..+""".toRegex()
+        return regex.matches(str)
+    }
+
+//    fun main() {
+//        val testStrings = listOf("1. Example text", "a. Another example", "Example without list format")
+//
+//        testStrings.forEach {
+//            println("\"$it\" is list element: ${isListElement(it)}")
+//        }
+//    }
+
+
 
 }
 
