@@ -91,7 +91,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                             text = docList[listIndex.intValue].str,
                             modifier = Modifier.fillMaxWidth(),
                         )
-                        listIndex.intValue++
+//                        listIndex.intValue++
                         Spacer(modifier = Modifier.height(20.dp))
                         HorizontalDivider()
                         LazyColumn {
