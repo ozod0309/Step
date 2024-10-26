@@ -82,54 +82,66 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                     modifier = Modifier
                         .padding(innerPadding)
                 ) {
-                    Box(
+                    Column(
                         modifier = Modifier
                             .weight(1f)
                     ) {
                         Spacer(modifier = Modifier.height(20.dp))
-                        while (!docList[listIndex.intValue].isQuestion) listIndex.intValue++
-                        Text(
-                            text = docList[listIndex.intValue].str,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        listIndex.intValue ++
-                        Spacer(modifier = Modifier.height(20.dp))
-                        HorizontalDivider()
-                        while (docList[listIndex.intValue].isAnswer) {
-                            Spacer(modifier = Modifier.height(20.dp))
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .border(
-                                        if (listIndex.intValue == selectedAnswer) 2.dp else 0.dp,
-                                        if (listIndex.intValue == selectedAnswer) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
-                                    )
-                                    .selectable(
-                                        selected = listIndex.intValue == selectedAnswer,
-                                        onClick = {
-                                            selectedAnswer =
-                                                if (selectedAnswer != listIndex.intValue)
-                                                    listIndex.intValue else -1
-                                        })
-                                    .padding(5.dp, 10.dp)
-                                    .fillMaxWidth()
-                            ) {
-                                Spacer(modifier = Modifier.width(15.dp))
-                                Icon(
-                                    imageVector = if (listIndex.intValue == selectedAnswer)
-                                        Icons.Filled.RadioButtonChecked
-                                    else
-                                        Icons.Filled.RadioButtonUnchecked,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    contentDescription = null
-                                )
-                                Spacer(modifier = Modifier.width(15.dp))
-
+                        while (!docList[listIndex.intValue].isQuestion) listIndex.intValue ++
+                        var listIndexDelta = 0
+                        while(listIndex.intValue + listIndexDelta < docList.size) {
+                            if(docList[listIndex.intValue + listIndexDelta].isQuestion) {
                                 Text(
-                                    text = docList[listIndex.intValue].str,
+                                    text = docList[listIndex.intValue + listIndexDelta].str,
                                     modifier = Modifier.fillMaxWidth(),
                                 )
+                            } else {
+                                break
                             }
+                            listIndexDelta ++
+                        }
+                        Spacer(modifier = Modifier.height(20.dp))
+                        HorizontalDivider()
+                        while(listIndex.intValue + listIndexDelta < docList.size) {
+                            Text(text = "Hello" + listIndex.intValue.toString())
+                            if (docList[listIndex.intValue + listIndexDelta].isAnswer) {
+                                Spacer(modifier = Modifier.height(20.dp))
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .border(
+                                            if (listIndex.intValue + listIndexDelta == selectedAnswer) 2.dp else 0.dp,
+                                            if (listIndex.intValue + listIndexDelta == selectedAnswer) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+                                        )
+                                        .selectable(
+                                            selected = listIndex.intValue + listIndexDelta == selectedAnswer,
+                                            onClick = {
+                                                selectedAnswer =
+                                                    if (selectedAnswer != listIndex.intValue + listIndexDelta)
+                                                        listIndex.intValue + listIndexDelta else -1
+                                            })
+                                        .padding(5.dp, 10.dp)
+                                        .fillMaxWidth()
+                                ) {
+                                    Spacer(modifier = Modifier.width(15.dp))
+                                    Icon(
+                                        imageVector = if (listIndex.intValue + listIndexDelta == selectedAnswer)
+                                            Icons.Filled.RadioButtonChecked
+                                        else
+                                            Icons.Filled.RadioButtonUnchecked,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        contentDescription = null
+                                    )
+                                    Spacer(modifier = Modifier.width(15.dp))
+                                    Text(
+                                        text = docList[listIndex.intValue + listIndexDelta].str,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                }
+                            } else {
+                                listIndexDelta = docList.size
+                            }
+                            listIndexDelta ++
                         }
                     }
                     HorizontalDivider()
@@ -152,7 +164,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                 )
                                 Spacer(modifier = Modifier.width(5.dp))
                                 Icon(
-                                    imageVector = if (item.enabled)
+                                    imageVector = if (item.disabled)
                                         Icons.Filled.Add
                                     else
                                         Icons.Filled.Cancel,
@@ -212,45 +224,123 @@ class CreateTestUI(val context: Context?, private var docText: String) {
     private fun docToTest() {
         val specialSymbols = "*-"
         val dividingSymbols = ".)"
+        var questionDividingTypeSet = false
+        var questionDividingType = textListTypes.Ordinary
+        var answerDividingTypeSet = false
+        var answerDividingType = textListTypes.Ordinary
         var questionDividing = 0.toChar()
-        var answerDividing = 0.toChar()
-        var questionListType = textListTypes.Ordinary
-        var questionListTypeSet = false
-        var answerListType = textListTypes.Ordinary
-        var answerListTypeSet = false
         var questionIndex = 0.toChar()
+        var answerDividing = 0.toChar()
         var answerIndex = 0.toChar()
-        var lastItemType = textListItemType.Question
         var index = 0
+        var currentItemType = textListItemType.Question
         var question = ""
         var answers = arrayListOf<MyAnswer>()
         while (index < docList.size) {
             val str = docList[index].str
             if (str.trim().isEmpty()) {
-                docList[index].enabled = false
+                docList[index].disabled = false
                 index++
                 continue
             }
-            var charType = textListTypes.Ordinary
-            if (str[0].isDigit()) charType = textListTypes.Numeric
-            if (str[0].isLetter()) charType = textListTypes.Letters
-            when (charType) {
-                textListTypes.Ordinary -> {
+            if(dividingSymbols.contains(str[1])) {
+                var charType = textListTypes.Ordinary
+                if (str[0].isDigit()) charType = textListTypes.Numeric
+                if (str[0].isLetter()) charType = textListTypes.Letters
+                when (charType) {
+                    textListTypes.Ordinary -> {
+                        when (currentItemType) {
+                            textListItemType.Question -> {
+                                docList[index].isQuestion = true
+                                questionDividingTypeSet = true
+                            }
+                            textListItemType.Answer -> {
+                                docList[index].isAnswer = true
+                                if(answerDividingTypeSet) {
+                                    if(answerDividingType != textListTypes.Ordinary) {
+                                        currentItemType = textListItemType.Question
+                                        index --
+                                    }
+                                } else {
+                                    answerDividingType = textListTypes.Ordinary
+                                    answerDividing = str[1]
+                                    answerDividingTypeSet = true
+                                }
+                            }
+                            textListItemType.Erased -> {
+                                docList[index].disabled = true
+                            }
+                        }
+                    }
+                    textListTypes.Numeric -> {
+                        when (currentItemType) {
+                            textListItemType.Question -> {
+                                docList[index].isQuestion = true
+                                if(!questionDividingTypeSet) {
+                                    questionDividingType = textListTypes.Numeric
+                                    questionDividing = str[1]
+                                    questionDividingTypeSet = true
+                                }
+                            }
+                            textListItemType.Answer -> {
+                                docList[index].isAnswer = true
+                                if(!answerDividingTypeSet) {
+                                    answerDividingType = textListTypes.Numeric
+                                    answerDividing = str[1]
+                                    answerDividingTypeSet = true
+                                }
+                            }
+                            textListItemType.Erased -> {
+                                docList[index].disabled = true
+                            }
+                        }
+                    }
+
+                    textListTypes.Letters -> {
+                        when (currentItemType) {
+                            textListItemType.Question -> {
+                                if(questionDividingTypeSet) {
+                                    if(questionDividingType != textListTypes.Letters) {
+                                        currentItemType = textListItemType.Answer
+                                        index --
+                                    } else {
+                                        docList[index].isQuestion = true
+                                    }
+                                } else {
+                                    questionDividingType = textListTypes.Letters
+                                    questionDividing = str[1]
+                                    questionDividingTypeSet = true
+                                    docList[index].isQuestion = true
+                                }
+                            }
+                            textListItemType.Answer -> {
+                                docList[index].isAnswer = true
+                                if(answerDividingTypeSet) {
+                                    if(answerDividingType != textListTypes.Letters) {
+                                        currentItemType = textListItemType.Question
+                                        index --
+                                    } else {
+                                        docList[index].isAnswer = true
+                                    }
+                                } else {
+                                    answerDividingType = textListTypes.Letters
+                                    answerDividing = str[1]
+                                    answerDividingTypeSet = true
+                                }
+                            }
+                            textListItemType.Erased -> {
+                                docList[index].disabled = true
+                            }
+                        }
+                    }
+                }
+            } else {
+                if(specialSymbols.contains(str[0])) {
+
+                } else {
                     docList[index].isQuestion = true
                 }
-
-                textListTypes.Numeric -> {
-
-                }
-
-                textListTypes.Letters -> {
-
-                }
             }
-            if (dividingSymbols.contains(str[1])) {
-            }
-            val question = str
-            val answers = arrayListOf<MyAnswer>()
             index++
         }
     }
@@ -275,8 +365,8 @@ class CreateTestUI(val context: Context?, private var docText: String) {
 data class DocToList(
     val str: String,
     var isQuestion: Boolean = false,
-    val isAnswer: Boolean = false,
-    var enabled: Boolean = false
+    var isAnswer: Boolean = false,
+    var disabled: Boolean = false
 )
 
 data class MyTest(

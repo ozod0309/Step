@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("com.google.gms.google-services") version "4.4.1" apply true
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -51,7 +51,6 @@ android {
 }
 
 dependencies {
-
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
