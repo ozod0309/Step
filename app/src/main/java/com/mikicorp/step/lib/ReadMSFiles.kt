@@ -18,7 +18,7 @@ class ReadMSFiles {
             type = "*/*"
             addCategory(Intent.CATEGORY_OPENABLE)
         }
-        MainActivity.requestFileLauncher.launch(intent)
+        MainActivity.requestMSFileLauncher.launch(intent)
     }
 
     @SuppressLint("Range", "Recycle")

@@ -37,6 +37,7 @@ import com.mikicorp.step.lib.PermissionManager
 import com.mikicorp.step.lib.PostData
 import com.mikicorp.step.lib.PreferencesKeys
 import com.mikicorp.step.lib.ReadMSFiles
+import com.mikicorp.step.lib.ReadPDFFiles
 import com.mikicorp.step.lib.RegistrationTypes
 import com.mikicorp.step.lib.SharedPreference
 import com.mikicorp.step.lib.SimUtil
@@ -74,8 +75,10 @@ class MainActivity : ComponentActivity() {
         val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
         lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
         lateinit var permissionManager: PermissionManager
-        lateinit var requestFileLauncher: ActivityResultLauncher<Intent>
+        lateinit var requestMSFileLauncher: ActivityResultLauncher<Intent>
+        lateinit var requestPDFFileLauncher: ActivityResultLauncher<Intent>
         lateinit var readMSFiles: ReadMSFiles
+        lateinit var readPDFFiles: ReadPDFFiles
 
     }
 
@@ -92,11 +95,20 @@ class MainActivity : ComponentActivity() {
                 permissionManager.onResult(isGranted)
             }
         readMSFiles = ReadMSFiles()
-        requestFileLauncher =
+        readPDFFiles = ReadPDFFiles()
+        requestMSFileLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
                     result.data?.data?.let { uri ->
                         readMSFiles.handleSelectedFile(this, uri)
+                    }
+                }
+            }
+        requestPDFFileLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    result.data?.data?.let { uri ->
+                        readPDFFiles.handleSelectedFile(uri)
                     }
                 }
             }
@@ -508,6 +520,14 @@ class MainActivity : ComponentActivity() {
                                     readMSFiles.openFileSelector()
                                 },
                                 onPDFDocs = {
+                                    readPDFFiles.onSuccess = {result ->
+                                        docText = result
+                                        navController.navigate(StepFragments.MSDOCS)
+                                    }
+                                    readPDFFiles.onError = {
+                                        navController.navigate(StepFragments.ERROR)
+                                    }
+                                    readPDFFiles.openFileSelector()
 
                                 },
                                 onOCR = {

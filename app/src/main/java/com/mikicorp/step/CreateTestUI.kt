@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -65,7 +66,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
             docList.add(DocToList(index, str))
         }
         docToTest()
-        val scroll = rememberScrollState(0)
+        val scroll = rememberLazyListState(0)
         val listIndex = remember { mutableIntStateOf(0) }
         var selectedAnswer by remember { mutableIntStateOf(-1) }
         val nextQuestion = remember { mutableIntStateOf(-1) }
@@ -153,7 +154,8 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                     }
                     HorizontalDivider()
                     LazyColumn(
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        state = scroll
                     ) {
                         itemsIndexed(docList) { idx, item ->
                             Spacer(modifier = Modifier.height(5.dp))
