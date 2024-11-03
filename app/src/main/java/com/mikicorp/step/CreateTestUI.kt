@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -45,6 +44,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,6 +52,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
 class CreateTestUI(val context: Context?, private var docText: String) {
     private var myTest = arrayListOf<MyTest>()
@@ -66,6 +67,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
             docList.add(DocToList(index, str))
         }
         docToTest()
+        val coroutineScope = rememberCoroutineScope()
         val scroll = rememberLazyListState(0)
         val listIndex = remember { mutableIntStateOf(0) }
         var selectedAnswer by remember { mutableIntStateOf(-1) }
@@ -244,6 +246,10 @@ class CreateTestUI(val context: Context?, private var docText: String) {
 
                         Button(
                             onClick = {
+                                listIndex.value = nextQuestion.value
+                                coroutineScope.launch {
+                                    scroll.animateScrollToItem(listIndex.value)
+                                }
                             },
                             modifier = Modifier
                                 .weight(1f)
@@ -332,12 +338,12 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                 if (str[0].isLetter()) charType = TextListTypes.Letters
                 when (charType) {
                     TextListTypes.Ordinary -> {
+                        docList[index].listType.value = TextListTypes.Ordinary
                         when (currentItemType) {
                             TextListItemType.Question -> {
                                 docList[index].isQuestion.value = true
                                 questionDividingTypeSet = true
                             }
-
                             TextListItemType.Answer -> {
                                 docList[index].isAnswer.value = true
                                 if (answerDividingTypeSet) {
@@ -351,15 +357,13 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                     answerDividingTypeSet = true
                                 }
                             }
-
                             TextListItemType.Erased -> {
                                 docList[index].disabled.value = true
                             }
                         }
-                        docList[index].listType.value = TextListTypes.Ordinary
                     }
-
                     TextListTypes.Numeric -> {
+                        docList[index].listType.value = TextListTypes.Numeric
                         when (currentItemType) {
                             TextListItemType.Question -> {
                                 docList[index].isQuestion.value = true
@@ -369,7 +373,6 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                     questionDividingTypeSet = true
                                 }
                             }
-
                             TextListItemType.Answer -> {
                                 docList[index].isAnswer.value = true
                                 if (!answerDividingTypeSet) {
@@ -378,15 +381,13 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                     answerDividingTypeSet = true
                                 }
                             }
-
                             TextListItemType.Erased -> {
                                 docList[index].disabled.value = true
                             }
                         }
-                        docList[index].listType.value = TextListTypes.Numeric
                     }
-
                     TextListTypes.Letters -> {
+                        docList[index].listType.value = TextListTypes.Letters
                         when (currentItemType) {
                             TextListItemType.Question -> {
                                 if (questionDividingTypeSet) {
@@ -403,7 +404,6 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                     docList[index].isQuestion.value = true
                                 }
                             }
-
                             TextListItemType.Answer -> {
                                 docList[index].isAnswer.value = true
                                 if (answerDividingTypeSet) {
@@ -419,12 +419,10 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                     answerDividingTypeSet = true
                                 }
                             }
-
                             TextListItemType.Erased -> {
                                 docList[index].disabled.value = true
                             }
                         }
-                        docList[index].listType.value = TextListTypes.Letters
                     }
                 }
             } else {
@@ -432,6 +430,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
 
                 } else {
                     docList[index].isQuestion.value = true
+                    docList[index].listType.value = TextListTypes.Ordinary
                     questionDividingTypeSet = true
                     currentItemType = TextListItemType.Question
                 }

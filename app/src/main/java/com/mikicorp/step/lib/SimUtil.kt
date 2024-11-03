@@ -61,7 +61,7 @@ class SimUtil (
             context.registerReceiver(deliverSMS, IntentFilter(delivered))
         }
         val localSubscriptionManager = getSystemService(context, SubscriptionManager::class.java) as SubscriptionManager
-        val localList: List<*> = localSubscriptionManager.activeSubscriptionInfoList
+        val localList: List<*> = localSubscriptionManager.activeSubscriptionInfoList!!
         val simInfo = localList[simSelected] as SubscriptionInfo
 //        val smsManager: SmsManager = SmsManager.getDefault()
 //        val smsManager: SmsManager = context.getSystemService(SmsManager::class.java)
