@@ -72,6 +72,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
         val listIndex = remember { mutableIntStateOf(0) }
         var selectedAnswer by remember { mutableIntStateOf(-1) }
         val nextQuestion = remember { mutableIntStateOf(-1) }
+        val prevQuestion = remember { mutableIntStateOf(-1) }
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -114,7 +115,13 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                         Spacer(modifier = Modifier.height(10.dp))
                         HorizontalDivider()
                         LazyColumn {
-                            items(getAnswers(listIndex.intValue, nextQuestion)) { answer ->
+                            items(
+                                getAnswers(
+                                    listIndex.intValue,
+                                    prevQuestion,
+                                    nextQuestion
+                                )
+                            ) { answer ->
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier
@@ -173,7 +180,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.QuestionAnswer,
-                                        tint = if(item.isQuestion.value)
+                                        tint = if (item.isQuestion.value)
                                             MaterialTheme.colorScheme.primary
                                         else
                                             MaterialTheme.colorScheme.onTertiary,
@@ -189,7 +196,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.Star,
-                                        tint = if(item.isAnswer.value)
+                                        tint = if (item.isAnswer.value)
                                             MaterialTheme.colorScheme.primary
                                         else
                                             MaterialTheme.colorScheme.onTertiary,
@@ -205,7 +212,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.Cancel,
-                                        tint = if(item.disabled.value)
+                                        tint = if (item.disabled.value)
                                             MaterialTheme.colorScheme.primary
                                         else
                                             MaterialTheme.colorScheme.onTertiary,
@@ -227,6 +234,12 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                     actions = {
                         Button(
                             onClick = {
+                                if (prevQuestion.intValue >= 0) {
+                                    listIndex.intValue = prevQuestion.intValue
+                                    coroutineScope.launch {
+                                        scroll.animateScrollToItem(listIndex.intValue)
+                                    }
+                                }
                             },
                             modifier = Modifier
                                 .weight(1f)
@@ -246,9 +259,11 @@ class CreateTestUI(val context: Context?, private var docText: String) {
 
                         Button(
                             onClick = {
-                                listIndex.value = nextQuestion.value
-                                coroutineScope.launch {
-                                    scroll.animateScrollToItem(listIndex.value)
+                                if (nextQuestion.intValue >= 0) {
+                                    listIndex.intValue = nextQuestion.intValue
+                                    coroutineScope.launch {
+                                        scroll.animateScrollToItem(listIndex.intValue)
+                                    }
                                 }
                             },
                             modifier = Modifier
@@ -279,21 +294,62 @@ class CreateTestUI(val context: Context?, private var docText: String) {
         val result = arrayListOf<DocToList>()
         var index = listIndex
         while (docList[index].isQuestion.value || docList[index].disabled.value) {
-            if(docList[index].isQuestion.value) result.add(docList[index])
+            if (docList[index].isQuestion.value) result.add(docList[index])
             index++
         }
         return result
     }
 
-    private fun getAnswers(listIndex: Int, nextQuestion: MutableState<Int>): ArrayList<DocToList> {
-        val result = arrayListOf<DocToList>()
+    private fun getAnswers(
+        listIndex: Int,
+        prevQuestion: MutableState<Int>,
+        nextQuestion: MutableState<Int>
+    ): ArrayList<DocToList> {
         var index = listIndex
-        while (!docList[index].isAnswer.value) index++
-        while (docList[index].isAnswer.value || docList[index].disabled.value) {
-            if(docList[index].isAnswer.value) result.add(docList[index])
-            index++
+        var found = false
+        while (true) {
+            index--
+            if (index < 0) {
+                if (found)
+                    prevQuestion.value = 0
+                else
+                    prevQuestion.value = -1
+                break
+            } else {
+                if (docList[index].isAnswer.value)
+                    if (found) {
+                        prevQuestion.value = index + 1
+                        break
+                    } else {
+                        continue
+                    }
+                if (docList[index].isQuestion.value) {
+                    found = true
+                }
+            }
         }
-        nextQuestion.value = index
+        val result = arrayListOf<DocToList>()
+        index = listIndex - 1
+        found = false
+        while (true) {
+            index++
+            if (index >= docList.size) {
+                nextQuestion.value = -1
+                break
+            } else {
+                if (docList[index].isAnswer.value) {
+                    found = true
+                    result.add(docList[index])
+                }
+                if (docList[index].isQuestion.value)
+                    if (found) {
+                        nextQuestion.value = index
+                        break
+                    } else {
+                        continue
+                    }
+            }
+        }
         return result
     }
 
@@ -344,6 +400,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                 docList[index].isQuestion.value = true
                                 questionDividingTypeSet = true
                             }
+
                             TextListItemType.Answer -> {
                                 docList[index].isAnswer.value = true
                                 if (answerDividingTypeSet) {
@@ -357,11 +414,13 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                     answerDividingTypeSet = true
                                 }
                             }
+
                             TextListItemType.Erased -> {
                                 docList[index].disabled.value = true
                             }
                         }
                     }
+
                     TextListTypes.Numeric -> {
                         docList[index].listType.value = TextListTypes.Numeric
                         when (currentItemType) {
@@ -373,6 +432,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                     questionDividingTypeSet = true
                                 }
                             }
+
                             TextListItemType.Answer -> {
                                 docList[index].isAnswer.value = true
                                 if (!answerDividingTypeSet) {
@@ -381,11 +441,13 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                     answerDividingTypeSet = true
                                 }
                             }
+
                             TextListItemType.Erased -> {
                                 docList[index].disabled.value = true
                             }
                         }
                     }
+
                     TextListTypes.Letters -> {
                         docList[index].listType.value = TextListTypes.Letters
                         when (currentItemType) {
@@ -404,6 +466,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                     docList[index].isQuestion.value = true
                                 }
                             }
+
                             TextListItemType.Answer -> {
                                 docList[index].isAnswer.value = true
                                 if (answerDividingTypeSet) {
@@ -419,6 +482,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                     answerDividingTypeSet = true
                                 }
                             }
+
                             TextListItemType.Erased -> {
                                 docList[index].disabled.value = true
                             }
