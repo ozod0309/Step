@@ -17,10 +17,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.QuestionAnswer
 import androidx.compose.material.icons.filled.RadioButtonChecked
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
@@ -61,6 +63,8 @@ class CreateTestUI(val context: Context?, private var docText: String) {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun UI(
+        onSubmit: (docList: DocToList) -> Unit = {},
+        onBackPressed: () -> Unit = {},
         onClose: () -> Unit = {}
     ) {
         docText.lines().mapIndexed { index, str ->
@@ -73,6 +77,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
         var selectedAnswer by remember { mutableIntStateOf(-1) }
         val nextQuestion = remember { mutableIntStateOf(-1) }
         val prevQuestion = remember { mutableIntStateOf(-1) }
+        var enabledSendButton = remember { mutableStateOf(false) }
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -82,6 +87,35 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                             text = stringResource(id = R.string.create_test),
                             textAlign = TextAlign.Center
                         )
+                    },
+                    navigationIcon = {
+                        IconButton(
+                            onClick = {
+                                onBackPressed()
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                tint = MaterialTheme.colorScheme.secondary,
+                                contentDescription = ""
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(
+                            onClick = {
+                            },
+                            enabled = enabledSendButton.value
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.DoneAll,
+                                tint = if(enabledSendButton.value)
+                                    MaterialTheme.colorScheme.secondary
+                                else
+                                    MaterialTheme.colorScheme.onSecondary,
+                                contentDescription = ""
+                            )
+                        }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         titleContentColor = MaterialTheme.colorScheme.secondary,
@@ -99,7 +133,6 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                             .weight(1f)
                     ) {
                         Spacer(modifier = Modifier.height(10.dp))
-//                        while (!docList[listIndex.intValue].isQuestion.value) listIndex.intValue++
                         LazyColumn {
                             items(getQuestion(listIndex.intValue)) { question ->
                                 Text(
@@ -132,6 +165,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                         .selectable(
                                             selected = answer.idx == selectedAnswer,
                                             onClick = {
+                                                checkForValidity(enabledSendButton)
                                                 selectedAnswer =
                                                     if (selectedAnswer != answer.idx)
                                                         answer.idx else -1
@@ -290,6 +324,31 @@ class CreateTestUI(val context: Context?, private var docText: String) {
         )
     }
 
+    private fun checkForValidity(enabledSendButton: MutableState<Boolean>) {
+        var index = 0
+        var question = ""
+        var answers = arrayListOf<MyAnswer>()
+        while (index < docList.size) {
+            val item = docList[index]
+            if(item.isQuestion.value) {
+                if(index > 0) {
+
+                }
+                question += item.str
+            }
+            if(item.isAnswer.value) {
+                answers.add(
+                    MyAnswer(
+                        answer = item.str,
+                        image = "",
+                        correct = item.isCorrect.value
+                    )
+                )
+            }
+            index ++
+        }
+    }
+
     private fun getQuestion(listIndex: Int): ArrayList<DocToList> {
         val result = arrayListOf<DocToList>()
         var index = listIndex
@@ -400,7 +459,6 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                 docList[index].isQuestion.value = true
                                 questionDividingTypeSet = true
                             }
-
                             TextListItemType.Answer -> {
                                 docList[index].isAnswer.value = true
                                 if (answerDividingTypeSet) {
@@ -420,7 +478,6 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                             }
                         }
                     }
-
                     TextListTypes.Numeric -> {
                         docList[index].listType.value = TextListTypes.Numeric
                         when (currentItemType) {
@@ -441,13 +498,11 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                     answerDividingTypeSet = true
                                 }
                             }
-
                             TextListItemType.Erased -> {
                                 docList[index].disabled.value = true
                             }
                         }
                     }
-
                     TextListTypes.Letters -> {
                         docList[index].listType.value = TextListTypes.Letters
                         when (currentItemType) {
@@ -525,6 +580,7 @@ data class DocToList(
     var isQuestion: MutableState<Boolean> = mutableStateOf(false),
     var isAnswer: MutableState<Boolean> = mutableStateOf(false),
     var disabled: MutableState<Boolean> = mutableStateOf(false),
+    var isCorrect: MutableState<Boolean> = mutableStateOf(false),
     var listType: MutableState<CreateTestUI.TextListTypes> = mutableStateOf(CreateTestUI.TextListTypes.Ordinary)
 )
 

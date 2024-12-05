@@ -543,6 +543,12 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(StepFragments.MSDOCS) {
                             CreateTestUI(LocalContext.current, docText).UI(
+                                onSubmit = { docList ->
+
+                                },
+                                onBackPressed = {
+                                    navController.navigate(StepFragments.MAIN)
+                                },
                                 onClose = {
                                     navController.navigate(StepFragments.MAIN)
                                 }
