@@ -77,7 +77,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
         var selectedAnswer by remember { mutableIntStateOf(-1) }
         val nextQuestion = remember { mutableIntStateOf(-1) }
         val prevQuestion = remember { mutableIntStateOf(-1) }
-        var enabledSendButton = remember { mutableStateOf(false) }
+        val enabledSendButton = remember { mutableStateOf(false) }
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -109,7 +109,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.DoneAll,
-                                tint = if(enabledSendButton.value)
+                                tint = if (enabledSendButton.value)
                                     MaterialTheme.colorScheme.secondary
                                 else
                                     MaterialTheme.colorScheme.onSecondary,
@@ -325,19 +325,17 @@ class CreateTestUI(val context: Context?, private var docText: String) {
     }
 
     private fun checkForValidity(enabledSendButton: MutableState<Boolean>) {
-        var index = 0
-        var question = ""
-        var answers = arrayListOf<MyAnswer>()
-        while (index < docList.size) {
-            val item = docList[index]
-            if(item.isQuestion.value) {
-                if(index > 0) {
-
+        var lastItemType = TextListItemType.Answer
+        docList.forEach { item ->
+            if (item.isQuestion.value) {
+                if (lastItemType == TextListItemType.Answer) {
+                    myTest.add(MyTest(question = ""))
                 }
-                question += item.str
+                myTest.last().question += item.str
+                lastItemType = TextListItemType.Question
             }
             if(item.isAnswer.value) {
-                answers.add(
+                myTest.last().answers.add(
                     MyAnswer(
                         answer = item.str,
                         image = "",
@@ -345,8 +343,12 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                     )
                 )
             }
-            index ++
         }
+        var valid = true
+        myTest.forEach { item ->
+            if(!item.answers.any { it.correct }) valid = false
+        }
+        enabledSendButton.value = valid
     }
 
     private fun getQuestion(listIndex: Int): ArrayList<DocToList> {
@@ -440,6 +442,9 @@ class CreateTestUI(val context: Context?, private var docText: String) {
         var currentItemType = TextListItemType.Question
         var question = ""
         var answers = arrayListOf<MyAnswer>()
+
+
+
         while (index < docList.size) {
             val str = docList[index].str
             if (str.trim().isEmpty()) {
@@ -459,6 +464,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                 docList[index].isQuestion.value = true
                                 questionDividingTypeSet = true
                             }
+
                             TextListItemType.Answer -> {
                                 docList[index].isAnswer.value = true
                                 if (answerDividingTypeSet) {
@@ -478,6 +484,7 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                             }
                         }
                     }
+
                     TextListTypes.Numeric -> {
                         docList[index].listType.value = TextListTypes.Numeric
                         when (currentItemType) {
@@ -498,11 +505,13 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                     answerDividingTypeSet = true
                                 }
                             }
+
                             TextListItemType.Erased -> {
                                 docList[index].disabled.value = true
                             }
                         }
                     }
+
                     TextListTypes.Letters -> {
                         docList[index].listType.value = TextListTypes.Letters
                         when (currentItemType) {
@@ -585,9 +594,9 @@ data class DocToList(
 )
 
 data class MyTest(
-    val question: String,
+    var question: String,
     val image: String = "",
-    val answers: ArrayList<MyAnswer>,
+    val answers: ArrayList<MyAnswer> = arrayListOf(),
 )
 
 data class MyAnswer(
