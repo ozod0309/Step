@@ -34,7 +34,7 @@ class CreateTestSourceUI(val context: Context?) {
         onMSDocs: () -> Unit = {},
         onPDFDocs: () -> Unit = {},
         onOCR: () -> Unit = {},
-        onAIOCR: () -> Unit = {},
+        onGPTParse: () -> Unit = {},
         onClose: () -> Unit = {}
     ) {
         Scaffold(
@@ -115,7 +115,7 @@ class CreateTestSourceUI(val context: Context?) {
                     }
                     Button(
                         onClick = {
-                            onAIOCR()
+                            onGPTParse()
                         },
                         modifier = Modifier
                             .weight(1f)

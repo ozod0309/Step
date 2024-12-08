@@ -9,9 +9,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import okhttp3.Call
+import okhttp3.Callback
 import okhttp3.FormBody
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.Response
+import java.io.File
+import java.io.IOException
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import java.util.concurrent.TimeUnit
@@ -141,7 +148,62 @@ object URLDownload {
         return sResult
     }
 
+    fun uploadFile(url: String, file: File, callback: (Boolean, String?) -> Unit) {
+        val fileKey = "file"
+        val client = OkHttpClient()
+
+        val trustAllCerts = arrayOf<TrustManager>(
+            @SuppressLint("CustomX509TrustManager")
+            object : X509TrustManager {
+                @SuppressLint("TrustAllX509TrustManager")
+                override fun checkClientTrusted(
+                    chain: Array<X509Certificate>,
+                    authType: String
+                ) {
+                }
+
+                @SuppressLint("TrustAllX509TrustManager")
+                override fun checkServerTrusted(
+                    chain: Array<X509Certificate>,
+                    authType: String
+                ) {
+                }
+
+                override fun getAcceptedIssuers(): Array<X509Certificate> {
+                    return arrayOf()
+                }
+            }
+        )
+
+        val sslContext: SSLContext = SSLContext.getInstance("SSL")
+        sslContext.init(null, trustAllCerts, SecureRandom())
+
+
+        val requestBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart(fileKey, file.name, file.asRequestBody())
+            .build()
+        val request = Request.Builder()
+            .url(url)
+            .post(requestBody)
+            .build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                callback(false, e.message)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    callback(true, response.body?.string())
+                } else {
+                    callback(false, response.message)
+                }
+            }
+        })
+    }
 }
+
+
 
 object InternetAvailable {
     fun internetAvailable(context: Context): Boolean {

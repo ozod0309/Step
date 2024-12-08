@@ -31,6 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import com.mikicorp.step.lib.ApiURLS
 import com.mikicorp.step.lib.AppNotification
 import com.mikicorp.step.lib.Category
+import com.mikicorp.step.lib.GPTParseFile
 import com.mikicorp.step.lib.InternetAvailable
 import com.mikicorp.step.lib.LocaleHelper
 import com.mikicorp.step.lib.PermissionManager
@@ -77,8 +78,10 @@ class MainActivity : ComponentActivity() {
         lateinit var permissionManager: PermissionManager
         lateinit var requestMSFileLauncher: ActivityResultLauncher<Intent>
         lateinit var requestPDFFileLauncher: ActivityResultLauncher<Intent>
+        lateinit var requestGPTParseLauncher: ActivityResultLauncher<Intent>
         lateinit var readMSFiles: ReadMSFiles
         lateinit var readPDFFiles: ReadPDFFiles
+        lateinit var gptParseFile: GPTParseFile
 
     }
 
@@ -96,6 +99,7 @@ class MainActivity : ComponentActivity() {
             }
         readMSFiles = ReadMSFiles()
         readPDFFiles = ReadPDFFiles()
+        gptParseFile = GPTParseFile()
         requestMSFileLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
@@ -109,6 +113,14 @@ class MainActivity : ComponentActivity() {
                 if (result.resultCode == RESULT_OK) {
                     result.data?.data?.let { uri ->
                         readPDFFiles.handleSelectedFile(uri)
+                    }
+                }
+            }
+        requestGPTParseLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    result.data?.data?.let { uri ->
+                        gptParseFile.handleSelectedFile(this, uri)
                     }
                 }
             }
@@ -533,8 +545,15 @@ class MainActivity : ComponentActivity() {
                                 onOCR = {
                                     navController.navigate(StepFragments.OCR)
                                 },
-                                onAIOCR = {
-
+                                onGPTParse = {
+                                    gptParseFile.onSuccess = {result ->
+                                        docText = result
+                                        navController.navigate(StepFragments.MSDOCS)
+                                    }
+                                    gptParseFile.onError = {
+                                        navController.navigate(StepFragments.ERROR)
+                                    }
+                                    gptParseFile.openFileSelector()
                                 },
                                 onClose = {
                                     navController.navigate(StepFragments.MAIN)
