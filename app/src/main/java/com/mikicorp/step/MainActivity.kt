@@ -458,6 +458,9 @@ class MainActivity : ComponentActivity() {
                                             }
                                         }
                                     )
+                                },
+                                onError = {error ->
+                                    navController.navigate(StepFragments.ERROR)
                                 }
                             )
                         }
@@ -551,7 +554,9 @@ class MainActivity : ComponentActivity() {
                                         navController.navigate(StepFragments.MSDOCS)
                                     }
                                     gptParseFile.onError = {
-                                        navController.navigate(StepFragments.ERROR)
+                                        runOnUiThread {
+                                            navController.navigate(StepFragments.ERROR)
+                                        }
                                     }
                                     gptParseFile.openFileSelector()
                                 },

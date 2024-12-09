@@ -60,8 +60,8 @@ class SignInUI(private val context: Context?, val onClick: (result: Boolean) -> 
     @Composable
     fun UI() {
         val isLoading  = remember { mutableStateOf(false) }
-        val image1 = AnimatedImageVector.animatedVectorResource(id = R.drawable.ic_logo_anim2)
-        val image2 = AnimatedImageVector.animatedVectorResource(id = R.drawable.ic_logo_anim2)
+        val image1 = AnimatedImageVector.animatedVectorResource(id = R.drawable.ic_logo_anim)
+        val image2 = AnimatedImageVector.animatedVectorResource(id = R.drawable.ic_logo_anim)
         var atEnd by remember { mutableStateOf(false) }
         Scaffold(
             topBar = {

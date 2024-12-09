@@ -81,8 +81,13 @@ class TestUI(context: Context?) {
     fun UI(
         onBackPressed: () -> Unit = {},
         onTimeOut: () -> Unit = {},
-        onFinishTest: () -> Unit = {}
+        onFinishTest: () -> Unit = {},
+        onError: (error: String) -> Unit = {},
     ) {
+        if(MainActivity.tests.size < 1) {
+            onError("No Test")
+            return
+        }
         val totalTime = 300
         var testTimer by remember { mutableIntStateOf(totalTime) }
         var testProgressBarAlpha by remember { mutableIntStateOf(0) }

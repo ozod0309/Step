@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.Uri
 import com.mikicorp.step.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,9 +16,8 @@ import okhttp3.FormBody
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
-import java.io.File
 import java.io.IOException
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
@@ -148,9 +148,25 @@ object URLDownload {
         return sResult
     }
 
-    fun uploadFile(url: String, file: File, callback: (Boolean, String?) -> Unit) {
+    fun uploadFile(context: Context, url: String, fileUri: Uri, callback: (Boolean, String?) -> Unit) {
         val fileKey = "file"
-        val client = OkHttpClient()
+        val contentResolver = context.contentResolver
+        val inputStream = contentResolver.openInputStream(fileUri)
+
+        if (inputStream == null) {
+            callback(false, "Не удалось открыть файл по указанному Uri")
+            return
+        }
+
+        // Получение имени файла из Uri
+        val fileName = contentResolver.query(fileUri, null, null, null, null)?.use { cursor ->
+            val nameIndex = cursor.getColumnIndexOrThrow("_display_name")
+            cursor.moveToFirst()
+            cursor.getString(nameIndex)
+        } ?: "uploaded_file"
+
+        // Создание тела запроса
+        val fileBody = inputStream.readBytes().toRequestBody() // Преобразуем InputStream в RequestBody
 
         val trustAllCerts = arrayOf<TrustManager>(
             @SuppressLint("CustomX509TrustManager")
@@ -178,15 +194,35 @@ object URLDownload {
         val sslContext: SSLContext = SSLContext.getInstance("SSL")
         sslContext.init(null, trustAllCerts, SecureRandom())
 
+        val client = OkHttpClient.Builder()
+            .sslSocketFactory(
+                sslContext.socketFactory,
+                trustAllCerts[0] as X509TrustManager
+            )
+            .hostnameVerifier { _: String?, _: SSLSession? -> true }
+            .readTimeout(3, TimeUnit.SECONDS)
+            .writeTimeout(3, TimeUnit.SECONDS)
+            .build()
+
+        var requestBuilder: Request.Builder = Request.Builder()
+            .url(url)
+            .addHeader("Accept", "application/json")
+            .addHeader(StepGlobal.ANDROID_ID, MainActivity.androidId)
+            .addHeader(StepGlobal.AUTH, "Bearer " + MainActivity.stepUser.stepToken)
+
 
         val requestBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
-            .addFormDataPart(fileKey, file.name, file.asRequestBody())
+            .addFormDataPart(fileKey, fileName, fileBody)
             .build()
-        val request = Request.Builder()
-            .url(url)
-            .post(requestBody)
-            .build()
+        requestBuilder = requestBuilder.post(requestBody)
+        val request = requestBuilder.build()
+
+//        val request = Request.Builder()
+//            .url(url)
+//            .post(requestBody)
+//            .build()
+
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 callback(false, e.message)

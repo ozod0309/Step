@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import com.mikicorp.step.MainActivity
-import java.io.File
+
 
 class GPTParseFile {
     var onSuccess: ((result: String) -> Unit)? = {}
@@ -23,8 +23,9 @@ class GPTParseFile {
     fun handleSelectedFile(context: Context, uri: Uri) {
         try {
             URLDownload.uploadFile(
+                context = context,
                 url = ApiURLS.AI_URL,
-                file = File(uri.path.toString())
+                fileUri = uri
             ) { success, result ->
                 if(success)
                     onSuccess!!.invoke(result.toString())
@@ -36,4 +37,5 @@ class GPTParseFile {
             onError!!.invoke()
         }
     }
+
 }
