@@ -11,7 +11,7 @@ import java.io.FileInputStream
 
 class ReadMSFiles {
     var onSuccess: ((result: String) -> Unit)? = {}
-    var onError: (() -> Unit)? = {}
+    var onError: ((errorText: String) -> Unit)? = {}
 
     fun openFileSelector() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
@@ -32,7 +32,7 @@ class ReadMSFiles {
             onSuccess!!.invoke(wordExtractor.text)
         } catch (e: Exception) {
             e.printStackTrace()
-            onError!!.invoke()
+            onError!!.invoke("File Open Error")
         }
     }
 }

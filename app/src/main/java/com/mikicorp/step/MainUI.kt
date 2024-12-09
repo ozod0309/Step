@@ -446,7 +446,7 @@ class MainUI(val context: Context?) {
                 }) {
                     Icon(
                         imageVector = Icons.Filled.Notifications,
-                        contentDescription = context!!.resources.getString(R.string.notificaations),
+                        contentDescription = context!!.resources.getString(R.string.notifications),
                         tint = MaterialTheme.colorScheme.secondary
                     )
                 }

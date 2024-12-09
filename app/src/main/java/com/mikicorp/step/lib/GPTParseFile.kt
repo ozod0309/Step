@@ -9,7 +9,7 @@ import com.mikicorp.step.MainActivity
 
 class GPTParseFile {
     var onSuccess: ((result: String) -> Unit)? = {}
-    var onError: (() -> Unit)? = {}
+    var onError: ((errorText: String) -> Unit)? = {}
 
     fun openFileSelector() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
@@ -30,11 +30,11 @@ class GPTParseFile {
                 if(success)
                     onSuccess!!.invoke(result.toString())
                 else
-                    onError!!.invoke()
+                    onError!!.invoke("Error Open File")
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            onError!!.invoke()
+            onError!!.invoke("Error Open File")
         }
     }
 

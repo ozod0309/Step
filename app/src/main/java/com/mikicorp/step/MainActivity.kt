@@ -145,7 +145,6 @@ class MainActivity : ComponentActivity() {
                                 resources.getString(R.string.server_error),
                                 Toast.LENGTH_SHORT
                             ).show()
-
                             StepFragments.ERROR
                         }
                     }
@@ -260,8 +259,10 @@ class MainActivity : ComponentActivity() {
 //                                        navController.navigate(StepFragments.MY_STEP)
 //                                    }
 //                                    permissionManager.onDenied = {
-//                                        navController.navigate(StepFragments.ERROR)
+//                                    navController.currentBackStackEntry?.arguments?.apply {
+//                                        putString("error", resources.getString(R.string.error_permission))
 //                                    }
+//                                    navController.navigate(StepFragments.ERROR)
 //                                    permissionManager.requestPermission(context, PermissionKeys.CAMERA)
                                 },
                                 onEditTest = {
@@ -269,6 +270,9 @@ class MainActivity : ComponentActivity() {
                                         navController.navigate(StepFragments.OCR)
                                     }
                                     permissionManager.onDenied = {
+                                        navController.currentBackStackEntry?.arguments?.apply {
+                                            putString("error", resources.getString(R.string.error_permission))
+                                        }
                                         navController.navigate(StepFragments.ERROR)
                                     }
                                     permissionManager.requestPermission(context, PermissionKeys.CAMERA)
@@ -278,6 +282,9 @@ class MainActivity : ComponentActivity() {
                                         navController.navigate(StepFragments.OCR)
                                     }
                                     permissionManager.onDenied = {
+                                        navController.currentBackStackEntry?.arguments?.apply {
+                                            putString("error", resources.getString(R.string.error_permission))
+                                        }
                                         navController.navigate(StepFragments.ERROR)
                                     }
                                     permissionManager.requestPermission(context, PermissionKeys.CAMERA)
@@ -442,6 +449,9 @@ class MainActivity : ComponentActivity() {
                                             if (result) {
                                                 navController.navigate(StepFragments.RESULT)
                                             } else {
+                                                navController.currentBackStackEntry?.arguments?.apply {
+                                                    putString("error", resources.getString(R.string.server_error))
+                                                }
                                                 navController.navigate(StepFragments.ERROR)
                                             }
                                         }
@@ -454,12 +464,18 @@ class MainActivity : ComponentActivity() {
                                             if (result) {
                                                 navController.navigate(StepFragments.RESULT)
                                             } else {
+                                                navController.currentBackStackEntry?.arguments?.apply {
+                                                    putString("error", resources.getString(R.string.server_error))
+                                                }
                                                 navController.navigate(StepFragments.ERROR)
                                             }
                                         }
                                     )
                                 },
-                                onError = {error ->
+                                onError = {errorText ->
+                                    navController.currentBackStackEntry?.arguments?.apply {
+                                        putString("error", errorText)
+                                    }
                                     navController.navigate(StepFragments.ERROR)
                                 }
                             )
@@ -529,7 +545,10 @@ class MainActivity : ComponentActivity() {
                                         docText = result
                                         navController.navigate(StepFragments.MSDOCS)
                                     }
-                                    readMSFiles.onError = {
+                                    readMSFiles.onError = {errorText ->
+                                        navController.currentBackStackEntry?.arguments?.apply {
+                                            putString("error", errorText)
+                                        }
                                         navController.navigate(StepFragments.ERROR)
                                     }
                                     readMSFiles.openFileSelector()
@@ -539,7 +558,10 @@ class MainActivity : ComponentActivity() {
                                         docText = result
                                         navController.navigate(StepFragments.MSDOCS)
                                     }
-                                    readPDFFiles.onError = {
+                                    readPDFFiles.onError = { errorText ->
+                                        navController.currentBackStackEntry?.arguments?.apply {
+                                            putString("error", errorText)
+                                        }
                                         navController.navigate(StepFragments.ERROR)
                                     }
                                     readPDFFiles.openFileSelector()
@@ -553,8 +575,11 @@ class MainActivity : ComponentActivity() {
                                         docText = result
                                         navController.navigate(StepFragments.MSDOCS)
                                     }
-                                    gptParseFile.onError = {
+                                    gptParseFile.onError = { errorText ->
                                         runOnUiThread {
+                                            navController.currentBackStackEntry?.arguments?.apply {
+                                                putString("error", errorText)
+                                            }
                                             navController.navigate(StepFragments.ERROR)
                                         }
                                     }
@@ -586,7 +611,9 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(StepFragments.ERROR) {
+                            val errorText = navController.previousBackStackEntry?.savedStateHandle?.get<String>("error")!!
                             ErrorUI(LocalContext.current).UI(
+                                errorText = errorText,
                                 onDone = {
                                     navController.navigate(StepFragments.MAIN)
                                 }
