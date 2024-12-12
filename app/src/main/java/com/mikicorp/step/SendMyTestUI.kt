@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -89,6 +90,11 @@ class SendMyTestUI(val context: Context?) {
                 )
             },
             content = { innerPadding ->
+                val fileName = context?.contentResolver?.query(uri, null, null, null, null)?.use { cursor ->
+                    val nameIndex = cursor.getColumnIndexOrThrow("_display_name")
+                    cursor.moveToFirst()
+                    cursor.getString(nameIndex)
+                } ?: "uploaded_file"
                 Column(
                     modifier = Modifier
                         .padding(innerPadding)
@@ -129,6 +135,14 @@ class SendMyTestUI(val context: Context?) {
                             )
                         }
                     }
+                    Spacer(modifier = Modifier.height(20.dp))
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = fileName,
+                        enabled = false,
+                        onValueChange = {}
+                    )
+
                 }
             },
             bottomBar = {
