@@ -73,6 +73,7 @@ class MainActivity : ComponentActivity() {
         var testSessionID = 0
         var tests = arrayListOf<Test>()
         var bottomBarSelector = 0
+        var errorText = ""
         val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
         lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
         lateinit var permissionManager: PermissionManager
@@ -100,6 +101,7 @@ class MainActivity : ComponentActivity() {
         readMSFiles = ReadMSFiles()
         readPDFFiles = ReadPDFFiles()
         gptParseFile = GPTParseFile()
+        var fileUri: Uri = Uri.EMPTY
         requestMSFileLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
@@ -120,7 +122,7 @@ class MainActivity : ComponentActivity() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
                     result.data?.data?.let { uri ->
-                        gptParseFile.handleSelectedFile(this, uri)
+                        gptParseFile.handleSelectedFile(uri)
                     }
                 }
             }
@@ -140,9 +142,10 @@ class MainActivity : ComponentActivity() {
                         if (loadCategories(this))
                             StepFragments.MAIN
                         else {
+                            errorText = resources.getString(R.string.server_error)
                             Toast.makeText(
                                 context,
-                                resources.getString(R.string.server_error),
+                                errorText,
                                 Toast.LENGTH_SHORT
                             ).show()
                             StepFragments.ERROR
@@ -472,10 +475,8 @@ class MainActivity : ComponentActivity() {
                                         }
                                     )
                                 },
-                                onError = {errorText ->
-                                    navController.currentBackStackEntry?.arguments?.apply {
-                                        putString("error", errorText)
-                                    }
+                                onError = {str ->
+                                    errorText = str
                                     navController.navigate(StepFragments.ERROR)
                                 }
                             )
@@ -545,10 +546,8 @@ class MainActivity : ComponentActivity() {
                                         docText = result
                                         navController.navigate(StepFragments.MSDOCS)
                                     }
-                                    readMSFiles.onError = {errorText ->
-                                        navController.currentBackStackEntry?.arguments?.apply {
-                                            putString("error", errorText)
-                                        }
+                                    readMSFiles.onError = {str ->
+                                        errorText = str
                                         navController.navigate(StepFragments.ERROR)
                                     }
                                     readMSFiles.openFileSelector()
@@ -558,10 +557,8 @@ class MainActivity : ComponentActivity() {
                                         docText = result
                                         navController.navigate(StepFragments.MSDOCS)
                                     }
-                                    readPDFFiles.onError = { errorText ->
-                                        navController.currentBackStackEntry?.arguments?.apply {
-                                            putString("error", errorText)
-                                        }
+                                    readPDFFiles.onError = { str ->
+                                        errorText = str
                                         navController.navigate(StepFragments.ERROR)
                                     }
                                     readPDFFiles.openFileSelector()
@@ -571,15 +568,13 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate(StepFragments.OCR)
                                 },
                                 onGPTParse = {
-                                    gptParseFile.onSuccess = {result ->
-                                        docText = result
-                                        navController.navigate(StepFragments.MSDOCS)
+                                    gptParseFile.onSuccess = { uri ->
+                                        fileUri = uri
+                                        navController.navigate(StepFragments.SEND_MY_TEST)
                                     }
-                                    gptParseFile.onError = { errorText ->
+                                    gptParseFile.onError = { str ->
+                                        errorText = str
                                         runOnUiThread {
-                                            navController.currentBackStackEntry?.arguments?.apply {
-                                                putString("error", errorText)
-                                            }
                                             navController.navigate(StepFragments.ERROR)
                                         }
                                     }
@@ -587,6 +582,34 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onClose = {
                                     navController.navigate(StepFragments.MAIN)
+                                }
+                            )
+                        }
+                        composable(StepFragments.SEND_MY_TEST) {
+                            SendMyTestUI(LocalContext.current).UI(
+                                uri = fileUri,
+                                onBackPressed = {
+                                    navController.navigate(StepFragments.MAIN)
+                                },
+                                onSend = { uri ->
+                                    try {
+                                        URLDownload.uploadFile(
+                                            context = context,
+                                            url = ApiURLS.AI_URL,
+                                            fileUri = uri
+                                        ) { success, result ->
+                                            if(success)
+                                                navController.navigate(StepFragments.MAIN)
+                                            else {
+                                                errorText = resources.getString(R.string.server_error)
+                                                navController.navigate(StepFragments.ERROR)
+                                            }
+                                        }
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                        errorText = resources.getString(R.string.server_error)
+                                        navController.navigate(StepFragments.ERROR)
+                                    }
                                 }
                             )
                         }
@@ -611,7 +634,6 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(StepFragments.ERROR) {
-                            val errorText = navController.previousBackStackEntry?.savedStateHandle?.get<String>("error")!!
                             ErrorUI(LocalContext.current).UI(
                                 errorText = errorText,
                                 onDone = {

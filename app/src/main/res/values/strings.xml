@@ -69,5 +69,7 @@
     <string name="no">No</string>
     <string name="soon">Soon …</string>
     <string name="invite_sms">You are invited to Step.\nhttp://play.google.com/store/apps/details?id=com.mikicorp.step</string>
+    <string name="send_my_test">Send Test to Server</string>
+    <string name="send">Send</string>
 
 </resources>

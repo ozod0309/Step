@@ -51,6 +51,9 @@
     <string name="no">Yo\'q</string>
     <string name="soon">Tez orada …</string>
     <string name="invite_sms">You are invited to Step.\nhttp://play.google.com/store/apps/details?id=com.mikicorp.step</string>
+    <string name="send_my_test">Testni Serverga Jo\'natish</string>
+    <string name="send">Jo\'natish</string>
+
 
 
 </resources>

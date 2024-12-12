@@ -1,14 +1,13 @@
 package com.mikicorp.step.lib
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import com.mikicorp.step.MainActivity
 
 
 class GPTParseFile {
-    var onSuccess: ((result: String) -> Unit)? = {}
+    var onSuccess: ((uri: Uri) -> Unit)? = {}
     var onError: ((errorText: String) -> Unit)? = {}
 
     fun openFileSelector() {
@@ -20,22 +19,11 @@ class GPTParseFile {
     }
 
     @SuppressLint("Range", "Recycle")
-    fun handleSelectedFile(context: Context, uri: Uri) {
-        try {
-            URLDownload.uploadFile(
-                context = context,
-                url = ApiURLS.AI_URL,
-                fileUri = uri
-            ) { success, result ->
-                if(success)
-                    onSuccess!!.invoke(result.toString())
-                else
-                    onError!!.invoke("Error Open File")
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
+    fun handleSelectedFile(uri: Uri) {
+        if(!Uri.EMPTY.equals(uri))
+            onSuccess!!.invoke(uri)
+        else
             onError!!.invoke("Error Open File")
-        }
     }
 
 }

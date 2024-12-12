@@ -43,6 +43,7 @@ object StepFragments {
     const val SIGN_IN = "SignIn"
     const val OCR = "MyStep"
     const val CREATE_TEST_SOURCE = "CreateTestType"
+    const val SEND_MY_TEST = "SendMyTest"
     const val MSDOCS = "MSDocs"
     const val ERROR = "error"
 }
