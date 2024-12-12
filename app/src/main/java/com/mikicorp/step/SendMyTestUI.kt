@@ -31,6 +31,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -53,9 +54,25 @@ class SendMyTestUI(val context: Context?) {
         onSend: (uri: Uri) -> Unit = {}
     ) {
         var mCategoryExpanded by remember { mutableStateOf(false) }
-        var mSelectedText by remember { mutableStateOf("") }
-        var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
-        val icon = if (mCategoryExpanded)
+        var mSelectedCategory by remember { mutableIntStateOf(MainActivity.activeCategory) }
+        var mCategoryFieldSize by remember { mutableStateOf(Size.Zero)}
+        val categoryIcon = if (mCategoryExpanded)
+            Icons.Filled.KeyboardArrowUp
+        else
+            Icons.Filled.KeyboardArrowDown
+
+        var mSubcategoryExpanded by remember { mutableStateOf(false) }
+        var mSelectedSubcategory by remember { mutableIntStateOf(MainActivity.activeSubcategory) }
+        var mSubcategoryFieldSize by remember { mutableStateOf(Size.Zero)}
+        val subcategoryIcon = if (mSubcategoryExpanded)
+            Icons.Filled.KeyboardArrowUp
+        else
+            Icons.Filled.KeyboardArrowDown
+
+        var mThemeExpanded by remember { mutableStateOf(false) }
+        var mSelectedTheme by remember { mutableIntStateOf(MainActivity.activeSubcategory) }
+        var mThemeFieldSize by remember { mutableStateOf(Size.Zero)}
+        val themeIcon = if (mThemeExpanded)
             Icons.Filled.KeyboardArrowUp
         else
             Icons.Filled.KeyboardArrowDown
@@ -101,19 +118,22 @@ class SendMyTestUI(val context: Context?) {
                 ) {
                     Spacer(modifier = Modifier.height(20.dp))
                     OutlinedTextField(
-                        value = mSelectedText,
-                        onValueChange = { mSelectedText = it },
+                        value = MainActivity.category[mSelectedCategory].name,
+                        onValueChange = {},
                         modifier = Modifier
                             .fillMaxWidth()
                             .onGloballyPositioned { coordinates ->
-                                // This value is used to assign to
-                                // the DropDown the same width
-                                mTextFieldSize = coordinates.size.toSize()
+                                mCategoryFieldSize = coordinates.size.toSize()
                             },
-                        label = {Text("Label")},
                         trailingIcon = {
-                            Icon(icon,"contentDescription",
-                                Modifier.clickable { mCategoryExpanded = !mCategoryExpanded })
+                            Icon(
+                                modifier = Modifier
+                                    .clickable {
+                                        mCategoryExpanded = !mCategoryExpanded
+                                    },
+                                imageVector = categoryIcon,
+                                contentDescription = ""
+                            )
                         }
                     )
 
@@ -121,7 +141,7 @@ class SendMyTestUI(val context: Context?) {
                         expanded = mCategoryExpanded,
                         onDismissRequest = { mCategoryExpanded = false },
                         modifier = Modifier
-                            .width(with(LocalDensity.current){mTextFieldSize.width.toDp()})
+                            .width(with(LocalDensity.current){mCategoryFieldSize.width.toDp()})
                     ) {
                         MainActivity.category.forEach { item ->
                             DropdownMenuItem(
@@ -129,12 +149,83 @@ class SendMyTestUI(val context: Context?) {
                                     Text(text = item.name)
                                 },
                                 onClick = {
-                                    mSelectedText = item.name
+                                    mSelectedCategory = item.id
                                     mCategoryExpanded = false
                                 }
                             )
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+                    OutlinedTextField(
+                        value = MainActivity.category[mSelectedCategory].subCategory[mSelectedSubcategory].name,
+                        onValueChange = {},
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onGloballyPositioned { coordinates ->
+                                // This value is used to assign to
+                                // the DropDown the same width
+                                mSubcategoryFieldSize = coordinates.size.toSize()
+                            },
+                        trailingIcon = {
+                            Icon(subcategoryIcon,"",
+                                Modifier.clickable { mSubcategoryExpanded = !mSubcategoryExpanded })
+                        }
+                    )
+
+                    DropdownMenu(
+                        expanded = mSubcategoryExpanded,
+                        onDismissRequest = { mSubcategoryExpanded = false },
+                        modifier = Modifier
+                            .width(with(LocalDensity.current){mSubcategoryFieldSize.width.toDp()})
+                    ) {
+                        MainActivity.category[mSelectedCategory].subCategory.forEach { item ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(text = item.name)
+                                },
+                                onClick = {
+                                    mSelectedSubcategory = item.id
+                                    mSubcategoryExpanded = false
+                                }
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+                    OutlinedTextField(
+                        value = MainActivity.category[mSelectedCategory].subCategory[mSelectedSubcategory].themes[mSelectedTheme].name,
+                        onValueChange = {},
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onGloballyPositioned { coordinates ->
+                                mThemeFieldSize = coordinates.size.toSize()
+                            },
+                        trailingIcon = {
+                            Icon(themeIcon,"",
+                                Modifier.clickable { mThemeExpanded = !mThemeExpanded })
+                        }
+                    )
+
+                    DropdownMenu(
+                        expanded = mThemeExpanded,
+                        onDismissRequest = { mThemeExpanded = false },
+                        modifier = Modifier
+                            .width(with(LocalDensity.current){mThemeFieldSize.width.toDp()})
+                    ) {
+                        MainActivity.category[mSelectedCategory].subCategory[mSelectedSubcategory].themes.forEach { item ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(text = item.name)
+                                },
+                                onClick = {
+                                    mSelectedTheme = item.id
+                                    mThemeExpanded = false
+                                }
+                            )
+                        }
+                    }
+
                     Spacer(modifier = Modifier.height(20.dp))
                     TextField(
                         modifier = Modifier.fillMaxWidth(),

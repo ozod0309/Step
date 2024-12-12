@@ -11,6 +11,7 @@ object StepGlobal {
     const val SURNAME = "surname"
     const val CATEGORY = "category"
     const val SUBCATEGORIES = "subcategories"
+    const val THEMES = "themes"
     const val CATEGORY_ID = "category_id"
     const val SUBCATEGORY_ID = "subcategory_id"
     const val QUESTION = "question"
@@ -113,6 +114,12 @@ data class Category(
 
 data class SubCategory(
     val id: Int,
+    val name: String,
+    val themes: ArrayList<Themes>
+)
+
+data class Themes(
+    val id: Int,
     val name: String
 )
 
@@ -124,10 +131,22 @@ fun JSONArray.toCategories(): ArrayList<Category> {
         val subCategoryList = item.optJSONArray(StepGlobal.SUBCATEGORIES)!!
         for(j in 0 until subCategoryList.length()) {
             val subItem = subCategoryList[j] as JSONObject
+            val themeArray = arrayListOf<Themes>()
+            val themeList = subItem.optJSONArray(StepGlobal.THEMES)!!
+            for(k in 0 until themeList.length()) {
+                val themeItem = themeList[k] as JSONObject
+                themeArray.add(
+                    Themes(
+                        id = themeItem.optInt(StepGlobal.ID),
+                        name = themeItem.optString(StepGlobal.NAME)
+                    )
+                )
+            }
             subCategories.add(
                 SubCategory(
                     id = subItem.optInt(StepGlobal.ID),
-                    name = subItem.optString(StepGlobal.NAME)
+                    name = subItem.optString(StepGlobal.NAME),
+                    themes = themeArray
                 )
             )
         }
