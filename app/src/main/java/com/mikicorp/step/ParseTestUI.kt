@@ -70,8 +70,6 @@ import com.mikicorp.step.lib.TextListTypes
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 
-fun String.base64ToByteCode() = Base64.decode(this.substring(this.indexOf(",")  + 1), Base64.DEFAULT)
-
 class ParseTestUI(val context: Context?, private var docList: MutableList<DocToList>) {
     private var myTest = arrayListOf<MyTest>()
 
@@ -89,14 +87,14 @@ class ParseTestUI(val context: Context?, private var docList: MutableList<DocToL
         val nextQuestion = remember { mutableIntStateOf(-1) }
         val prevQuestion = remember { mutableIntStateOf(-1) }
         val enabledSendButton = remember { mutableStateOf(false) }
-        var imageBase64 by remember { mutableStateOf<String>("") }
+        var imageBase64 by remember { mutableStateOf("") }
         var image by remember {
             mutableStateOf<Bitmap?>( null)
         }
         val launcher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent()
         ) { uri: Uri? ->
-            val bm = BitmapFactory.decodeFile(context?.contentResolver?.openInputStream(uri!!).toString())
+            val bm = BitmapFactory.decodeStream(context?.contentResolver?.openInputStream(uri!!))
             val stream = ByteArrayOutputStream()
             bm.compress(Bitmap.CompressFormat.JPEG, 70, stream)
             val byteFormat = stream.toByteArray()
@@ -163,19 +161,15 @@ class ParseTestUI(val context: Context?, private var docList: MutableList<DocToL
                         image?.let {
                             Image(
                                 bitmap = it.asImageBitmap(),
+                                modifier = Modifier
+                                    .padding(4.dp)
+                                    .height(100.dp)
+                                    .width(100.dp)
+                                    .clip(RoundedCornerShape(12.dp)),
+                                contentScale = ContentScale.Inside,
                                 contentDescription = ""
                             )
                         }
-                        AsyncImage(
-                            model = imageBase64,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .height(100.dp)
-                                .width(100.dp)
-                                .clip(RoundedCornerShape(12.dp)),
-                            contentScale = ContentScale.Inside,
-                        )
                         Spacer(modifier = Modifier.height(10.dp))
                         LazyColumn {
                             items(getQuestion(listIndex.intValue)) { question ->
