@@ -128,6 +128,7 @@ class MainActivity : ComponentActivity() {
             }
         val sharedPreference = SharedPreference(applicationContext)
         var docText = ""
+        var docList = mutableListOf<DocToList>()
         androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
         userRegistration = sharedPreference.getValueInt(PreferencesKeys.USER_REGISTRATION)
         langCode = sharedPreference.getValueString(PreferencesKeys.LANG_CODE).toString()
@@ -274,11 +275,17 @@ class MainActivity : ComponentActivity() {
                                     }
                                     permissionManager.onDenied = {
                                         navController.currentBackStackEntry?.arguments?.apply {
-                                            putString("error", resources.getString(R.string.error_permission))
+                                            putString(
+                                                "error",
+                                                resources.getString(R.string.error_permission)
+                                            )
                                         }
                                         navController.navigate(StepFragments.ERROR)
                                     }
-                                    permissionManager.requestPermission(context, PermissionKeys.CAMERA)
+                                    permissionManager.requestPermission(
+                                        context,
+                                        PermissionKeys.CAMERA
+                                    )
                                 },
                                 onDeleteTest = {
                                     permissionManager.onGranted = {
@@ -286,11 +293,17 @@ class MainActivity : ComponentActivity() {
                                     }
                                     permissionManager.onDenied = {
                                         navController.currentBackStackEntry?.arguments?.apply {
-                                            putString("error", resources.getString(R.string.error_permission))
+                                            putString(
+                                                "error",
+                                                resources.getString(R.string.error_permission)
+                                            )
                                         }
                                         navController.navigate(StepFragments.ERROR)
                                     }
-                                    permissionManager.requestPermission(context, PermissionKeys.CAMERA)
+                                    permissionManager.requestPermission(
+                                        context,
+                                        PermissionKeys.CAMERA
+                                    )
                                 },
                                 onLogout = {
                                     URLDownload.urlDownload(
@@ -310,7 +323,10 @@ class MainActivity : ComponentActivity() {
                                                 userRegistration =
                                                     RegistrationTypes.UNREGISTERED
                                                 sharedPreference.save(PreferencesKeys.USER, "")
-                                                sharedPreference.save(PreferencesKeys.GOOGLE_TOKEN, "")
+                                                sharedPreference.save(
+                                                    PreferencesKeys.GOOGLE_TOKEN,
+                                                    ""
+                                                )
                                                 sharedPreference.save(
                                                     PreferencesKeys.USER_REGISTRATION,
                                                     userRegistration
@@ -337,7 +353,7 @@ class MainActivity : ComponentActivity() {
                                 )
                                 LocaleHelper().setLocale(this@MainActivity, langCode)
                                 recreate()
-                                if(!notFirstRun) {
+                                if (!notFirstRun) {
                                     permissionManager.onGranted = {
                                         Toast.makeText(
                                             context,
@@ -352,7 +368,10 @@ class MainActivity : ComponentActivity() {
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }
-                                    permissionManager.requestPermission(context, PermissionKeys.POST_NOTIFICATIONS)
+                                    permissionManager.requestPermission(
+                                        context,
+                                        PermissionKeys.POST_NOTIFICATIONS
+                                    )
                                 }
                                 if (userRegistration == RegistrationTypes.REGISTERED) {
                                     navController.navigate(StepFragments.MAIN)
@@ -414,7 +433,10 @@ class MainActivity : ComponentActivity() {
                                                     Toast.LENGTH_SHORT
                                                 ).show()
                                             }
-                                            permissionManager.requestPermission(context, PermissionKeys.SEND_SMS)
+                                            permissionManager.requestPermission(
+                                                context,
+                                                PermissionKeys.SEND_SMS
+                                            )
                                         }
                                         permissionManager.onDenied = {
                                             Toast.makeText(
@@ -453,7 +475,10 @@ class MainActivity : ComponentActivity() {
                                                 navController.navigate(StepFragments.RESULT)
                                             } else {
                                                 navController.currentBackStackEntry?.arguments?.apply {
-                                                    putString("error", resources.getString(R.string.server_error))
+                                                    putString(
+                                                        "error",
+                                                        resources.getString(R.string.server_error)
+                                                    )
                                                 }
                                                 navController.navigate(StepFragments.ERROR)
                                             }
@@ -468,14 +493,17 @@ class MainActivity : ComponentActivity() {
                                                 navController.navigate(StepFragments.RESULT)
                                             } else {
                                                 navController.currentBackStackEntry?.arguments?.apply {
-                                                    putString("error", resources.getString(R.string.server_error))
+                                                    putString(
+                                                        "error",
+                                                        resources.getString(R.string.server_error)
+                                                    )
                                                 }
                                                 navController.navigate(StepFragments.ERROR)
                                             }
                                         }
                                     )
                                 },
-                                onError = {str ->
+                                onError = { str ->
                                     errorText = str
                                     navController.navigate(StepFragments.ERROR)
                                 }
@@ -542,18 +570,18 @@ class MainActivity : ComponentActivity() {
                         composable(StepFragments.CREATE_TEST_SOURCE) {
                             CreateTestSourceUI(LocalContext.current).UI(
                                 onMSDocs = {
-                                    readMSFiles.onSuccess = {result ->
+                                    readMSFiles.onSuccess = { result ->
                                         docText = result
                                         navController.navigate(StepFragments.MSDOCS)
                                     }
-                                    readMSFiles.onError = {str ->
+                                    readMSFiles.onError = { str ->
                                         errorText = str
                                         navController.navigate(StepFragments.ERROR)
                                     }
                                     readMSFiles.openFileSelector()
                                 },
                                 onPDFDocs = {
-                                    readPDFFiles.onSuccess = {result ->
+                                    readPDFFiles.onSuccess = { result ->
                                         docText = result
                                         navController.navigate(StepFragments.MSDOCS)
                                     }
@@ -591,32 +619,42 @@ class MainActivity : ComponentActivity() {
                                 onBackPressed = {
                                     navController.navigate(StepFragments.MAIN)
                                 },
-                                onSend = { uri ->
+                                onSend = { categoryIndex, subcategoryIndex, themeIndex, uri ->
                                     try {
                                         URLDownload.uploadFile(
                                             context = context,
                                             url = ApiURLS.AI_URL,
                                             fileUri = uri
                                         ) { success, result ->
-                                            if(success)
-                                                navController.navigate(StepFragments.MAIN)
-                                            else {
-                                                errorText = resources.getString(R.string.server_error)
-                                                navController.navigate(StepFragments.ERROR)
+                                            runOnUiThread {
+                                                if (success)
+                                                    navController.navigate(StepFragments.MAIN)
+                                                else {
+                                                    errorText =
+                                                        resources.getString(R.string.server_error)
+                                                    navController.navigate(StepFragments.ERROR)
+                                                }
                                             }
                                         }
                                     } catch (e: Exception) {
-                                        e.printStackTrace()
-                                        errorText = resources.getString(R.string.server_error)
-                                        navController.navigate(StepFragments.ERROR)
+                                        runOnUiThread {
+                                            e.printStackTrace()
+                                            errorText = resources.getString(R.string.server_error)
+                                            navController.navigate(StepFragments.ERROR)
+                                        }
                                     }
                                 }
                             )
                         }
+                        composable(StepFragments.PARSE_TEST) {
+                            ParseTestUI(LocalContext.current, docList).UI(
+                            )
+                        }
                         composable(StepFragments.MSDOCS) {
                             CreateTestUI(LocalContext.current, docText).UI(
-                                onSubmit = { docList ->
-
+                                onSubmit = { resultList ->
+                                    docList = resultList
+                                    navController.navigate(StepFragments.PARSE_TEST)
                                 },
                                 onBackPressed = {
                                     navController.navigate(StepFragments.MAIN)
@@ -681,7 +719,7 @@ class MainActivity : ComponentActivity() {
                     if (dataResult!!.optInt(StepGlobal.SESSION_ID) == testSessionID) {
                         val answerResults = try {
                             dataResult.getJSONArray(StepGlobal.RESULTS)
-                        } catch (e:Exception) {
+                        } catch (e: Exception) {
                             JSONArray()
                         }
                         for (i in 0 until answerResults!!.length()) {

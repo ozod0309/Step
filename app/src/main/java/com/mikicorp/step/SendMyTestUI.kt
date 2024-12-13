@@ -51,7 +51,11 @@ class SendMyTestUI(val context: Context?) {
     fun UI(
         uri: Uri,
         onBackPressed: () -> Unit = {},
-        onSend: (uri: Uri) -> Unit = {}
+        onSend: (
+            categoryIndex: Int,
+            subcategoryIndex: Int,
+            themeIndex: Int,
+            uri: Uri) -> Unit = {_,_,_,_ ->}
     ) {
         var mCategoryExpanded by remember { mutableStateOf(false) }
         var mSelectedCategory by remember { mutableIntStateOf(MainActivity.activeCategory) }
@@ -117,115 +121,118 @@ class SendMyTestUI(val context: Context?) {
                         .padding(innerPadding)
                 ) {
                     Spacer(modifier = Modifier.height(20.dp))
-                    OutlinedTextField(
-                        value = MainActivity.category[mSelectedCategory].name,
-                        onValueChange = {},
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .onGloballyPositioned { coordinates ->
-                                mCategoryFieldSize = coordinates.size.toSize()
-                            },
-                        trailingIcon = {
-                            Icon(
-                                modifier = Modifier
-                                    .clickable {
-                                        mCategoryExpanded = !mCategoryExpanded
+                    Column {
+                        OutlinedTextField(
+                            value = MainActivity.category[mSelectedCategory].name,
+                            onValueChange = {},
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .onGloballyPositioned { coordinates ->
+                                    mCategoryFieldSize = coordinates.size.toSize()
+                                },
+                            trailingIcon = {
+                                Icon(
+                                    modifier = Modifier
+                                        .clickable {
+                                            mCategoryExpanded = !mCategoryExpanded
+                                        },
+                                    imageVector = categoryIcon,
+                                    contentDescription = ""
+                                )
+                            }
+                        )
+                        DropdownMenu(
+                            expanded = mCategoryExpanded,
+                            onDismissRequest = { mCategoryExpanded = false },
+                            modifier = Modifier
+                                .width(with(LocalDensity.current) { mCategoryFieldSize.width.toDp() })
+                        ) {
+                            MainActivity.category.forEachIndexed { index, item ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(text = item.name)
                                     },
-                                imageVector = categoryIcon,
-                                contentDescription = ""
-                            )
-                        }
-                    )
-
-                    DropdownMenu(
-                        expanded = mCategoryExpanded,
-                        onDismissRequest = { mCategoryExpanded = false },
-                        modifier = Modifier
-                            .width(with(LocalDensity.current){mCategoryFieldSize.width.toDp()})
-                    ) {
-                        MainActivity.category.forEach { item ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(text = item.name)
-                                },
-                                onClick = {
-                                    mSelectedCategory = item.id
-                                    mCategoryExpanded = false
-                                }
-                            )
+                                    onClick = {
+                                        mSelectedCategory = index
+                                        mCategoryExpanded = false
+                                    }
+                                )
+                            }
                         }
                     }
-
                     Spacer(modifier = Modifier.height(20.dp))
-                    OutlinedTextField(
-                        value = MainActivity.category[mSelectedCategory].subCategory[mSelectedSubcategory].name,
-                        onValueChange = {},
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .onGloballyPositioned { coordinates ->
-                                // This value is used to assign to
-                                // the DropDown the same width
-                                mSubcategoryFieldSize = coordinates.size.toSize()
-                            },
-                        trailingIcon = {
-                            Icon(subcategoryIcon,"",
-                                Modifier.clickable { mSubcategoryExpanded = !mSubcategoryExpanded })
-                        }
-                    )
-
-                    DropdownMenu(
-                        expanded = mSubcategoryExpanded,
-                        onDismissRequest = { mSubcategoryExpanded = false },
-                        modifier = Modifier
-                            .width(with(LocalDensity.current){mSubcategoryFieldSize.width.toDp()})
-                    ) {
-                        MainActivity.category[mSelectedCategory].subCategory.forEach { item ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(text = item.name)
+                    Column {
+                        OutlinedTextField(
+                            value = MainActivity.category[mSelectedCategory].subCategory[mSelectedSubcategory].name,
+                            onValueChange = {},
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .onGloballyPositioned { coordinates ->
+                                    // This value is used to assign to
+                                    // the DropDown the same width
+                                    mSubcategoryFieldSize = coordinates.size.toSize()
                                 },
-                                onClick = {
-                                    mSelectedSubcategory = item.id
-                                    mSubcategoryExpanded = false
-                                }
-                            )
+                            trailingIcon = {
+                                Icon(subcategoryIcon, "",
+                                    Modifier.clickable {
+                                        mSubcategoryExpanded = !mSubcategoryExpanded
+                                    })
+                            }
+                        )
+
+                        DropdownMenu(
+                            expanded = mSubcategoryExpanded,
+                            onDismissRequest = { mSubcategoryExpanded = false },
+                            modifier = Modifier
+                                .width(with(LocalDensity.current) { mSubcategoryFieldSize.width.toDp() })
+                        ) {
+                            MainActivity.category[mSelectedCategory].subCategory.forEachIndexed { index, item ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(text = item.name)
+                                    },
+                                    onClick = {
+                                        mSelectedSubcategory = index
+                                        mSubcategoryExpanded = false
+                                    }
+                                )
+                            }
                         }
                     }
-
                     Spacer(modifier = Modifier.height(20.dp))
-                    OutlinedTextField(
-                        value = MainActivity.category[mSelectedCategory].subCategory[mSelectedSubcategory].themes[mSelectedTheme].name,
-                        onValueChange = {},
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .onGloballyPositioned { coordinates ->
-                                mThemeFieldSize = coordinates.size.toSize()
-                            },
-                        trailingIcon = {
-                            Icon(themeIcon,"",
-                                Modifier.clickable { mThemeExpanded = !mThemeExpanded })
-                        }
-                    )
-
-                    DropdownMenu(
-                        expanded = mThemeExpanded,
-                        onDismissRequest = { mThemeExpanded = false },
-                        modifier = Modifier
-                            .width(with(LocalDensity.current){mThemeFieldSize.width.toDp()})
-                    ) {
-                        MainActivity.category[mSelectedCategory].subCategory[mSelectedSubcategory].themes.forEach { item ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(text = item.name)
+                    Column {
+                        OutlinedTextField(
+                            value = MainActivity.category[mSelectedCategory].subCategory[mSelectedSubcategory].themes[mSelectedTheme].name,
+                            onValueChange = {},
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .onGloballyPositioned { coordinates ->
+                                    mThemeFieldSize = coordinates.size.toSize()
                                 },
-                                onClick = {
-                                    mSelectedTheme = item.id
-                                    mThemeExpanded = false
-                                }
-                            )
+                            trailingIcon = {
+                                Icon(themeIcon, "",
+                                    Modifier.clickable { mThemeExpanded = !mThemeExpanded })
+                            }
+                        )
+                        DropdownMenu(
+                            expanded = mThemeExpanded,
+                            onDismissRequest = { mThemeExpanded = false },
+                            modifier = Modifier
+                                .width(with(LocalDensity.current) { mThemeFieldSize.width.toDp() })
+                        ) {
+                            MainActivity.category[mSelectedCategory].subCategory[mSelectedSubcategory].themes.forEachIndexed { index, item ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(text = item.name)
+                                    },
+                                    onClick = {
+                                        mSelectedTheme = index
+                                        mThemeExpanded = false
+                                    }
+                                )
+                            }
                         }
                     }
-
                     Spacer(modifier = Modifier.height(20.dp))
                     TextField(
                         modifier = Modifier.fillMaxWidth(),
@@ -242,7 +249,7 @@ class SendMyTestUI(val context: Context?) {
                     actions = {
                         Button(
                             onClick = {
-                                onSend(uri)
+                                onSend(mSelectedCategory, mSelectedSubcategory, mSelectedTheme, uri)
                             },
                             modifier = Modifier
                                 .weight(1f)

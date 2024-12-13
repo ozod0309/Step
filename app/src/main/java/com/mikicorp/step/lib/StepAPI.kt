@@ -45,6 +45,7 @@ object StepFragments {
     const val OCR = "MyStep"
     const val CREATE_TEST_SOURCE = "CreateTestType"
     const val SEND_MY_TEST = "SendMyTest"
+    const val PARSE_TEST = "ParseTest"
     const val MSDOCS = "MSDocs"
     const val ERROR = "error"
 }
@@ -214,4 +215,16 @@ data class PhoneContact(
 data class PhoneContactNumber(
     val number: String
 )
+
+enum class TextListTypes {
+    Ordinary,
+    Numeric,
+    Letters
+}
+
+enum class TextListItemType {
+    Question,
+    Answer,
+    Erased
+}
 

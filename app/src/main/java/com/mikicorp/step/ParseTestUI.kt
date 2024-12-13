@@ -1,33 +1,39 @@
 package com.mikicorp.step
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
-import androidx.compose.foundation.background
+import android.util.Base64
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Attachment
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.DoneAll
-import androidx.compose.material.icons.filled.QuestionAnswer
 import androidx.compose.material.icons.filled.RadioButtonChecked
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -44,36 +50,38 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.mikicorp.step.lib.TextListItemType
 import com.mikicorp.step.lib.TextListTypes
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 
-class CreateTestUI(val context: Context?, private var docText: String) {
+fun String.base64ToByteCode() = Base64.decode(this.substring(this.indexOf(",")  + 1), Base64.DEFAULT)
+
+class ParseTestUI(val context: Context?, private var docList: MutableList<DocToList>) {
     private var myTest = arrayListOf<MyTest>()
-    private val docList = mutableStateListOf<DocToList>()
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun UI(
-        onSubmit: (docList: MutableList<DocToList>) -> Unit = {},
+        onSubmit: (docList: DocToList) -> Unit = {},
         onBackPressed: () -> Unit = {},
         onClose: () -> Unit = {}
     ) {
-        docText.lines().mapIndexed { index, str ->
-            docList.add(DocToList(index, str))
-        }
-        docToTest()
         val coroutineScope = rememberCoroutineScope()
         val scroll = rememberLazyListState(0)
         val listIndex = remember { mutableIntStateOf(0) }
@@ -81,9 +89,22 @@ class CreateTestUI(val context: Context?, private var docText: String) {
         val nextQuestion = remember { mutableIntStateOf(-1) }
         val prevQuestion = remember { mutableIntStateOf(-1) }
         val enabledSendButton = remember { mutableStateOf(false) }
-        var imageUri by remember {
-            mutableStateOf<Uri?>(null)
+        var imageBase64 by remember { mutableStateOf<String>("") }
+        var image by remember {
+            mutableStateOf<Bitmap?>( null)
         }
+        val launcher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent()
+        ) { uri: Uri? ->
+            val bm = BitmapFactory.decodeFile(context?.contentResolver?.openInputStream(uri!!).toString())
+            val stream = ByteArrayOutputStream()
+            bm.compress(Bitmap.CompressFormat.JPEG, 70, stream)
+            val byteFormat = stream.toByteArray()
+            imageBase64 = Base64.encodeToString(byteFormat, Base64.DEFAULT)
+            val imageBytes = Base64.decode(imageBase64, 0)
+            image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+        }
+
 
         Scaffold(
             topBar = {
@@ -111,9 +132,8 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                     actions = {
                         IconButton(
                             onClick = {
-                                onSubmit(docList)
                             },
-//                            enabled = enabledSendButton.value
+                            enabled = enabledSendButton.value
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.DoneAll,
@@ -140,6 +160,22 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                         modifier = Modifier
                             .weight(1f)
                     ) {
+                        image?.let {
+                            Image(
+                                bitmap = it.asImageBitmap(),
+                                contentDescription = ""
+                            )
+                        }
+                        AsyncImage(
+                            model = imageBase64,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .height(100.dp)
+                                .width(100.dp)
+                                .clip(RoundedCornerShape(12.dp)),
+                            contentScale = ContentScale.Inside,
+                        )
                         Spacer(modifier = Modifier.height(10.dp))
                         LazyColumn {
                             items(getQuestion(listIndex.intValue)) { question ->
@@ -203,71 +239,6 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                             }
                         }
                     }
-                    HorizontalDivider()
-                    LazyColumn(
-                        modifier = Modifier.weight(1f),
-                        state = scroll
-                    ) {
-                        itemsIndexed(docList) { idx, item ->
-                            Spacer(modifier = Modifier.height(5.dp))
-                            Row(
-                                modifier = Modifier.background(MaterialTheme.colorScheme.onSecondary)
-                            ) {
-                                IconButton(
-                                    onClick = {
-                                        docList[idx].isQuestion.value = true
-                                        docList[idx].isAnswer.value = false
-                                        docList[idx].disabled.value = false
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.QuestionAnswer,
-                                        tint = if (item.isQuestion.value)
-                                            MaterialTheme.colorScheme.primary
-                                        else
-                                            MaterialTheme.colorScheme.onTertiary,
-                                        contentDescription = null
-                                    )
-                                }
-                                IconButton(
-                                    onClick = {
-                                        docList[idx].isQuestion.value = false
-                                        docList[idx].isAnswer.value = true
-                                        docList[idx].disabled.value = false
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Star,
-                                        tint = if (item.isAnswer.value)
-                                            MaterialTheme.colorScheme.primary
-                                        else
-                                            MaterialTheme.colorScheme.onTertiary,
-                                        contentDescription = null
-                                    )
-                                }
-                                IconButton(
-                                    onClick = {
-                                        docList[idx].isQuestion.value = false
-                                        docList[idx].isAnswer.value = false
-                                        docList[idx].disabled.value = true
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Cancel,
-                                        tint = if (item.disabled.value)
-                                            MaterialTheme.colorScheme.primary
-                                        else
-                                            MaterialTheme.colorScheme.onTertiary,
-                                        contentDescription = null
-                                    )
-                                }
-                                Text(
-                                    text = item.str,
-                                    modifier = Modifier.fillMaxWidth(),
-                                )
-                            }
-                        }
-                    }
                 }
             },
             bottomBar = {
@@ -296,6 +267,26 @@ class CreateTestUI(val context: Context?, private var docText: String) {
                                 imageVector = Icons.Filled.ChevronLeft,
                                 tint = MaterialTheme.colorScheme.primary,
                                 contentDescription = null
+                            )
+                        }
+                        Button(
+                            onClick = {
+                                launcher.launch("image/*")
+                            },
+                            modifier = Modifier
+                                .size(65.dp),
+                            shape = CircleShape,
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
+                            contentPadding = PaddingValues(0.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.secondary
+                            )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Attachment,
+                                modifier = Modifier.rotate(135f),
+                                tint = MaterialTheme.colorScheme.primary,
+                                contentDescription = "Attach Photo"
                             )
                         }
 
@@ -421,189 +412,11 @@ class CreateTestUI(val context: Context?, private var docText: String) {
         }
         return result
     }
-
-
-    private fun docToTest() {
-        val specialSymbols = "*-"
-        val dividingSymbols = ".)"
-        var questionDividingTypeSet = false
-        var questionDividingType = TextListTypes.Ordinary
-        var answerDividingTypeSet = false
-        var answerDividingType = TextListTypes.Ordinary
-        var questionDividing = 0.toChar()
-        var questionIndex = 0.toChar()
-        var answerDividing = 0.toChar()
-        var answerIndex = 0.toChar()
-        var index = 0
-        var currentItemType = TextListItemType.Question
-        var question = ""
-        var answers = arrayListOf<MyAnswer>()
-
-
-
-        while (index < docList.size) {
-            val str = docList[index].str
-            if (str.trim().isEmpty()) {
-                docList[index].disabled.value = false
-                index++
-                continue
-            }
-            if (dividingSymbols.contains(str[1])) {
-                var charType = TextListTypes.Ordinary
-                if (str[0].isDigit()) charType = TextListTypes.Numeric
-                if (str[0].isLetter()) charType = TextListTypes.Letters
-                when (charType) {
-                    TextListTypes.Ordinary -> {
-                        docList[index].listType.value = TextListTypes.Ordinary
-                        when (currentItemType) {
-                            TextListItemType.Question -> {
-                                docList[index].isQuestion.value = true
-                                questionDividingTypeSet = true
-                            }
-
-                            TextListItemType.Answer -> {
-                                docList[index].isAnswer.value = true
-                                if (answerDividingTypeSet) {
-                                    if (answerDividingType != TextListTypes.Ordinary) {
-                                        currentItemType = TextListItemType.Question
-                                        index--
-                                    }
-                                } else {
-                                    answerDividingType = TextListTypes.Ordinary
-                                    answerDividing = str[1]
-                                    answerDividingTypeSet = true
-                                }
-                            }
-
-                            TextListItemType.Erased -> {
-                                docList[index].disabled.value = true
-                            }
-                        }
-                    }
-
-                    TextListTypes.Numeric -> {
-                        docList[index].listType.value = TextListTypes.Numeric
-                        when (currentItemType) {
-                            TextListItemType.Question -> {
-                                docList[index].isQuestion.value = true
-                                if (!questionDividingTypeSet) {
-                                    questionDividingType = TextListTypes.Numeric
-                                    questionDividing = str[1]
-                                    questionDividingTypeSet = true
-                                }
-                            }
-
-                            TextListItemType.Answer -> {
-                                docList[index].isAnswer.value = true
-                                if (!answerDividingTypeSet) {
-                                    answerDividingType = TextListTypes.Numeric
-                                    answerDividing = str[1]
-                                    answerDividingTypeSet = true
-                                }
-                            }
-
-                            TextListItemType.Erased -> {
-                                docList[index].disabled.value = true
-                            }
-                        }
-                    }
-
-                    TextListTypes.Letters -> {
-                        docList[index].listType.value = TextListTypes.Letters
-                        when (currentItemType) {
-                            TextListItemType.Question -> {
-                                if (questionDividingTypeSet) {
-                                    if (questionDividingType != TextListTypes.Letters) {
-                                        currentItemType = TextListItemType.Answer
-                                        index--
-                                    } else {
-                                        docList[index].isQuestion.value = true
-                                    }
-                                } else {
-                                    questionDividingType = TextListTypes.Letters
-                                    questionDividing = str[1]
-                                    questionDividingTypeSet = true
-                                    docList[index].isQuestion.value = true
-                                }
-                            }
-
-                            TextListItemType.Answer -> {
-                                docList[index].isAnswer.value = true
-                                if (answerDividingTypeSet) {
-                                    if (answerDividingType != TextListTypes.Letters) {
-                                        currentItemType = TextListItemType.Question
-                                        index--
-                                    } else {
-                                        docList[index].isAnswer.value = true
-                                    }
-                                } else {
-                                    answerDividingType = TextListTypes.Letters
-                                    answerDividing = str[1]
-                                    answerDividingTypeSet = true
-                                }
-                            }
-
-                            TextListItemType.Erased -> {
-                                docList[index].disabled.value = true
-                            }
-                        }
-                    }
-                }
-            } else {
-                if (specialSymbols.contains(str[0])) {
-
-                } else {
-                    docList[index].isQuestion.value = true
-                    docList[index].listType.value = TextListTypes.Ordinary
-                    questionDividingTypeSet = true
-                    currentItemType = TextListItemType.Question
-                }
-            }
-            index++
-        }
-    }
-
-    fun isListElement(str: String): Boolean {
-        val regex = """^[a-zA-Z0-9]\..+""".toRegex()
-        return regex.matches(str)
-    }
-
-//    fun main() {
-//        val testStrings = listOf("1. Example text", "a. Another example", "Example without list format")
-//
-//        testStrings.forEach {
-//            println("\"$it\" is list element: ${isListElement(it)}")
-//        }
-//    }
-
-
 }
-
-data class DocToList(
-    val idx: Int,
-    val str: String,
-    var isQuestion: MutableState<Boolean> = mutableStateOf(false),
-    var isAnswer: MutableState<Boolean> = mutableStateOf(false),
-    var disabled: MutableState<Boolean> = mutableStateOf(false),
-    var isCorrect: MutableState<Boolean> = mutableStateOf(false),
-    var listType: MutableState<TextListTypes> = mutableStateOf(TextListTypes.Ordinary)
-)
-
-data class MyTest(
-    var question: String,
-    val image: String = "",
-    val answers: ArrayList<MyAnswer> = arrayListOf(),
-)
-
-data class MyAnswer(
-    val answer: String,
-    val image: String = "",
-    val correct: Boolean = false
-)
 
 @Preview
 @Composable
-fun CreateTestUIPreview() {
+fun ParseTestUIPreview() {
     val ddd = "Кинематика: Перемещение, Путь, Равномерное движение\n" +
             "Тело переместилось из точки с координатами (0,3) (м) в точку с координатами (3, 1) (м). Найдите модуль перемещения тела.\n" +
             "A. 3 м\n" +
