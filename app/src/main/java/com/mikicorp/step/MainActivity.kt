@@ -51,6 +51,12 @@ import com.mikicorp.step.lib.toCategories
 import com.mikicorp.step.lib.toStepUser
 import com.mikicorp.step.lib.toTest
 import com.mikicorp.step.mlkit.MLKit
+import com.mikicorp.step.mytest.CreateTestSourceUI
+import com.mikicorp.step.mytest.CreateTestUI
+import com.mikicorp.step.mytest.DocToList
+import com.mikicorp.step.mytest.ParseTestUI
+import com.mikicorp.step.mytest.SendMyTestGPTUI
+import com.mikicorp.step.mytest.SendMyTestUI
 import com.mikicorp.step.ui.theme.StepTheme
 import com.zumo.mikitodo.libs.PermissionKeys
 import kotlinx.coroutines.Dispatchers
@@ -122,7 +128,7 @@ class MainActivity : ComponentActivity() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
                     result.data?.data?.let { uri ->
-                        gptParseFile.handleSelectedFile(uri)
+                        gptParseFile.handleSelectedFile(this, uri)
                     }
                 }
             }
@@ -596,9 +602,9 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate(StepFragments.OCR)
                                 },
                                 onGPTParse = {
-                                    gptParseFile.onSuccess = { uri ->
-                                        fileUri = uri
-                                        navController.navigate(StepFragments.SEND_MY_TEST)
+                                    gptParseFile.onSuccess = { result ->
+                                        docText = result
+                                        navController.navigate(StepFragments.CHATGPT)
                                     }
                                     gptParseFile.onError = { str ->
                                         errorText = str
@@ -660,6 +666,31 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate(StepFragments.MAIN)
                                 },
                                 onClose = {
+                                    navController.navigate(StepFragments.MAIN)
+                                }
+                            )
+                        }
+                        composable(StepFragments.CHATGPT) {
+                            SendMyTestGPTUI(LocalContext.current, docText).UI(
+                                onSend = { categoryIndex, subcategoryIndex, themeIndex, docText: String ->
+                                    URLDownload.urlDownload(
+                                        context = context,
+                                        sURL = "${ApiURLS.AI_URL}",
+                                        requestBody = arrayListOf(
+                                            PostData(StepGlobal.DATA, docText)
+                                        ),
+                                        onResult = { result ->
+                                            runOnUiThread {
+                                                Toast.makeText(context, result, Toast.LENGTH_LONG)
+                                                    .show()
+                                            }
+                                        }
+                                    )
+
+
+                                    navController.navigate(StepFragments.MAIN)
+                                },
+                                onBackPressed = {
                                     navController.navigate(StepFragments.MAIN)
                                 }
                             )

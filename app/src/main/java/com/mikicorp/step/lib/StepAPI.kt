@@ -47,6 +47,7 @@ object StepFragments {
     const val SEND_MY_TEST = "SendMyTest"
     const val PARSE_TEST = "ParseTest"
     const val MSDOCS = "MSDocs"
+    const val CHATGPT = "ChatGPT"
     const val ERROR = "error"
 }
 

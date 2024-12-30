@@ -1,4 +1,4 @@
-package com.mikicorp.step
+package com.mikicorp.step.mytest
 
 import android.content.Context
 import android.net.Uri
@@ -44,18 +44,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
+import com.mikicorp.step.MainActivity
+import com.mikicorp.step.R
 
-class SendMyTestUI(val context: Context?) {
+class SendMyTestGPTUI(val context: Context?, val docText: String) {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun UI(
-        uri: Uri,
         onBackPressed: () -> Unit = {},
         onSend: (
             categoryIndex: Int,
             subcategoryIndex: Int,
             themeIndex: Int,
-            uri: Uri) -> Unit = {_,_,_,_ ->}
+            docText: String) -> Unit = {_,_,_,_ ->}
     ) {
         var mCategoryExpanded by remember { mutableStateOf(false) }
         var mSelectedCategory by remember { mutableIntStateOf(MainActivity.activeCategory) }
@@ -111,11 +112,6 @@ class SendMyTestUI(val context: Context?) {
                 )
             },
             content = { innerPadding ->
-                val fileName = context?.contentResolver?.query(uri, null, null, null, null)?.use { cursor ->
-                    val nameIndex = cursor.getColumnIndexOrThrow("_display_name")
-                    cursor.moveToFirst()
-                    cursor.getString(nameIndex)
-                } ?: "uploaded_file"
                 Column(
                     modifier = Modifier
                         .padding(innerPadding)
@@ -236,7 +232,7 @@ class SendMyTestUI(val context: Context?) {
                     Spacer(modifier = Modifier.height(20.dp))
                     TextField(
                         modifier = Modifier.fillMaxWidth(),
-                        value = fileName,
+                        value = docText,
                         enabled = false,
                         onValueChange = {}
                     )
@@ -249,7 +245,7 @@ class SendMyTestUI(val context: Context?) {
                     actions = {
                         Button(
                             onClick = {
-                                onSend(mSelectedCategory, mSelectedSubcategory, mSelectedTheme, uri)
+                                onSend(mSelectedCategory, mSelectedSubcategory, mSelectedTheme, docText)
                             },
                             modifier = Modifier
                                 .weight(1f)
@@ -274,6 +270,6 @@ class SendMyTestUI(val context: Context?) {
 
 @Preview
 @Composable
-fun SendMyTestPreview() {
+fun SendMyTestGPTPreview() {
     SendMyTestUI(null).UI(Uri.EMPTY)
 }

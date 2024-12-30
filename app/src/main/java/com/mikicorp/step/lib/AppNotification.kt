@@ -43,7 +43,7 @@ import kotlinx.coroutines.delay
 object AppNotification {
     @Composable
     fun Add(
-        icon: ImageVector,
+        icon: ImageVector? = null,
         message: String,
         onFinish:() -> Unit
     ) {
@@ -102,11 +102,13 @@ object AppNotification {
                             modifier = Modifier
                                 .padding(5.dp)
                         ) {
-                            Icon(
-                                imageVector = icon,
-                                tint = MaterialTheme.colorScheme.primary,
-                                contentDescription = ""
-                            )
+                            if(icon != null) {
+                                Icon(
+                                    imageVector = icon,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    contentDescription = ""
+                                )
+                            }
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
                                 text = message
